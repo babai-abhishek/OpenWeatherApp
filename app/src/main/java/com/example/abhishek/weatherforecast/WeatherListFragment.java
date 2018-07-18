@@ -96,22 +96,6 @@ public class WeatherListFragment extends Fragment
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.settings, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                clickListener.onSettingOptiionClicked(this);
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -131,6 +115,22 @@ public class WeatherListFragment extends Fragment
     public void onPause() {
         super.onPause();
         broadcastManager.unregisterReceiver(broadcastReceiver);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.settings, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                clickListener.onSettingOptiionClicked(this);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
