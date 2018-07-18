@@ -6,13 +6,25 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+
+import com.example.abhishek.weatherforecast.model.api.WeatherApiModel;
+import com.example.abhishek.weatherforecast.networkutils.ApiClient;
+import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
@@ -21,8 +33,12 @@ import android.widget.Toast;
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
 
+    private static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
+
     SettingsOptionClickListener clickListener;
 
+    List<WeatherApiModel> weatherDetails = new ArrayList<>();
+    WeatherInterface weatherInterface = ApiClient.getClient().create(WeatherInterface.class);
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -43,6 +59,7 @@ public class WeatherListFragment extends Fragment
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
+        loadWeather();
     }
 
     @Override
@@ -74,6 +91,22 @@ public class WeatherListFragment extends Fragment
 
     public interface SettingsOptionClickListener{
         void onSettingOptiionClicked(Fragment fragment);
+    }
+
+    private void loadWeather() {
+        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast("Kolkata,in",OWM_API_KEY);
+         call.enqueue(new Callback<WeatherApiModel>() {
+            @Override
+            public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {
+                Log.d("#","response "+response.body().toString());
+            }
+
+            @Override
+            public void onFailure(Call<WeatherApiModel> call, Throwable t) {
+
+            }
+        });
+
     }
 
 }
