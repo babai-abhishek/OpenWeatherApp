@@ -1,11 +1,14 @@
 
 package com.example.abhishek.weatherforecast.model.api;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class WeatherListApiModel {
+public class WeatherListApiModel implements Parcelable {
 
     @SerializedName("dt")
     @Expose
@@ -22,9 +25,6 @@ public class WeatherListApiModel {
     @SerializedName("wind")
     @Expose
     private WindApiModel windApiModel;
-    @SerializedName("rain")
-    @Expose
-    private RainApiModel rainApiModel;
     @SerializedName("sys")
     @Expose
     private SysApiModel sysApiModel;
@@ -43,19 +43,35 @@ public class WeatherListApiModel {
      * @param wind
      * @param sys
      * @param weather
-     * @param rain
      * @param main
      */
-    public WeatherListApiModel(long dt, MainApiModel mainApiModel, java.util.List<WeatherInfoApiModel> weatherInfoApiModel, CloudsApiModel cloudsApiModel, WindApiModel windApiModel, RainApiModel rainApiModel, SysApiModel sysApiModel) {
+    public WeatherListApiModel(long dt, MainApiModel mainApiModel, java.util.List<WeatherInfoApiModel> weatherInfoApiModel, CloudsApiModel cloudsApiModel, WindApiModel windApiModel, SysApiModel sysApiModel) {
         super();
         this.dt = dt;
         this.mainApiModel = mainApiModel;
         this.weatherInfoApiModel = weatherInfoApiModel;
         this.cloudsApiModel = cloudsApiModel;
         this.windApiModel = windApiModel;
-        this.rainApiModel = rainApiModel;
         this.sysApiModel = sysApiModel;
     }
+
+    protected WeatherListApiModel(Parcel in) {
+        dt = in.readLong();
+        mainApiModel = in.readParcelable(MainApiModel.class.getClassLoader());
+        cloudsApiModel = in.readParcelable(CloudsApiModel.class.getClassLoader());
+    }
+
+    public static final Creator<WeatherListApiModel> CREATOR = new Creator<WeatherListApiModel>() {
+        @Override
+        public WeatherListApiModel createFromParcel(Parcel in) {
+            return new WeatherListApiModel(in);
+        }
+
+        @Override
+        public WeatherListApiModel[] newArray(int size) {
+            return new WeatherListApiModel[size];
+        }
+    };
 
     public long getDt() {
         return dt;
@@ -97,14 +113,6 @@ public class WeatherListApiModel {
         this.windApiModel = windApiModel;
     }
 
-    public RainApiModel getRainApiModel() {
-        return rainApiModel;
-    }
-
-    public void setRainApiModel(RainApiModel rainApiModel) {
-        this.rainApiModel = rainApiModel;
-    }
-
     public SysApiModel getSysApiModel() {
         return sysApiModel;
     }
@@ -113,4 +121,15 @@ public class WeatherListApiModel {
         this.sysApiModel = sysApiModel;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(dt);
+        dest.writeParcelable(mainApiModel, flags);
+        dest.writeParcelable(cloudsApiModel, flags);
+    }
 }

@@ -1,10 +1,13 @@
 
 package com.example.abhishek.weatherforecast.model.api;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CoordApiModel {
+public class CoordApiModel implements Parcelable{
 
     @SerializedName("lat")
     @Expose
@@ -31,6 +34,23 @@ public class CoordApiModel {
         this.lon = lon;
     }
 
+    protected CoordApiModel(Parcel in) {
+        lat = in.readDouble();
+        lon = in.readDouble();
+    }
+
+    public static final Creator<CoordApiModel> CREATOR = new Creator<CoordApiModel>() {
+        @Override
+        public CoordApiModel createFromParcel(Parcel in) {
+            return new CoordApiModel(in);
+        }
+
+        @Override
+        public CoordApiModel[] newArray(int size) {
+            return new CoordApiModel[size];
+        }
+    };
+
     public double getLat() {
         return lat;
     }
@@ -47,4 +67,14 @@ public class CoordApiModel {
         this.lon = lon;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(lat);
+        dest.writeDouble(lon);
+    }
 }

@@ -1,10 +1,13 @@
 
 package com.example.abhishek.weatherforecast.model.api;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class MainApiModel {
+public class MainApiModel implements Parcelable{
 
     @SerializedName("temp")
     @Expose
@@ -41,6 +44,25 @@ public class MainApiModel {
         this.humidity = humidity;
     }
 
+    protected MainApiModel(Parcel in) {
+        temp = in.readDouble();
+        tempMin = in.readDouble();
+        tempMax = in.readDouble();
+        humidity = in.readLong();
+    }
+
+    public static final Creator<MainApiModel> CREATOR = new Creator<MainApiModel>() {
+        @Override
+        public MainApiModel createFromParcel(Parcel in) {
+            return new MainApiModel(in);
+        }
+
+        @Override
+        public MainApiModel[] newArray(int size) {
+            return new MainApiModel[size];
+        }
+    };
+
     public double getTemp() {
         return temp;
     }
@@ -73,4 +95,16 @@ public class MainApiModel {
         this.humidity = humidity;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(temp);
+        dest.writeDouble(tempMin);
+        dest.writeDouble(tempMax);
+        dest.writeLong(humidity);
+    }
 }

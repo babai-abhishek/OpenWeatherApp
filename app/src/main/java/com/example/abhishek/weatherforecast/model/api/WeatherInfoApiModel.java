@@ -1,10 +1,13 @@
 
 package com.example.abhishek.weatherforecast.model.api;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class WeatherInfoApiModel {
+public class WeatherInfoApiModel implements Parcelable {
 
     @SerializedName("id")
     @Expose
@@ -41,6 +44,25 @@ public class WeatherInfoApiModel {
         this.icon = icon;
     }
 
+    protected WeatherInfoApiModel(Parcel in) {
+        id = in.readLong();
+        main = in.readString();
+        description = in.readString();
+        icon = in.readString();
+    }
+
+    public static final Creator<WeatherInfoApiModel> CREATOR = new Creator<WeatherInfoApiModel>() {
+        @Override
+        public WeatherInfoApiModel createFromParcel(Parcel in) {
+            return new WeatherInfoApiModel(in);
+        }
+
+        @Override
+        public WeatherInfoApiModel[] newArray(int size) {
+            return new WeatherInfoApiModel[size];
+        }
+    };
+
     public long getId() {
         return id;
     }
@@ -73,4 +95,16 @@ public class WeatherInfoApiModel {
         this.icon = icon;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(main);
+        dest.writeString(description);
+        dest.writeString(icon);
+    }
 }

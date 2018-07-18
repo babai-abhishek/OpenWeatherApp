@@ -1,10 +1,13 @@
 
 package com.example.abhishek.weatherforecast.model.api;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SysApiModel {
+public class SysApiModel implements Parcelable{
 
     @SerializedName("pod")
     @Expose
@@ -26,6 +29,22 @@ public class SysApiModel {
         this.pod = pod;
     }
 
+    protected SysApiModel(Parcel in) {
+        pod = in.readString();
+    }
+
+    public static final Creator<SysApiModel> CREATOR = new Creator<SysApiModel>() {
+        @Override
+        public SysApiModel createFromParcel(Parcel in) {
+            return new SysApiModel(in);
+        }
+
+        @Override
+        public SysApiModel[] newArray(int size) {
+            return new SysApiModel[size];
+        }
+    };
+
     public String getPod() {
         return pod;
     }
@@ -34,4 +53,13 @@ public class SysApiModel {
         this.pod = pod;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(pod);
+    }
 }
