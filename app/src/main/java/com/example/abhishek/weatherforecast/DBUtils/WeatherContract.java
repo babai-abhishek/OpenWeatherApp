@@ -12,7 +12,7 @@ public class WeatherContract {
 
         public static final String WEATHER_TABLE_NAME = "weather";
         public static final String WEATHER_COLUMN_DATE = "date";
-        public static final String WEATHER_COLUMN_WEATHER_ID = "weather_id";
+        public static final String WEATHER_COLUMN_WEATHER_OF_CITY_ID = "weather_of_city_id";
         public static final String WEATHER_COLUMN_MIN_TEMP = "min";
         public static final String WEATHER_COLUMN_MAX_TEMP = "max";
         public static final String WEATHER_COLUMN_HUMIDITY = "humidity";
@@ -20,14 +20,14 @@ public class WeatherContract {
         public static final String WEATHER_COLUMN_DEGREES = "degrees";
         public static final String WEATHER_COLUMN_ICON = "icon_id";
         public static final String WEATHER_COLUMN_DESCRIPTION = "weather_description";
-        public static final int WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE = 0;
+        public static final String WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE = "clouds";
     }
 
     public static final class CityEntry implements BaseColumns{
 
         public static final String CITY_TABLE_NAME = "city";
-        public static final String CITY_TABLE_COLUMN_ID = "id";
-        public static final String CITY_TABLE_COLUMN_NAME = "name";
+        public static final String CITY_TABLE_COLUMN_CITY_ID = "id";
+        public static final String CITY_TABLE_COLUMN_CITY_NAME = "name";
         public static final String CITY_TABLE_COLUMN_LAT = "lat";
         public static final String CITY_TABLE_COLUMN_LON = "lon";
         public static final String CITY_TABLE_COLUMN_COUNTRY = "country";
