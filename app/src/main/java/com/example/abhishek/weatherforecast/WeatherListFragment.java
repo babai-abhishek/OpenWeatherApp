@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
+import com.example.abhishek.weatherforecast.DBUtils.WeatherForecastDBDao;
 import com.example.abhishek.weatherforecast.models.api.WeatherApiModel;
+import com.example.abhishek.weatherforecast.models.business.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
 import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
 
@@ -51,11 +53,9 @@ public class WeatherListFragment extends Fragment
                 case ACTION_WEATHER_FORECAST_API_SUCCESS:
                     Toast.makeText(getActivity(), "Api Success", Toast.LENGTH_SHORT).show();
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
-                    /*List<WeatherListApiModel> list = weather.getWeatherListApiModel();
-                    for(WeatherListApiModel apiModel: list){
-                        Log.d("#","dt = "+apiModel.getDt());
-                    }*/
+
                     //call utility method to save data into local database(SQLite/Realm/Room)
+                    WeatherForecastDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
                     break;
 
 
