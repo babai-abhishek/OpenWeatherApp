@@ -1,6 +1,6 @@
 package com.example.abhishek.weatherforecast.networkutils;
 
-import com.example.abhishek.weatherforecast.model.api.WeatherApiModel;
+import com.example.abhishek.weatherforecast.models.api.WeatherApiModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

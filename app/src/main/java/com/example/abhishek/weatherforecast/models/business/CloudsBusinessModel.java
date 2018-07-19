@@ -1,8 +1,8 @@
 
-package com.example.abhishek.weatherforecast.model.business;
+package com.example.abhishek.weatherforecast.models.business;
 
 
-import com.example.abhishek.weatherforecast.model.api.CloudsApiModel;
+import com.example.abhishek.weatherforecast.models.api.CloudsApiModel;
 
 public class CloudsBusinessModel {
 

@@ -1,9 +1,8 @@
 
-package com.example.abhishek.weatherforecast.model.business;
+package com.example.abhishek.weatherforecast.models.business;
 
-import com.example.abhishek.weatherforecast.model.api.CityApiModel;
-import com.example.abhishek.weatherforecast.model.api.WeatherApiModel;
-import com.example.abhishek.weatherforecast.model.api.WeatherListApiModel;
+import com.example.abhishek.weatherforecast.models.api.WeatherApiModel;
+import com.example.abhishek.weatherforecast.models.api.WeatherListApiModel;
 
 import java.util.ArrayList;
 

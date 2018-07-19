@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +19,9 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
-import com.example.abhishek.weatherforecast.model.api.WeatherApiModel;
-import com.example.abhishek.weatherforecast.model.api.WeatherListApiModel;
+import com.example.abhishek.weatherforecast.models.api.WeatherApiModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
 import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,10 +51,11 @@ public class WeatherListFragment extends Fragment
                 case ACTION_WEATHER_FORECAST_API_SUCCESS:
                     Toast.makeText(getActivity(), "Api Success", Toast.LENGTH_SHORT).show();
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
-                    List<WeatherListApiModel> list = weather.getWeatherListApiModel();
+                    /*List<WeatherListApiModel> list = weather.getWeatherListApiModel();
                     for(WeatherListApiModel apiModel: list){
                         Log.d("#","dt = "+apiModel.getDt());
-                    }
+                    }*/
+                    //call utility method to save data into local database(SQLite/Realm/Room)
                     break;
 
 

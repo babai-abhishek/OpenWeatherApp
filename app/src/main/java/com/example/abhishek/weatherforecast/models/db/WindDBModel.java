@@ -1,19 +1,21 @@
 
-package com.example.abhishek.weatherforecast.model.business;
+package com.example.abhishek.weatherforecast.models.db;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-import com.example.abhishek.weatherforecast.model.api.WindApiModel;
+public class WindDBModel {
 
-public class WindBusinessModel {
 
     private double speed;
+
     private double deg;
 
     /**
      * No args constructor for use in serialization
      * 
      */
-    public WindBusinessModel() {
+    public WindDBModel() {
     }
 
     /**
@@ -21,15 +23,10 @@ public class WindBusinessModel {
      * @param speed
      * @param deg
      */
-    public WindBusinessModel(double speed, double deg) {
+    public WindDBModel(double speed, double deg) {
         super();
         this.speed = speed;
         this.deg = deg;
-    }
-
-    public WindBusinessModel(WindApiModel windApiModel) {
-        this.speed = windApiModel.getSpeed();
-        this.deg = windApiModel.getDeg();
     }
 
     public double getSpeed() {
