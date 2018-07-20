@@ -2,6 +2,7 @@ package com.example.abhishek.weatherforecast.DBUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -31,7 +32,7 @@ public class WeatherForecastDBDao {
             int rowsInserted = 0;
             try {
 
-                database.insert(WeatherForecastContract.CityEntry.CITY_TABLE_NAME,
+               long _id = database.insert(WeatherForecastContract.CityEntry.CITY_TABLE_NAME,
                         null,
                         cityContentValue);
 

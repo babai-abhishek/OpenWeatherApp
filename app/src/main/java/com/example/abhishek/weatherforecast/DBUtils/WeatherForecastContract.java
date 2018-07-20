@@ -12,9 +12,9 @@ public class WeatherForecastContract {
 
         public static final String WEATHER_TABLE_NAME = "weather";
         public static final String WEATHER_COLUMN_DATE = "date";
-        public static final String WEATHER_COLUMN_WEATHER_OF_CITY_ID = "weather_of_city_id";
-        public static final String WEATHER_COLUMN_MIN_TEMP = "min";
-        public static final String WEATHER_COLUMN_MAX_TEMP = "max";
+        public static final String WEATHER_COLUMN_WEATHER_OF_CITY_ID = "_city_id";
+        public static final String WEATHER_COLUMN_MIN_TEMP = "min_temp";
+        public static final String WEATHER_COLUMN_MAX_TEMP = "max_temp";
         public static final String WEATHER_COLUMN_HUMIDITY = "humidity";
         public static final String WEATHER_COLUMN_WIND_SPEED = "wind";
         public static final String WEATHER_COLUMN_DEGREES = "degrees";

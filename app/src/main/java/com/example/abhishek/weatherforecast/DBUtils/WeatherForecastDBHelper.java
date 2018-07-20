@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class WeatherForecastDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "weatherforecast.db";
+    private static final int DATABASE_VERSION = 16;
+    public static final String DATABASE_NAME = "weatherForecast.db";
 
 
     public WeatherForecastDBHelper(Context context) {
@@ -38,8 +38,7 @@ public class WeatherForecastDBHelper extends SQLiteOpenHelper {
                 WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WIND_SPEED + " REAL NOT NULL, " +
                 WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_ICON       + " TEXT NOT NULL, " +
                 WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_DESCRIPTION    + " TEXT NOT NULL, " +
-                WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE    + " REAL NOT NULL, " +
-                " FOREIGN KEY ("+ WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WEATHER_OF_CITY_ID+") REFERENCES "+ WeatherForecastContract.CityEntry.CITY_TABLE_NAME+"("+ WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID+"));";
+                WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE    + " REAL NOT NULL, PRIMARY KEY("+WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_DATE +","+WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WEATHER_OF_CITY_ID+"));";
 
         db.execSQL(SQL_CREATE_CITY_TABLE);
         db.execSQL(SQL_CREATE_WEATHER_TABLE);
@@ -47,6 +46,8 @@ public class WeatherForecastDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        db.execSQL("DROP TABLE IF EXISTS " + WeatherForecastContract.WeatherEntry.WEATHER_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + WeatherForecastContract.CityEntry.CITY_TABLE_NAME);
+        onCreate(db);
     }
 }

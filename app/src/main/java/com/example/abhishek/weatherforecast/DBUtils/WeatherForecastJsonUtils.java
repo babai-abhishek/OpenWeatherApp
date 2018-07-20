@@ -20,6 +20,7 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContra
 import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_ICON;
 import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_MAX_TEMP;
 import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_MIN_TEMP;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WEATHER_OF_CITY_ID;
 import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WIND_SPEED;
 
 /**
@@ -33,7 +34,7 @@ public class WeatherForecastJsonUtils {
 
         for(int i=0; i<weather.size(); i++){
             ContentValues weatherContentValue = new ContentValues();
-            weatherContentValue.put(WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WEATHER_OF_CITY_ID, id);
+            weatherContentValue.put(WEATHER_COLUMN_WEATHER_OF_CITY_ID, id);
             weatherContentValue.put(WEATHER_COLUMN_DATE, weather.get(i).getDt());
             weatherContentValue.put(WEATHER_COLUMN_MIN_TEMP, weather.get(i).getMainBusinessModel().getTempMin());
             weatherContentValue.put(WEATHER_COLUMN_MAX_TEMP, weather.get(i).getMainBusinessModel().getTempMax());
