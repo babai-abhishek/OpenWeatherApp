@@ -13,7 +13,7 @@ public class MainDBModel {
 
     private double tempMax;
 
-    private int humidity;
+    private long humidity;
 
     /**
      * No args constructor for use in serialization
@@ -61,11 +61,11 @@ public class MainDBModel {
         this.tempMax = tempMax;
     }
 
-    public int getHumidity() {
+    public long getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(int humidity) {
+    public void setHumidity(long humidity) {
         this.humidity = humidity;
     }
 

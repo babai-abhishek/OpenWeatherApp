@@ -56,6 +56,7 @@ public class WeatherListFragment extends Fragment
 
                     //call utility method to save data into local database(SQLite/Realm/Room)
                     WeatherForecastDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
+
                     break;
 
 

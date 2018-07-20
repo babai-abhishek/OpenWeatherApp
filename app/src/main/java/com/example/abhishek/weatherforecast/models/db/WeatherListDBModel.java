@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class WeatherListDBModel {
 
-    private int dt;
+    private long dt;
     private MainDBModel mainDBModel;
     private java.util.List<WeatherInfoDBModel> weatherInfoDBModel = new ArrayList<WeatherInfoDBModel>();
 
@@ -43,11 +43,11 @@ public class WeatherListDBModel {
         this.sysDBModel = sysDBModel;
     }
 
-    public int getDt() {
+    public long getDt() {
         return dt;
     }
 
-    public void setDt(int dt) {
+    public void setDt(long dt) {
         this.dt = dt;
     }
 

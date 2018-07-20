@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 public class CloudsDBModel {
 
 
-    private int all;
+    private long all;
 
     /**
      * No args constructor for use in serialization
@@ -25,11 +25,11 @@ public class CloudsDBModel {
         this.all = all;
     }
 
-    public int getAll() {
+    public long getAll() {
         return all;
     }
 
-    public void setAll(int all) {
+    public void setAll(long all) {
         this.all = all;
     }
 

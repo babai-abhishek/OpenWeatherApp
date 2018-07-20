@@ -6,6 +6,9 @@ import android.util.Log;
 import com.example.abhishek.weatherforecast.models.business.CityBusinessModel;
 import com.example.abhishek.weatherforecast.models.business.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.business.WeatherListBusinessModel;
+import com.example.abhishek.weatherforecast.models.db.CityDBModel;
+import com.example.abhishek.weatherforecast.models.db.WeatherDBModel;
+import com.example.abhishek.weatherforecast.models.db.WeatherListDBModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +31,7 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContra
  */
 
 public class WeatherForecastJsonUtils {
-    public static ContentValues[] getWeatherForecastContentValuesFromJson(List<WeatherListBusinessModel> weather, long id){
+    public static ContentValues[] getWeatherForecastContentValuesFromJson(List<WeatherListDBModel> weather, long id){
 
         ContentValues[] weatherContentValues = new ContentValues[weather.size()];
 
@@ -36,13 +39,13 @@ public class WeatherForecastJsonUtils {
             ContentValues weatherContentValue = new ContentValues();
             weatherContentValue.put(WEATHER_COLUMN_WEATHER_OF_CITY_ID, id);
             weatherContentValue.put(WEATHER_COLUMN_DATE, weather.get(i).getDt());
-            weatherContentValue.put(WEATHER_COLUMN_MIN_TEMP, weather.get(i).getMainBusinessModel().getTempMin());
-            weatherContentValue.put(WEATHER_COLUMN_MAX_TEMP, weather.get(i).getMainBusinessModel().getTempMax());
-            weatherContentValue.put(WEATHER_COLUMN_HUMIDITY, weather.get(i).getMainBusinessModel().getHumidity());
-            weatherContentValue.put(WEATHER_COLUMN_WIND_SPEED, weather.get(i).getWindBusinessModel().getSpeed());
-            weatherContentValue.put(WEATHER_COLUMN_ICON, weather.get(i).getWeatherInfoBusinessModel().get(0).getIcon());
-            weatherContentValue.put(WEATHER_COLUMN_DESCRIPTION, weather.get(i).getWeatherInfoBusinessModel().get(0).getDescription());
-            weatherContentValue.put(WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE, weather.get(i).getCloudsBusinessModel().getAll());
+            weatherContentValue.put(WEATHER_COLUMN_MIN_TEMP, weather.get(i).getMainDBModel().getTempMin());
+            weatherContentValue.put(WEATHER_COLUMN_MAX_TEMP, weather.get(i).getMainDBModel().getTempMax());
+            weatherContentValue.put(WEATHER_COLUMN_HUMIDITY, weather.get(i).getMainDBModel().getHumidity());
+            weatherContentValue.put(WEATHER_COLUMN_WIND_SPEED, weather.get(i).getWindDBModel().getSpeed());
+            weatherContentValue.put(WEATHER_COLUMN_ICON, weather.get(i).getWeatherInfoDBModel().get(0).getIcon());
+            weatherContentValue.put(WEATHER_COLUMN_DESCRIPTION, weather.get(i).getWeatherInfoDBModel().get(0).getDescription());
+            weatherContentValue.put(WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE, weather.get(i).getCloudsDBModel().getAll());
 
             weatherContentValues[i] = weatherContentValue;
         }
@@ -50,14 +53,14 @@ public class WeatherForecastJsonUtils {
         return weatherContentValues;
     }
 
-    public static ContentValues getCityContentValues(CityBusinessModel cityBusinessModel) {
+    public static ContentValues getCityContentValues(CityDBModel cityDBModel) {
 
         ContentValues cityContentValue = new ContentValues();
-        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID, cityBusinessModel.getId());
-        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_NAME, cityBusinessModel.getName());
-        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_LAT, cityBusinessModel.getCoordBusinessModel().getLat());
-        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_LON, cityBusinessModel.getCoordBusinessModel().getLon());
-        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_COUNTRY, cityBusinessModel.getCountry());
+        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID, cityDBModel.getId());
+        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_NAME, cityDBModel.getName());
+        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_LAT, cityDBModel.getCoordDBModel().getLat());
+        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_LON, cityDBModel.getCoordDBModel().getLon());
+        cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_COUNTRY, cityDBModel.getCountry());
 
         return cityContentValue;
     }
