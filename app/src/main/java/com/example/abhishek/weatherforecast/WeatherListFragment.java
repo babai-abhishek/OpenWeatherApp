@@ -139,7 +139,7 @@ public class WeatherListFragment extends Fragment
     }
 
     private void loadWeather() {
-        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast("kolkata,in",OWM_API_KEY);
+        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast("Chennai,in",OWM_API_KEY);
          call.enqueue(new Callback<WeatherApiModel>() {
             @Override
             public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {

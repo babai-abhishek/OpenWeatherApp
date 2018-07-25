@@ -27,6 +27,7 @@ import java.util.List;
 public class WeatherForecastDBDao {
 
     private static WeatherForecastDBHelper weatherForecastDBHelper;
+    private static boolean isCityAlreadyPresent = false;
 
     public static void insertData(WeatherBusinessModel weather, Context ctx){
 
@@ -95,30 +96,60 @@ public class WeatherForecastDBDao {
 
         weatherForecastDBHelper = new WeatherForecastDBHelper(ctx);
 
-        if(weatherValues.length != 0){
-            SQLiteDatabase database = weatherForecastDBHelper.getWritableDatabase();
-            database.beginTransaction();
-            int rowsInserted = 0;
-            try {
+        //check city name unique or not
+        isCityAlreadyPresent = checkCityAlreadyPresentInDB(weather.getCityBusinessModel().getId(), weatherForecastDBHelper);
+        if(isCityAlreadyPresent){
+            //insert only weather, no city will be added into city table
+            //check duplicate entry in weather table
+        }else {
+            //insert city details in city table and add weather data into weather table
+            insertCityIntoTable(cityContentValue);
+            insertWeatherForecastInfoIntoTable(weatherValues);
 
-                long _id = database.insert(WeatherForecastContract.CityEntry.CITY_TABLE_NAME,
-                        null,
-                        cityContentValue);
+        }
+    }
+    private static boolean checkCityAlreadyPresentInDB(long id, WeatherForecastDBHelper weatherForecastDBHelper) {
+        SQLiteDatabase database = weatherForecastDBHelper.getReadableDatabase();
+        String qry = "SELECT * FROM "+WeatherForecastContract.CityEntry.CITY_TABLE_NAME+" where "+WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID+" = "+id+"";
+        Cursor cursor = database.rawQuery(qry, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
+    }
 
-                for (ContentValues cv: weatherValues){
-                    long id = database.insert(WeatherForecastContract.WeatherEntry.WEATHER_TABLE_NAME,
-                            null,
-                            cv);
-                    if(id != -1){
-                        rowsInserted++;
-                        Log.d("#", "row "+rowsInserted);
-                    }
-                }
-                database.setTransactionSuccessful();
-            }finally {
-                database.endTransaction();
+    private static void insertCityIntoTable(ContentValues cityContentValue) {
+        SQLiteDatabase database = weatherForecastDBHelper.getWritableDatabase();
+        database.beginTransaction();
+        try {
+
+            database.insert(WeatherForecastContract.CityEntry.CITY_TABLE_NAME,
+                    null,cityContentValue);
+            database.setTransactionSuccessful();
+        }finally {
+            database.endTransaction();
+        }
+    }
+
+    private static void insertWeatherForecastInfoIntoTable(ContentValues[] weatherContentVlues){
+        int rowsInserted = 0;
+        SQLiteDatabase database = weatherForecastDBHelper.getWritableDatabase();
+        database.beginTransaction();
+
+        for(ContentValues cv: weatherContentVlues){
+            long id = database.insert(WeatherForecastContract.WeatherEntry.WEATHER_TABLE_NAME,
+                    null,
+                    cv);
+            if(id != -1){
+                rowsInserted++;
+                Log.d("#", "row "+rowsInserted);
             }
         }
 
+        database.setTransactionSuccessful();
+        database.endTransaction();
     }
+
 }
