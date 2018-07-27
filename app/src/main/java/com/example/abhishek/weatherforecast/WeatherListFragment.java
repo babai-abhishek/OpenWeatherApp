@@ -19,7 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
-import com.example.abhishek.weatherforecast.DBUtils.WeatherForecastDBDao;
+import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
@@ -57,10 +57,10 @@ public class WeatherListFragment extends Fragment
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
 
                     //call utility method to save data into local database(SQLite/Realm/Room)
-                    WeatherForecastDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
+                    WeatherDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
 
                     //call utility method to retrieve data from DB to show in the list
-                 //   WeatherForecastDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
+                 //   WeatherDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
 
                     //show into the list
 
@@ -96,7 +96,7 @@ public class WeatherListFragment extends Fragment
         super.onCreate(savedInstanceState);
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
         setHasOptionsMenu(true);
-        loadWeather();
+        loadWeatherForecast();
     }
 
     @Override
@@ -146,7 +146,7 @@ public class WeatherListFragment extends Fragment
         void onSettingOptiionClicked(Fragment fragment);
     }
 
-    private void loadWeather() {
+    private void loadWeatherForecast() {
         Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(TEST_LOCATION,OWM_API_KEY);
          call.enqueue(new Callback<WeatherApiModel>() {
             @Override
