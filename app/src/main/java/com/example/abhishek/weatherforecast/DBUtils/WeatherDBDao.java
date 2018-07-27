@@ -2,10 +2,21 @@ package com.example.abhishek.weatherforecast.DBUtils;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCloudsDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCoordDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherInfoDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherMainDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherSysDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherWindDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CityDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CloudsDBModel;
@@ -32,7 +43,7 @@ public class WeatherDBDao {
     private static WeatherDBHelper weatherDBHelper;
     private static boolean isTimeAlreadyPresent = false;
 
-    public static void insertData(WeatherBusinessModel weather, Context ctx) {
+    public static void insertForecastData(WeatherBusinessModel weather, Context ctx) {
 
         //convert business model class into db model class
         WeatherDBModel weatherDBModel = new WeatherDBModel();
@@ -94,10 +105,6 @@ public class WeatherDBDao {
         ContentValues[] weatherForecastContentValues = WeatherUtils
                 .getWeatherForecastContentValuesFromJson(weatherDBModel);
 
-
-        /*ContentValues cityContentValue = WeatherUtils
-                .getCityContentValues(weatherDBModel.getCityDBModel());*/
-
         weatherDBHelper = new WeatherDBHelper(ctx);
 
         //GET AVAILABLE DATE VALUES OF THE RESPECTIVE CITY
@@ -136,6 +143,79 @@ public class WeatherDBDao {
 
     }
 
+    public static void insertCurrentWeatherIntoDB(CurrentWeatherBusinessModel currentWeatherBusinessModel, Context ctx) {
+
+        //CONVERT BUSINESS MODEL CLASS TO DB MODEL CLASS
+        CurrentWeatherDBModel currentWeatherDBModel = new CurrentWeatherDBModel();
+
+        currentWeatherDBModel.setName(currentWeatherBusinessModel.getName());
+        currentWeatherDBModel.setId(currentWeatherBusinessModel.getId());
+        currentWeatherDBModel.setDt(currentWeatherBusinessModel.getDt());
+
+        CurrentWeatherCoordDBModel coordDBModel = new CurrentWeatherCoordDBModel();
+        coordDBModel.setLat(currentWeatherBusinessModel.getCurrentWeatherCoordBusinessModel().getLat());
+        coordDBModel.setLon(currentWeatherBusinessModel.getCurrentWeatherCoordBusinessModel().getLon());
+        currentWeatherDBModel.setCurrentWeatherCoordDBModel(coordDBModel);
+
+        CurrentWeatherMainDBModel mainDBModel = new CurrentWeatherMainDBModel();
+        mainDBModel.setHumidity(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getHumidity());
+        mainDBModel.setTempMax(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getTempMax());
+        mainDBModel.setTempMin(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getTempMin());
+        currentWeatherDBModel.setCurrentWeatherMainDBModel(mainDBModel);
+
+        CurrentWeatherWindDBModel windDBModel = new CurrentWeatherWindDBModel();
+        windDBModel.setSpeed(currentWeatherBusinessModel.getCurrentWeatherWindBusinessModel().getSpeed());
+        currentWeatherDBModel.setCurrentWeatherWindDBModel(windDBModel);
+
+        CurrentWeatherSysDBModel sysDBModel = new CurrentWeatherSysDBModel();
+        sysDBModel.setCountry(currentWeatherBusinessModel.getCurrentWeatherSysBusinessModel().getCountry());
+        currentWeatherDBModel.setCurrentWeatherSysDBModel(sysDBModel);
+
+        CurrentWeatherCloudsDBModel cloudsDBModel = new CurrentWeatherCloudsDBModel();
+        cloudsDBModel.setAll(currentWeatherBusinessModel.getCurrentWeatherCloudsBusinessModel().getAll());
+        currentWeatherDBModel.setCurrentWeatherCloudsDBModel(cloudsDBModel);
+
+        List<CurrentWeatherInfoDBModel> weatherInfoDBModelList = new ArrayList<>();
+        for(CurrentWeatherInfoBusinessModel infoBusinessModel: currentWeatherBusinessModel.getCurrentWeatherInfoBusinessModel()){
+            CurrentWeatherInfoDBModel infoDBModel = new CurrentWeatherInfoDBModel();
+            infoDBModel.setDescription(infoBusinessModel.getDescription());
+            infoDBModel.setIcon(infoBusinessModel.getIcon());
+            weatherInfoDBModelList.add(infoDBModel);
+        }
+        currentWeatherDBModel.setCurrentWeatherInfoDBModel(weatherInfoDBModelList);
+
+        ContentValues currentWeatherContentValue = WeatherUtils
+                .getCurrentWeatherContentValueFromJson(currentWeatherDBModel);
+
+        weatherDBHelper = new WeatherDBHelper(ctx);
+
+        long dt ;
+
+        //GET DATE VALUE PRESENT IN TABLE FOR PARTICULAR CITY
+        String qry = "SELECT "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE+" " +
+                "FROM "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME+"" +
+                " WHERE "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID+" = \""+currentWeatherBusinessModel.getId()+"\"";
+        SQLiteDatabase db = weatherDBHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(qry, null);
+        if(cursor.getCount() <= 0){
+            SQLiteDatabase writeOperation = weatherDBHelper.getWritableDatabase();
+            writeOperation.beginTransaction();
+            writeOperation.insert(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME,
+                    null,
+                    currentWeatherContentValue);
+            writeOperation.setTransactionSuccessful();
+            writeOperation.endTransaction();
+        }
+        else {
+            if(cursor.moveToFirst()){
+                dt = cursor.getLong(cursor.getColumnIndex(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE));
+                Log.d("#","available dt : "+dt);
+            }
+            cursor.close();
+        }
+
+//        if(currentWeatherBusinessModel.getDt())
+    }
 }
 
 

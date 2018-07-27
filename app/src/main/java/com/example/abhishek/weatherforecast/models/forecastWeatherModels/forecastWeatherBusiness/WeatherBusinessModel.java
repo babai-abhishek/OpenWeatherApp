@@ -24,11 +24,6 @@ public class WeatherBusinessModel {
         }
     }
 
-    public WeatherBusinessModel(String cod, java.util.List<WeatherListBusinessModel> weatherListBusinessModel, CityBusinessModel cityBusinessModel) {
-        this.cod = cod;
-        this.weatherListBusinessModel = weatherListBusinessModel;
-        this.cityBusinessModel = cityBusinessModel;
-    }
 
     public String getCod() {
         return cod;

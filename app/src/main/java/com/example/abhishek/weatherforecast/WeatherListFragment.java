@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
@@ -36,12 +38,15 @@ import retrofit2.Response;
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
 
-    private static final String TEST_LOCATION = "Mysore,in";
+    private static final String TEST_LOCATION = "Kolkata,in";
 
     private static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
     private static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
     private static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
+    private static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
+    private static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
     private static final String KEY_WEATHER_FORECAST = "weather_forecast";
+    private static final String KEY_CURRENT_WEATHER = "currentWeather";
 
     SettingsOptionClickListener clickListener;
     private LocalBroadcastManager broadcastManager = null;
@@ -56,20 +61,31 @@ public class WeatherListFragment extends Fragment
                     Toast.makeText(getActivity(), "Api Success", Toast.LENGTH_SHORT).show();
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
 
-                    //call utility method to save data into local database(SQLite/Realm/Room)
-                    WeatherDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
+                    //INSERT WEATHER FORECAST INTO DB
+                    WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
 
-                    //call utility method to retrieve data from DB to show in the list
-                 //   WeatherDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
+                    //RETRIEVE FORECAST DATA EXCLUDING CURRENT DATE'S WEATHER
+                    //   WeatherDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
 
                     //show into the list
 
 
                     break;
+                case ACTION_CURRENT_WEATHER_API_SUCCESS:
+                    Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
+                    CurrentWeatherApiModel currentWeather = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
 
+                    //INSERT CURRENT WEATHER INTO DATABASE
+                    WeatherDBDao.insertCurrentWeatherIntoDB(new CurrentWeatherBusinessModel(currentWeather), getActivity());
 
+                    //SHOW CURRENT WEATHER IN THE LIST
+
+                    break;
                 case ACTION_WEATHER_FORECAST_API_FAILURE:
-                    Toast.makeText(getActivity(), "Api Failure", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Weather forecast Api Failure", Toast.LENGTH_SHORT).show();
+                    break;
+                case ACTION_CURRENT_WEATHER_API_FAILURE:
+                    Toast.makeText(getActivity(), "Current weather Api Failure", Toast.LENGTH_SHORT).show();
                     break;
             }
 
@@ -111,6 +127,8 @@ public class WeatherListFragment extends Fragment
     public void onResume() {
         super.onResume();
         IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_CURRENT_WEATHER_API_SUCCESS);
+        filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);
         filter.addAction(ACTION_WEATHER_FORECAST_API_SUCCESS);
         filter.addAction(ACTION_WEATHER_FORECAST_API_FAILURE);
         broadcastManager.registerReceiver(broadcastReceiver, filter);
@@ -179,7 +197,28 @@ public class WeatherListFragment extends Fragment
     }
 
     private void loadCurrentWeather() {
+        Call<CurrentWeatherApiModel> currentWeatherApiModelCall = weatherInterface.getCurrentWeather(TEST_LOCATION, OWM_API_KEY);
+        currentWeatherApiModelCall.enqueue(new Callback<CurrentWeatherApiModel>() {
+            @Override
+            public void onResponse(Call<CurrentWeatherApiModel> call, Response<CurrentWeatherApiModel> response) {
+                CurrentWeatherApiModel currentWeatherApiModel = null;
+                if(response.isSuccessful()){
+                    currentWeatherApiModel = response.body();
+                }
+                //register intent for broadcast manager
+                Intent intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
+                intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
 
+                //send broadcast
+                broadcastManager.sendBroadcast(intent);
+            }
+
+            @Override
+            public void onFailure(Call<CurrentWeatherApiModel> call, Throwable t) {
+                Intent intent = new Intent(ACTION_CURRENT_WEATHER_API_FAILURE);
+                broadcastManager.sendBroadcast(intent);
+            }
+        });
 
     }
 

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherDBModel;
 
 import java.util.ArrayList;
@@ -56,18 +57,6 @@ public class WeatherUtils {
         return weatherContentValues;
     }
 
-   /* public static ContentValues getCityContentValues(CityDBModel cityDBModel) {
-
-        ContentValues cityContentValue = new ContentValues();
-        cityContentValue.put(WeatherContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID, cityDBModel.getId());
-        cityContentValue.put(WeatherContract.CityEntry.CITY_TABLE_COLUMN_CITY_NAME, cityDBModel.getName());
-        cityContentValue.put(WeatherContract.CityEntry.CITY_TABLE_COLUMN_LAT, cityDBModel.getCoordDBModel().getLat());
-        cityContentValue.put(WeatherContract.CityEntry.CITY_TABLE_COLUMN_LON, cityDBModel.getCoordDBModel().getLon());
-        cityContentValue.put(WeatherContract.CityEntry.CITY_TABLE_COLUMN_COUNTRY, cityDBModel.getCountry());
-
-        return cityContentValue;
-    }*/
-
    public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherDBHelper weatherDBHelper){
         List<String> dates = new ArrayList<>();
         SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
@@ -86,6 +75,24 @@ public class WeatherUtils {
         }
         cursor.close();
         return dates;
+    }
+
+    public static ContentValues getCurrentWeatherContentValueFromJson(CurrentWeatherDBModel currentWeatherDBModel) {
+        ContentValues cv = new ContentValues();
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME, currentWeatherDBModel.getName());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE, currentWeatherDBModel.getDt());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID, currentWeatherDBModel.getId());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE, currentWeatherDBModel.getCurrentWeatherCloudsDBModel().getAll());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_COUNTRY, currentWeatherDBModel.getCurrentWeatherSysDBModel().getCountry());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LAT, currentWeatherDBModel.getCurrentWeatherCoordDBModel().getLat());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LON, currentWeatherDBModel.getCurrentWeatherCoordDBModel().getLon());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_HUMIDITY, currentWeatherDBModel.getCurrentWeatherMainDBModel().getHumidity());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MAX_TEMP, currentWeatherDBModel.getCurrentWeatherMainDBModel().getTempMax());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MIN_TEMP, currentWeatherDBModel.getCurrentWeatherMainDBModel().getTempMin());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WIND_SPEED, currentWeatherDBModel.getCurrentWeatherWindDBModel().getSpeed());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DESCRIPTION, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getDescription());
+        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_ICON, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getIcon());
+        return cv;
     }
 
  /*    public static boolean checkCityAlreadyPresentInDB(long id, WeatherDBHelper weatherForecastDBHelper) {
