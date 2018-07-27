@@ -75,32 +75,27 @@ public class WeatherForecastUtils {
         return cityContentValue;
     }*/
 
-  /*  public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherForecastDBHelper weatherForecastDBHelper){
+   public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherForecastDBHelper weatherForecastDBHelper){
         List<String> dates = new ArrayList<>();
         SQLiteDatabase database = weatherForecastDBHelper.getReadableDatabase();
-        String qry = "SELECT * FROM "+ WeatherForecastContract.WeatherForecastEntry.WEATHER_TABLE_NAME+" where "+ WEATHER_COLUMN_WEATHER_OF_CITY_ID+" = "+cityId+"";
+        String qry = "SELECT "+WEATHER_FORECAST_TABLE_COLUMN_DATE+" FROM "+
+                WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME+" where "
+                + WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID+" = "+cityId+"";
         Cursor cursor = database.rawQuery(qry, null);
         if(cursor.getCount() <= 0){
             cursor.close();
             return dates;
         }
-        *//*if(cursor.getCount()>0){
-            while (cursor.moveToNext()){
-                dates.add(String.valueOf(cursor.getString(0)));
-            }
-            cursor.close();
-        }*//*
-
         if (cursor.moveToFirst()){
             do{
-                dates.add(String.valueOf(cursor.getString(0)));
+                dates.add(String.valueOf(cursor.getString(cursor.getColumnIndex(WEATHER_FORECAST_TABLE_COLUMN_DATE))));
             }while(cursor.moveToNext());
         }
         cursor.close();
         return dates;
     }
 
-    public static boolean checkCityAlreadyPresentInDB(long id, WeatherForecastDBHelper weatherForecastDBHelper) {
+ /*    public static boolean checkCityAlreadyPresentInDB(long id, WeatherForecastDBHelper weatherForecastDBHelper) {
         SQLiteDatabase database = weatherForecastDBHelper.getReadableDatabase();
         String qry = "SELECT * FROM "+WeatherForecastContract.CityEntry.CITY_TABLE_NAME+" where "+WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID+" = "+id+"";
         Cursor cursor = database.rawQuery(qry, null);

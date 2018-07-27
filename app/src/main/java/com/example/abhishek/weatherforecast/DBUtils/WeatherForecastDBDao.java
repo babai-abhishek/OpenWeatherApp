@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastUtils.getAlreadyPresentDatesFromDB;
+
 
 /**
  * Created by abhishek on 19/7/18.
@@ -31,8 +33,7 @@ import java.util.List;
 public class WeatherForecastDBDao {
 
     private static WeatherForecastDBHelper weatherForecastDBHelper;
-    private static boolean isCityAlreadyPresent = false;
-    private static boolean isWeatherDetailsAlreadyPresent = false;
+    private static boolean isTimeAlreadyPresent = false;
 
     public static void insertData(WeatherBusinessModel weather, Context ctx){
 
@@ -93,9 +94,6 @@ public class WeatherForecastDBDao {
         //SET WEATHERLISTDBMODEL IN WEATHERDBMODEL
         weatherDBModel.setWeatherListDBModel(weatherListDBModel);
 
-//        weatherDBModel.setCod(weather.getCod());
-
-
         ContentValues[] weatherForecastContentValues = WeatherForecastUtils
                 .getWeatherForecastContentValuesFromJson(weatherDBModel);
 
@@ -105,21 +103,39 @@ public class WeatherForecastDBDao {
 
         weatherForecastDBHelper = new WeatherForecastDBHelper(ctx);
 
-        SQLiteDatabase database = weatherForecastDBHelper.getWritableDatabase();
-        database.beginTransaction();
-        int rowsInserted =0;
-        for(ContentValues cv: weatherForecastContentValues){
-            long id = database.insert(WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME,
-                    null,
-                    cv);
-            if(id != -1){
-                rowsInserted++;
-                Log.d("#", "row "+rowsInserted);
-            }
-        }
+        //GET AVAILABLE DATE VALUES OF THE RESPECTIVE CITY
+        List<String> availableDateAndTime = getAlreadyPresentDatesFromDB(String.valueOf(weather.getCityBusinessModel().getId()), weatherForecastDBHelper);
 
-        database.setTransactionSuccessful();
-        database.endTransaction();
+        //CHECK WHETHER WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE VALUE
+        //MATHCES WITH NEW INCOMING DATE VALUE
+        for(ContentValues weathervalue : weatherForecastContentValues){
+            String date = String.valueOf(weathervalue.get(WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE));
+
+            //CHECK ALREADY DATE PRESENT OR NOT
+            isTimeAlreadyPresent = availableDateAndTime.contains(date);
+
+            //IF UNIQUE THEN INSERT
+            if(!isTimeAlreadyPresent){
+                //INSERT UNIQUE DATE
+                SQLiteDatabase database = weatherForecastDBHelper.getWritableDatabase();
+                database.beginTransaction();
+                int rowsInserted =0;
+
+                    long id = database.insert(WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME,
+                            null,
+                            weathervalue);
+                    if(id != -1){
+                        rowsInserted++;
+                        Log.d("#", "row "+rowsInserted);
+
+                }
+
+                database.setTransactionSuccessful();
+                database.endTransaction();
+
+            }
+
+        }
 
     }
 
