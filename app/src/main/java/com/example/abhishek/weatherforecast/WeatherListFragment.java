@@ -97,6 +97,7 @@ public class WeatherListFragment extends Fragment
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
         setHasOptionsMenu(true);
         loadWeatherForecast();
+        loadCurrentWeather();
     }
 
     @Override
@@ -174,6 +175,11 @@ public class WeatherListFragment extends Fragment
                 broadcastManager.sendBroadcast(intent);
             }
         });
+
+    }
+
+    private void loadCurrentWeather() {
+
 
     }
 

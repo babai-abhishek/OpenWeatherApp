@@ -25,7 +25,7 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.Curre
 
 public class WeatherDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 19;
+    private static final int DATABASE_VERSION = 23;
     public static final String DATABASE_NAME = "weather.db";
 
 
@@ -55,7 +55,7 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_CURRENT_WEATHER_TABLE =  "CREATE TABLE " + CURRENT_WEATHER_TABLE_NAME + " (" +
                 CURRENT_WEATHER_TABLE_COLUMN_DATE + " INTEGER NOT NULL, " +
-                CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID + " INTEGER NOT NULL," +
+                CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID + " INTEGER NOT NULL PRIMARY KEY," +
                 CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME  + " TEXT NOT NULL, " +
                 CURRENT_WEATHER_TABLE_COLUMN_COUNTRY + " TEXT NOT NULL, " +
                 CURRENT_WEATHER_TABLE_COLUMN_MIN_TEMP  + " REAL NOT NULL, " +
@@ -66,8 +66,7 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
                 CURRENT_WEATHER_TABLE_COLUMN_LAT + " REAL NOT NULL, " +
                 CURRENT_WEATHER_TABLE_COLUMN_LON + " REAL NOT NULL, " +
                 CURRENT_WEATHER_TABLE_COLUMN_DESCRIPTION    + " TEXT NOT NULL, " +
-                CURRENT_WEATHER_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE    + " REAL NOT NULL, " +
-                "PRIMARY KEY("+CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID+"));";
+                CURRENT_WEATHER_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE    + " REAL NOT NULL);";
 
 
         db.execSQL(SQL_CREATE_CURRENT_WEATHER_TABLE);
@@ -77,7 +76,7 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME);
-//        db.execSQL("DROP TABLE IF EXISTS " + WeatherContract.CityEntry.CITY_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME);
         onCreate(db);
     }
 }
