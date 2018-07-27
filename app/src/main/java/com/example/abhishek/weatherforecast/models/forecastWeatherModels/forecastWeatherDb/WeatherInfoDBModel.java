@@ -1,21 +1,22 @@
 
-package com.example.abhishek.weatherforecast.models.business;
+package com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb;
 
+public class WeatherInfoDBModel {
 
-import com.example.abhishek.weatherforecast.models.api.WeatherInfoApiModel;
-
-public class WeatherInfoBusinessModel {
 
     private long id;
+
     private String main;
+
     private String description;
+
     private String icon;
 
     /**
      * No args constructor for use in serialization
-     *
+     * 
      */
-    public WeatherInfoBusinessModel() {
+    public WeatherInfoDBModel() {
     }
 
     /**
@@ -25,18 +26,12 @@ public class WeatherInfoBusinessModel {
      * @param description
      * @param main
      */
-    public WeatherInfoBusinessModel(long id, String main, String description, String icon) {
+    public WeatherInfoDBModel(int id, String main, String description, String icon) {
+        super();
         this.id = id;
         this.main = main;
         this.description = description;
         this.icon = icon;
-    }
-
-    public WeatherInfoBusinessModel(WeatherInfoApiModel weatherInfoApiModel) {
-        this.id = weatherInfoApiModel.getId();
-        this.main = weatherInfoApiModel.getMain();
-        this.description = weatherInfoApiModel.getDescription();
-        this.icon = weatherInfoApiModel.getIcon();
     }
 
     public long getId() {

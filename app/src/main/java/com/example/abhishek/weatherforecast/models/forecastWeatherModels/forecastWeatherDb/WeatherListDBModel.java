@@ -1,9 +1,7 @@
 
-package com.example.abhishek.weatherforecast.models.db;
+package com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb;
 
 import java.util.ArrayList;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 public class WeatherListDBModel {
 

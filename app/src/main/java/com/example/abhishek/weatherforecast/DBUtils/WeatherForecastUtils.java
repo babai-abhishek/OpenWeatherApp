@@ -3,35 +3,32 @@ package com.example.abhishek.weatherforecast.DBUtils;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-import com.example.abhishek.weatherforecast.models.db.CityDBModel;
-import com.example.abhishek.weatherforecast.models.db.MainDBModel;
-import com.example.abhishek.weatherforecast.models.db.WeatherDBModel;
-import com.example.abhishek.weatherforecast.models.db.WeatherInfoDBModel;
-import com.example.abhishek.weatherforecast.models.db.WeatherListDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CityDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.MainDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherInfoDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherListDBModel;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_DATE;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_DESCRIPTION;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_HUMIDITY;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_ICON;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_MAX_TEMP;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_MIN_TEMP;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WEATHER_OF_CITY_ID;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_WIND_SPEED;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherEntry.WEATHER_TABLE_NAME;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CITY_NAME;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_COUNTRY;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DESCRIPTION;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_HUMIDITY;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_ICON;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LAT;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LON;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MIN_TEMP;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WIND_SPEED;
 
 /**
  * Created by abhishek on 19/7/18.
@@ -39,21 +36,26 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherForecastContra
 
 public class WeatherForecastUtils {
 
-    public static ContentValues[] getWeatherForecastContentValuesFromJson(List<WeatherListDBModel> weather, long id){
+    public static ContentValues[] getWeatherForecastContentValuesFromJson(WeatherDBModel weather){
 
-        ContentValues[] weatherContentValues = new ContentValues[weather.size()];
+        ContentValues[] weatherContentValues = new ContentValues[weather.getWeatherListDBModel().size()];
 
-        for(int i=0; i<weather.size(); i++){
+        for(int i=0; i<weather.getWeatherListDBModel().size(); i++){
+
             ContentValues weatherContentValue = new ContentValues();
-            weatherContentValue.put(WEATHER_COLUMN_WEATHER_OF_CITY_ID, id);
-            weatherContentValue.put(WEATHER_COLUMN_DATE, weather.get(i).getDt());
-            weatherContentValue.put(WEATHER_COLUMN_MIN_TEMP, weather.get(i).getMainDBModel().getTempMin());
-            weatherContentValue.put(WEATHER_COLUMN_MAX_TEMP, weather.get(i).getMainDBModel().getTempMax());
-            weatherContentValue.put(WEATHER_COLUMN_HUMIDITY, weather.get(i).getMainDBModel().getHumidity());
-            weatherContentValue.put(WEATHER_COLUMN_WIND_SPEED, weather.get(i).getWindDBModel().getSpeed());
-            weatherContentValue.put(WEATHER_COLUMN_ICON, weather.get(i).getWeatherInfoDBModel().get(0).getIcon());
-            weatherContentValue.put(WEATHER_COLUMN_DESCRIPTION, weather.get(i).getWeatherInfoDBModel().get(0).getDescription());
-            weatherContentValue.put(WEATHER_COLUMN_CLOUDS_IN_PERCENTAGE, weather.get(i).getCloudsDBModel().getAll());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID, weather.getCityDBModel().getId());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_DATE, weather.getWeatherListDBModel().get(i).getDt());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_MIN_TEMP, weather.getWeatherListDBModel().get(i).getMainDBModel().getTempMin());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP, weather.getWeatherListDBModel().get(i).getMainDBModel().getTempMax());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_HUMIDITY, weather.getWeatherListDBModel().get(i).getMainDBModel().getHumidity());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_WIND_SPEED, weather.getWeatherListDBModel().get(i).getWindDBModel().getSpeed());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_ICON, weather.getWeatherListDBModel().get(i).getWeatherInfoDBModel().get(0).getIcon());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_DESCRIPTION, weather.getWeatherListDBModel().get(i).getWeatherInfoDBModel().get(0).getDescription());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE, weather.getWeatherListDBModel().get(i).getCloudsDBModel().getAll());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_CITY_NAME, weather.getCityDBModel().getName());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_LAT, weather.getCityDBModel().getCoordDBModel().getLat());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_LON, weather.getCityDBModel().getCoordDBModel().getLon());
+            weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_COUNTRY, weather.getCityDBModel().getCountry());
 
             weatherContentValues[i] = weatherContentValue;
         }
@@ -61,7 +63,7 @@ public class WeatherForecastUtils {
         return weatherContentValues;
     }
 
-    public static ContentValues getCityContentValues(CityDBModel cityDBModel) {
+   /* public static ContentValues getCityContentValues(CityDBModel cityDBModel) {
 
         ContentValues cityContentValue = new ContentValues();
         cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID, cityDBModel.getId());
@@ -71,23 +73,23 @@ public class WeatherForecastUtils {
         cityContentValue.put(WeatherForecastContract.CityEntry.CITY_TABLE_COLUMN_COUNTRY, cityDBModel.getCountry());
 
         return cityContentValue;
-    }
+    }*/
 
-    public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherForecastDBHelper weatherForecastDBHelper){
+  /*  public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherForecastDBHelper weatherForecastDBHelper){
         List<String> dates = new ArrayList<>();
         SQLiteDatabase database = weatherForecastDBHelper.getReadableDatabase();
-        String qry = "SELECT * FROM "+ WeatherForecastContract.WeatherEntry.WEATHER_TABLE_NAME+" where "+ WEATHER_COLUMN_WEATHER_OF_CITY_ID+" = "+cityId+"";
+        String qry = "SELECT * FROM "+ WeatherForecastContract.WeatherForecastEntry.WEATHER_TABLE_NAME+" where "+ WEATHER_COLUMN_WEATHER_OF_CITY_ID+" = "+cityId+"";
         Cursor cursor = database.rawQuery(qry, null);
         if(cursor.getCount() <= 0){
             cursor.close();
             return dates;
         }
-        /*if(cursor.getCount()>0){
+        *//*if(cursor.getCount()>0){
             while (cursor.moveToNext()){
                 dates.add(String.valueOf(cursor.getString(0)));
             }
             cursor.close();
-        }*/
+        }*//*
 
         if (cursor.moveToFirst()){
             do{
@@ -108,9 +110,9 @@ public class WeatherForecastUtils {
         }
         cursor.close();
         return true;
-    }
+    }*/
 
-    public static void insertCityIntoTable(ContentValues cityContentValue, WeatherForecastDBHelper weatherForecastDBHelper) {
+    /*public static void insertCityIntoTable(ContentValues cityContentValue, WeatherForecastDBHelper weatherForecastDBHelper) {
         SQLiteDatabase database = weatherForecastDBHelper.getWritableDatabase();
         database.beginTransaction();
         try {
@@ -129,13 +131,13 @@ public class WeatherForecastUtils {
         database.beginTransaction();
 
         for(ContentValues cv: weatherContentVlues){
-            long id = database.insert(WeatherForecastContract.WeatherEntry.WEATHER_TABLE_NAME,
+            long id = database.insert(WeatherForecastContract.WeatherForecastEntry.WEATHER_TABLE_NAME,
                     null,
                     cv);
-            /*if(id != -1){
+            *//*if(id != -1){
                 rowsInserted++;
                 Log.d("#", "row "+rowsInserted);
-            }*/
+            }*//*
         }
 
         database.setTransactionSuccessful();
@@ -165,16 +167,16 @@ public class WeatherForecastUtils {
             do{
                 WeatherListDBModel weatherListDBModel = new WeatherListDBModel();
 
-                weatherListDBModel.setDt(cursor.getLong(cursor.getColumnIndex(WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_DATE)));
+                weatherListDBModel.setDt(cursor.getLong(cursor.getColumnIndex(WeatherForecastContract.WeatherForecastEntry.WEATHER_COLUMN_DATE)));
 
                 MainDBModel mainDBModel = new MainDBModel();
-                mainDBModel.setTempMin(cursor.getDouble(cursor.getColumnIndex(WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_MIN_TEMP)));
-                mainDBModel.setTempMax(cursor.getDouble(cursor.getColumnIndex(WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_MAX_TEMP)));
+                mainDBModel.setTempMin(cursor.getDouble(cursor.getColumnIndex(WeatherForecastContract.WeatherForecastEntry.WEATHER_COLUMN_MIN_TEMP)));
+                mainDBModel.setTempMax(cursor.getDouble(cursor.getColumnIndex(WeatherForecastContract.WeatherForecastEntry.WEATHER_COLUMN_MAX_TEMP)));
                 weatherListDBModel.setMainDBModel(mainDBModel);
 
                 WeatherInfoDBModel weatherInfoDBModel = new WeatherInfoDBModel();
-                weatherInfoDBModel.setDescription(cursor.getString(cursor.getColumnIndex(WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_DESCRIPTION)));
-                weatherInfoDBModel.setIcon(cursor.getString(cursor.getColumnIndex(WeatherForecastContract.WeatherEntry.WEATHER_COLUMN_ICON)));
+                weatherInfoDBModel.setDescription(cursor.getString(cursor.getColumnIndex(WeatherForecastContract.WeatherForecastEntry.WEATHER_COLUMN_DESCRIPTION)));
+                weatherInfoDBModel.setIcon(cursor.getString(cursor.getColumnIndex(WeatherForecastContract.WeatherForecastEntry.WEATHER_COLUMN_ICON)));
                 List<WeatherInfoDBModel> infoDBModels = new ArrayList<>();
                 infoDBModels.add(weatherInfoDBModel);
                 weatherListDBModel.setWeatherInfoDBModel(infoDBModels);
@@ -219,5 +221,5 @@ public class WeatherForecastUtils {
 
         return cal.getTimeInMillis()/1000;
     }
-
+*/
 }

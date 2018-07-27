@@ -1,19 +1,18 @@
 
-package com.example.abhishek.weatherforecast.models.business;
+package com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb;
 
+public class CoordDBModel {
 
-import com.example.abhishek.weatherforecast.models.api.CoordApiModel;
-
-public class CoordBusinessModel {
 
     private double lat;
+
     private double lon;
 
     /**
      * No args constructor for use in serialization
      * 
      */
-    public CoordBusinessModel() {
+    public CoordDBModel() {
     }
 
     /**
@@ -21,14 +20,10 @@ public class CoordBusinessModel {
      * @param lon
      * @param lat
      */
-    public CoordBusinessModel(double lat, double lon) {
+    public CoordDBModel(double lat, double lon) {
+        super();
         this.lat = lat;
         this.lon = lon;
-    }
-
-    public CoordBusinessModel(CoordApiModel coordApiModel) {
-        this.lat = coordApiModel.getLat();
-        this.lon = coordApiModel.getLon();
     }
 
     public double getLat() {

@@ -1,5 +1,5 @@
 
-package com.example.abhishek.weatherforecast.models.api;
+package com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi;
 
 import android.os.Parcel;
 import android.os.Parcelable;

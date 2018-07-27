@@ -1,14 +1,12 @@
 
-package com.example.abhishek.weatherforecast.models.db;
+package com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb;
 
 import java.util.ArrayList;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 
 public class WeatherDBModel {
 
 
-    private String cod;
+//    private String cod;
 
     private java.util.List<WeatherListDBModel> weatherListDBModel = new ArrayList<WeatherListDBModel>();
 
@@ -29,19 +27,19 @@ public class WeatherDBModel {
      */
     public WeatherDBModel(String cod, java.util.List<WeatherListDBModel> weatherListDBModel, CityDBModel cityDBModel) {
         super();
-        this.cod = cod;
+//        this.cod = cod;
         this.weatherListDBModel = weatherListDBModel;
         this.cityDBModel = cityDBModel;
     }
 
-    public String getCod() {
+  /*  public String getCod() {
         return cod;
     }
 
     public void setCod(String cod) {
         this.cod = cod;
     }
-
+*/
     public java.util.List<WeatherListDBModel> getWeatherListDBModel() {
         return weatherListDBModel;
     }

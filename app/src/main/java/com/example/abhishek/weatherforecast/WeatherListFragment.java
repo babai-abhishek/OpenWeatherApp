@@ -20,8 +20,8 @@ import android.widget.Toast;
 
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherForecastDBDao;
-import com.example.abhishek.weatherforecast.models.api.WeatherApiModel;
-import com.example.abhishek.weatherforecast.models.business.WeatherBusinessModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
 import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
 
@@ -60,7 +60,7 @@ public class WeatherListFragment extends Fragment
                     WeatherForecastDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
 
                     //call utility method to retrieve data from DB to show in the list
-                    WeatherForecastDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
+                 //   WeatherForecastDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
 
                     //show into the list
 

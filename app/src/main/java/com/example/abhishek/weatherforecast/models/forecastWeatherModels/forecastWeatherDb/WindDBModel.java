@@ -1,8 +1,5 @@
 
-package com.example.abhishek.weatherforecast.models.db;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+package com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb;
 
 public class WindDBModel {
 
