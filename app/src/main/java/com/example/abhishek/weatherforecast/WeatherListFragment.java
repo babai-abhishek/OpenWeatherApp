@@ -36,6 +36,8 @@ import retrofit2.Response;
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
 
+    private static final String TEST_LOCATION = "Mysore,in";
+
     private static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
     private static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
     private static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
@@ -56,6 +58,12 @@ public class WeatherListFragment extends Fragment
 
                     //call utility method to save data into local database(SQLite/Realm/Room)
                     WeatherForecastDBDao.insertData(new WeatherBusinessModel(weather), getActivity());
+
+                    //call utility method to retrieve data from DB to show in the list
+                    WeatherForecastDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
+
+                    //show into the list
+
 
                     break;
 
@@ -139,7 +147,7 @@ public class WeatherListFragment extends Fragment
     }
 
     private void loadWeather() {
-        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast("Kolkata,in",OWM_API_KEY);
+        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(TEST_LOCATION,OWM_API_KEY);
          call.enqueue(new Callback<WeatherApiModel>() {
             @Override
             public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {
