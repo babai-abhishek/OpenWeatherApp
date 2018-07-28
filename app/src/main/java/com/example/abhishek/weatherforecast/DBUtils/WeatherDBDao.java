@@ -189,7 +189,7 @@ public class WeatherDBDao {
 
         weatherDBHelper = new WeatherDBHelper(ctx);
 
-        long dt ;
+        long dt = 0;
 
         //GET DATE VALUE PRESENT IN TABLE FOR PARTICULAR CITY
         String qry = "SELECT "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE+" " +
@@ -212,9 +212,22 @@ public class WeatherDBDao {
                 Log.d("#","available dt : "+dt);
             }
             cursor.close();
-        }
 
-//        if(currentWeatherBusinessModel.getDt())
+            if(String.valueOf(currentWeatherBusinessModel.getDt()).equals(String.valueOf(dt))){
+                Log.d("#","matched found ");
+                return;
+            }
+
+            SQLiteDatabase updateOperation = weatherDBHelper.getWritableDatabase();
+            updateOperation.beginTransaction();
+            updateOperation.update(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME,
+                    currentWeatherContentValue,
+                    "_city_id="+currentWeatherContentValue.get(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID),
+                    null);
+            updateOperation.setTransactionSuccessful();
+            updateOperation.endTransaction();
+
+        }
     }
 }
 

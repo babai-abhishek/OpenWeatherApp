@@ -27,6 +27,9 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
 import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -52,6 +55,9 @@ public class WeatherListFragment extends Fragment
     private LocalBroadcastManager broadcastManager = null;
     WeatherInterface weatherInterface = ApiClient.getClient().create(WeatherInterface.class);
 
+    //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
+    List<WeatherBusinessModel> weatherInfoListFromToday = new ArrayList<>();
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -65,7 +71,7 @@ public class WeatherListFragment extends Fragment
                     WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
 
                     //RETRIEVE FORECAST DATA EXCLUDING CURRENT DATE'S WEATHER
-                    //   WeatherDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
+                  //  WeatherDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
 
                     //show into the list
 
@@ -73,12 +79,15 @@ public class WeatherListFragment extends Fragment
                     break;
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
                     Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
-                    CurrentWeatherApiModel currentWeather = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
+                    CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
+
+                    CurrentWeatherBusinessModel currentWeatherBusinessModel = new CurrentWeatherBusinessModel(currentWeatherApiModel);
 
                     //INSERT CURRENT WEATHER INTO DATABASE
-                    WeatherDBDao.insertCurrentWeatherIntoDB(new CurrentWeatherBusinessModel(currentWeather), getActivity());
+                    WeatherDBDao.insertCurrentWeatherIntoDB(currentWeatherBusinessModel, getActivity());
 
                     //SHOW CURRENT WEATHER IN THE LIST
+
 
                     break;
                 case ACTION_WEATHER_FORECAST_API_FAILURE:
