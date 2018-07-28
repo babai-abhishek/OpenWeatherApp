@@ -1,13 +1,14 @@
 
 package com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness;
 
+import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherInfoApiModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrentWeatherBusinessModel {
+public class CurrentWeatherBusinessModel implements IWeatherDetails {
 
     private CurrentWeatherCoordBusinessModel currentWeatherCoordBusinessModel;
     private List<CurrentWeatherInfoBusinessModel> currentWeatherInfoBusinessModel = new ArrayList<CurrentWeatherInfoBusinessModel>();
