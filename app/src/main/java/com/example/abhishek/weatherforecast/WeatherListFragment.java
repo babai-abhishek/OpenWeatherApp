@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,14 +21,18 @@ import android.widget.Toast;
 
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
+import com.example.abhishek.weatherforecast.DBUtils.WeatherUtils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
 import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -56,7 +61,7 @@ public class WeatherListFragment extends Fragment
     WeatherInterface weatherInterface = ApiClient.getClient().create(WeatherInterface.class);
 
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
-    List<WeatherBusinessModel> weatherInfoListFromToday = new ArrayList<>();
+    List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -64,35 +69,41 @@ public class WeatherListFragment extends Fragment
 
             switch (intent.getAction()) {
                 case ACTION_WEATHER_FORECAST_API_SUCCESS:
-                    Toast.makeText(getActivity(), "Api Success", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Weather forecast Api Success", Toast.LENGTH_SHORT).show();
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
+
+                    //RETRIEVE FORECAST DATA EXCLUDING TODAY'S WEATHER
+                    weatherListFromTomorrow = WeatherUtils.getWeatherForecastInfoFromTomorrowFromJSON(weather);
+                    for(WeatherListApiModel apiModel: weatherListFromTomorrow){
+                        Date dt = new Date(apiModel.getDt()*1000L);
+                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                        Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt));
+                    }
 
                     //INSERT WEATHER FORECAST INTO DB
                     WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
-
-                    //RETRIEVE FORECAST DATA EXCLUDING CURRENT DATE'S WEATHER
-                  //  WeatherDBDao.retrieveWeatherForecastInfo(TEST_LOCATION);
-
-                    //show into the list
-
-
                     break;
+
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
                     Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
                     CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
 
                     CurrentWeatherBusinessModel currentWeatherBusinessModel = new CurrentWeatherBusinessModel(currentWeatherApiModel);
 
+                    //SHOW CURRENT WEATHER IN THE LIST
+                    Date dt = new Date(currentWeatherBusinessModel.getDt()*1000L);
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+                    Log.d("#",currentWeatherBusinessModel.getName()+ " Today : "+sdf.format(dt));
+
+
                     //INSERT CURRENT WEATHER INTO DATABASE
                     WeatherDBDao.insertCurrentWeatherIntoDB(currentWeatherBusinessModel, getActivity());
-
-                    //SHOW CURRENT WEATHER IN THE LIST
-
-
                     break;
+
                 case ACTION_WEATHER_FORECAST_API_FAILURE:
                     Toast.makeText(getActivity(), "Weather forecast Api Failure", Toast.LENGTH_SHORT).show();
                     break;
+
                 case ACTION_CURRENT_WEATHER_API_FAILURE:
                     Toast.makeText(getActivity(), "Current weather Api Failure", Toast.LENGTH_SHORT).show();
                     break;
@@ -176,18 +187,18 @@ public class WeatherListFragment extends Fragment
 
     private void loadWeatherForecast() {
         Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(TEST_LOCATION,OWM_API_KEY);
-         call.enqueue(new Callback<WeatherApiModel>() {
+        call.enqueue(new Callback<WeatherApiModel>() {
             @Override
             public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {
                 WeatherApiModel weather = null;
 
-               //if response is sucessful
+                //if response is sucessful
                 if(response.isSuccessful()){
                     //get data from response
                     weather = response.body();
                 }
 
-               //register intent for broadcast manager
+                //register intent for broadcast manager
                 Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_SUCCESS);
                 intent.putExtra(KEY_WEATHER_FORECAST,weather);
 

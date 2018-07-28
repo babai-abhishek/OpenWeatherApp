@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCloudsDBModel;
@@ -209,12 +208,10 @@ public class WeatherDBDao {
         else {
             if(cursor.moveToFirst()){
                 dt = cursor.getLong(cursor.getColumnIndex(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE));
-                Log.d("#","available dt : "+dt);
             }
             cursor.close();
 
             if(String.valueOf(currentWeatherBusinessModel.getDt()).equals(String.valueOf(dt))){
-                Log.d("#","matched found ");
                 return;
             }
 
@@ -229,37 +226,8 @@ public class WeatherDBDao {
 
         }
     }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
