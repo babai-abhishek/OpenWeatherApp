@@ -73,7 +73,7 @@ public class WeatherListFragment extends Fragment
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
 
                     //RETRIEVE FORECAST DATA EXCLUDING TODAY'S WEATHER
-                    weatherListFromTomorrow = WeatherUtils.getWeatherForecastInfoFromTomorrowFromJSON(weather);
+                    weatherListFromTomorrow = WeatherUtils.getWeatherForecastListFromTomorrow(weather);
                     for(WeatherListApiModel apiModel: weatherListFromTomorrow){
                         Date dt = new Date(apiModel.getDt()*1000L);
                         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -94,7 +94,6 @@ public class WeatherListFragment extends Fragment
                     Date dt = new Date(currentWeatherBusinessModel.getDt()*1000L);
                     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
                     Log.d("#",currentWeatherBusinessModel.getName()+ " Today : "+sdf.format(dt));
-
 
                     //INSERT CURRENT WEATHER INTO DATABASE
                     WeatherDBDao.insertCurrentWeatherIntoDB(currentWeatherBusinessModel, getActivity());

@@ -101,7 +101,7 @@ public class WeatherUtils {
         return cv;
     }
 
-    public static List<WeatherListApiModel> getWeatherForecastInfoFromTomorrowFromJSON(WeatherApiModel weather) {
+    public static List<WeatherListApiModel> getWeatherForecastListFromTomorrow(WeatherApiModel weather) {
 
         List<WeatherListApiModel> weatherListApiModelList = weather.getWeatherListApiModel();
 
@@ -122,7 +122,6 @@ public class WeatherUtils {
         }
         return singleWeatherApiModelPerDay;
     }
-
 
     private static Date getNextDate(Date curDate) {
         final Calendar calendar = Calendar.getInstance();

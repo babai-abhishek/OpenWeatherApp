@@ -229,36 +229,3 @@ public class WeatherDBDao {
 
 }
 
-
-
-
-
-//    public static void retrieveWeatherForecastInfo(String location) {
-//        String[] loc = location.split(",");
-//        long cityId = 0;
-//        //find id for the location from DB
-//        SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
-//        String qry = "SELECT "+ WeatherContract.CityEntry.CITY_TABLE_COLUMN_CITY_ID+" FROM "
-//                + WeatherContract.CityEntry.CITY_TABLE_NAME+" where "
-//                + WeatherContract.CityEntry.CITY_TABLE_COLUMN_CITY_NAME+" = \""+loc[0].trim()+"\" COLLATE NOCASE";
-//        Cursor cursor = database.rawQuery(qry, null);
-//        if(cursor.getCount() <= 0){
-//            cursor.close();
-//            return;
-//        }
-//        if(cursor.moveToFirst()){
-//            cityId = Long.parseLong(cursor.getString(cursor.getColumnIndex("id")));
-//            Log.d("#","id "+cityId);
-//        }
-//        cursor.close();
-//
-//        List<WeatherListDBModel> weatherDetailsFromToday = WeatherUtils.getWeatherDetailsFromToday(cityId, weatherDBHelper);
-//        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-//
-//        for(WeatherListDBModel weatherListDBModel: weatherDetailsFromToday){
-//            Date date = new Date(weatherListDBModel.getDt()*1000L);
-//
-//            Log.d("#", loc[0]+ " on "+sdf.format(date)+" | max temp "+weatherListDBModel.getMainDBModel().getTempMax());
-//        }
-//    }
-
