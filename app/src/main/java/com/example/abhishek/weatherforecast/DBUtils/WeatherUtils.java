@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.example.abhishek.weatherforecast.R;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CITY_NAME;
 import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE;
@@ -39,6 +41,11 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.Weath
  */
 
 public class WeatherUtils {
+
+    public static final long SECOND_IN_MILLIS = 1000;
+    public static final long MINUTE_IN_MILLIS = SECOND_IN_MILLIS * 60;
+    public static final long HOUR_IN_MILLIS = MINUTE_IN_MILLIS * 60;
+    public static final long DAY_IN_MILLIS = HOUR_IN_MILLIS * 24;
 
     public static ContentValues[] getWeatherForecastContentValuesFromJson(WeatherDBModel weather){
 
@@ -206,6 +213,66 @@ public class WeatherUtils {
         }
 
         return R.drawable.ic_storm;
+    }
+
+    public static String formatTemperature(Context context, double temperature) {
+        int temperatureFormatResourceId = R.string.format_temperature_celsius;
+
+       /* if (!SunshinePreferences.isMetric(context)) {
+            temperature = celsiusToFahrenheit(temperature);
+            temperatureFormatResourceId = R.string.format_temperature_fahrenheit;
+        }*/
+
+        temperature = celsiusToFahrenheit(temperature);
+        temperatureFormatResourceId = R.string.format_temperature_fahrenheit;
+
+        return String.format(context.getString(temperatureFormatResourceId), temperature);
+    }
+
+    private static double celsiusToFahrenheit(double temperatureInCelsius) {
+        double temperatureInFahrenheit = (temperatureInCelsius * 1.8) + 32;
+        return temperatureInFahrenheit;
+    }
+
+    public static String formatHighLows(Context context, double high, double low) {
+        long roundedHigh = Math.round(high);
+        long roundedLow = Math.round(low);
+
+        String formattedHigh = formatTemperature(context, roundedHigh);
+        String formattedLow = formatTemperature(context, roundedLow);
+
+        String highLowStr = formattedHigh + " / " + formattedLow;
+        return highLowStr;
+    }
+
+    public static String getFormattedWind(Context context, float windSpeed, float degrees) {
+
+        int windFormat = R.string.format_wind_kmh;
+
+        //  if (!SunshinePreferences.isMetric(context)) {
+        windFormat = R.string.format_wind_mph;
+        windSpeed = .621371192237334f * windSpeed;
+        //  }
+
+        String direction = "Unknown";
+        if (degrees >= 337.5 || degrees < 22.5) {
+            direction = "N";
+        } else if (degrees >= 22.5 && degrees < 67.5) {
+            direction = "NE";
+        } else if (degrees >= 67.5 && degrees < 112.5) {
+            direction = "E";
+        } else if (degrees >= 112.5 && degrees < 157.5) {
+            direction = "SE";
+        } else if (degrees >= 157.5 && degrees < 202.5) {
+            direction = "S";
+        } else if (degrees >= 202.5 && degrees < 247.5) {
+            direction = "SW";
+        } else if (degrees >= 247.5 && degrees < 292.5) {
+            direction = "W";
+        } else if (degrees >= 292.5 && degrees < 337.5) {
+            direction = "NW";
+        }
+        return String.format(context.getString(windFormat), windSpeed, direction);
     }
 
     public static String getStringForWeatherCondition(Context context, int weatherId) {
@@ -377,10 +444,83 @@ public class WeatherUtils {
         return context.getString(stringId);
     }
 
+    public static String getFriendlyDateString(Context context, long dateInMillis, boolean showFullDate) {
 
+        long localDate = getLocalDateFromUTC(dateInMillis);
+        long dayNumber = getDayNumber(localDate);
+        long currentDayNumber = getDayNumber(System.currentTimeMillis());
 
+        if (dayNumber == currentDayNumber || showFullDate) {
 
-/*    private static long getEpochForTodayMidnight(){
+            String dayName = getDayName(context, localDate);
+            String readableDate = getReadableDateString(context, localDate);
+            if (dayNumber - currentDayNumber < 2) {
+                String localizedDayName = new SimpleDateFormat("EEEE").format(localDate);
+                return readableDate.replace(localizedDayName, dayName);
+            } else {
+                return readableDate;
+            }
+        } else if (dayNumber < currentDayNumber + 7) {
+            /* If the input date is less than a week in the future, just return the day name. */
+            return getDayName(context, localDate);
+        } else {
+            int flags = DateUtils.FORMAT_SHOW_DATE
+                    | DateUtils.FORMAT_NO_YEAR
+                    | DateUtils.FORMAT_ABBREV_ALL
+                    | DateUtils.FORMAT_SHOW_WEEKDAY;
+
+            return DateUtils.formatDateTime(context, localDate, flags);
+        }
+    }
+
+    public static long getDayNumber(long date) {
+        TimeZone tz = TimeZone.getDefault();
+        long gmtOffset = tz.getOffset(date);
+        return (date + gmtOffset) / DAY_IN_MILLIS;
+    }
+
+    public static long normalizeDate(long date) {
+        // Normalize the start date to the beginning of the (UTC) day in local time
+        long retValNew = date / DAY_IN_MILLIS * DAY_IN_MILLIS;
+        return retValNew;
+    }
+
+    public static long getLocalDateFromUTC(long utcDate) {
+        TimeZone tz = TimeZone.getDefault();
+        long gmtOffset = tz.getOffset(utcDate);
+        return utcDate - gmtOffset;
+    }
+
+    public static long getUTCDateFromLocal(long localDate) {
+        TimeZone tz = TimeZone.getDefault();
+        long gmtOffset = tz.getOffset(localDate);
+        return localDate + gmtOffset;
+    }
+
+    private static String getReadableDateString(Context context, long timeInMillis) {
+        int flags = DateUtils.FORMAT_SHOW_DATE
+                | DateUtils.FORMAT_NO_YEAR
+                | DateUtils.FORMAT_SHOW_WEEKDAY;
+
+        return DateUtils.formatDateTime(context, timeInMillis, flags);
+    }
+
+    private static String getDayName(Context context, long dateInMillis) {
+
+        long dayNumber = getDayNumber(dateInMillis);
+        long currentDayNumber = getDayNumber(System.currentTimeMillis());
+        if (dayNumber == currentDayNumber) {
+            return context.getString(R.string.today);
+        } else if (dayNumber == currentDayNumber + 1) {
+            return context.getString(R.string.tomorrow);
+        } else {
+
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE");
+            return dayFormat.format(dateInMillis);
+        }
+    }
+
+    private static long getEpochForTodayMidnight(){
         Date currDate = new Date();
         Calendar cal = Calendar.getInstance();
         // compute start of the day for the timestamp
@@ -392,6 +532,5 @@ public class WeatherUtils {
 
         return cal.getTimeInMillis()/1000;
     }
-*/
 
 }

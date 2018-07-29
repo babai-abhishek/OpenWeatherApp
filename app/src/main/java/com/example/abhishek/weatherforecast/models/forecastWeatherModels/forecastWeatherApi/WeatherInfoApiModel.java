@@ -11,7 +11,7 @@ public class WeatherInfoApiModel implements Parcelable {
 
     @SerializedName("id")
     @Expose
-    private long id;
+    private int id;
     @SerializedName("main")
     @Expose
     private String main;
@@ -36,7 +36,7 @@ public class WeatherInfoApiModel implements Parcelable {
      * @param description
      * @param main
      */
-    public WeatherInfoApiModel(long id, String main, String description, String icon) {
+    public WeatherInfoApiModel(int id, String main, String description, String icon) {
         super();
         this.id = id;
         this.main = main;
@@ -45,7 +45,7 @@ public class WeatherInfoApiModel implements Parcelable {
     }
 
     protected WeatherInfoApiModel(Parcel in) {
-        id = in.readLong();
+        id = in.readInt();
         main = in.readString();
         description = in.readString();
         icon = in.readString();
@@ -63,11 +63,11 @@ public class WeatherInfoApiModel implements Parcelable {
         }
     };
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

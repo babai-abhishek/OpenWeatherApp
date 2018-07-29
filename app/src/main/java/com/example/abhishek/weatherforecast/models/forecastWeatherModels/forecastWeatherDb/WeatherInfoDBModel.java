@@ -4,7 +4,7 @@ package com.example.abhishek.weatherforecast.models.forecastWeatherModels.foreca
 public class WeatherInfoDBModel {
 
 
-    private long id;
+    private int id;
 
     private String main;
 
@@ -38,7 +38,7 @@ public class WeatherInfoDBModel {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

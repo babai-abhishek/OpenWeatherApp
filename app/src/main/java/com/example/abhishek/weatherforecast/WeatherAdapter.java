@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.abhishek.weatherforecast.DBUtils.WeatherUtils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 
@@ -99,6 +100,41 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void Bind(WeatherListBusinessModel weatherListBusinessModel){
+
+            //SET DESC
+            String description = WeatherUtils.getStringForWeatherCondition(mContext, weatherListBusinessModel.getWeatherInfoBusinessModel().get(0).getId());
+            String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
+            tv_forecast_weather_description.setText(description);
+            tv_forecast_weather_description.setContentDescription(descriptionA11y);
+
+            //SET MAX TEMP
+            double highInCelsius = weatherListBusinessModel.getMainBusinessModel().getTempMax();
+            String highString = WeatherUtils.formatTemperature(mContext, highInCelsius);
+            String highA11y = mContext.getString(R.string.a11y_high_temp, highString);
+            tv_forecast_weather_high_temperature.setText(highString);
+            tv_forecast_weather_high_temperature.setContentDescription(highA11y);
+
+
+            //SET MIN TEMP
+            double lowInCelsius = weatherListBusinessModel.getMainBusinessModel().getTempMin();
+            String lowString = WeatherUtils.formatTemperature(mContext, lowInCelsius);
+            String lowA11y = mContext.getString(R.string.a11y_low_temp, lowString);
+            tv_forecast_weather_low_temperature.setText(lowString);
+            tv_forecast_weather_low_temperature.setContentDescription(lowA11y);
+
+            //SET ICON
+            int weatherImageId = WeatherUtils
+                    .getSmallArtResourceIdForWeatherCondition((weatherListBusinessModel
+                            .getWeatherInfoBusinessModel()
+                            .get(0)
+                            .getId()));
+            img_forecast_weather_icon.setImageResource(weatherImageId);
+
+            //SET DATE
+            long dateInMillis = weatherListBusinessModel.getDt();
+            String dateString = WeatherUtils.getFriendlyDateString(mContext, dateInMillis, false);
+            tv_forecast_weather_date.setText(dateString);
+
         }
     }
 
@@ -119,6 +155,41 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         void Bind(WeatherListBusinessModel weatherListBusinessModel){
+
+            //SET DESC
+            String description = WeatherUtils.getStringForWeatherCondition(mContext, weatherListBusinessModel.getWeatherInfoBusinessModel().get(0).getId());
+            String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
+            tv_current_weather_description.setText(description);
+            tv_current_weather_description.setContentDescription(descriptionA11y);
+
+            //SET MAX TEMP
+            double highInCelsius = weatherListBusinessModel.getMainBusinessModel().getTempMax();
+            String highString = WeatherUtils.formatTemperature(mContext, highInCelsius);
+            String highA11y = mContext.getString(R.string.a11y_high_temp, highString);
+            tv_current_weather_high_temperature.setText(highString);
+            tv_current_weather_high_temperature.setContentDescription(highA11y);
+
+
+            //SET MIN TEMP
+            double lowInCelsius = weatherListBusinessModel.getMainBusinessModel().getTempMin();
+            String lowString = WeatherUtils.formatTemperature(mContext, lowInCelsius);
+            String lowA11y = mContext.getString(R.string.a11y_low_temp, lowString);
+            tv_current_weather_low_temperature.setText(lowString);
+            tv_current_weather_low_temperature.setContentDescription(lowA11y);
+
+            //SET ICON
+            int weatherImageId = WeatherUtils
+                    .getLargeArtResourceIdForWeatherCondition((weatherListBusinessModel
+                            .getWeatherInfoBusinessModel()
+                            .get(0)
+                            .getId()));
+            img_current_weather_icon.setImageResource(weatherImageId);
+
+            //SET DATE
+            long dateInMillis = weatherListBusinessModel.getDt();
+            String dateString = WeatherUtils.getFriendlyDateString(mContext, dateInMillis, false);
+            tv_current_weather_date.setText(dateString);
+
         }
     }
 }

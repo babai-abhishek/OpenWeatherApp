@@ -6,7 +6,7 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 
 public class WeatherInfoBusinessModel {
 
-    private long id;
+    private int id;
     private String main;
     private String description;
     private String icon;
@@ -25,7 +25,7 @@ public class WeatherInfoBusinessModel {
      * @param description
      * @param main
      */
-    public WeatherInfoBusinessModel(long id, String main, String description, String icon) {
+    public WeatherInfoBusinessModel(int id, String main, String description, String icon) {
         this.id = id;
         this.main = main;
         this.description = description;
@@ -39,11 +39,11 @@ public class WeatherInfoBusinessModel {
         this.icon = weatherInfoApiModel.getIcon();
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
