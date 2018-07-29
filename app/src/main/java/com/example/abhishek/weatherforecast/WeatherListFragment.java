@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +23,6 @@ import android.widget.Toast;
 
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
-import com.example.abhishek.weatherforecast.DBUtils.WeatherUtils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
@@ -65,6 +66,11 @@ public class WeatherListFragment extends Fragment
     List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
     List<IWeatherDetails> iWeatherDetailsList = new ArrayList<>();
 
+
+    //VARIABLES FOR SHOWING LIST
+    WeatherAdapter adapter;
+    private RecyclerView recyclerView;
+
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -87,6 +93,8 @@ public class WeatherListFragment extends Fragment
                     for(WeatherListBusinessModel weatherListBusinessModel: listBusinessModels){
                         iWeatherDetailsList.add(weatherListBusinessModel);
                     }
+                    adapter.setCurrentWeatherList(iWeatherDetailsList);
+
                     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 
                     for(IWeatherDetails details: iWeatherDetailsList){
@@ -115,6 +123,7 @@ public class WeatherListFragment extends Fragment
                     iWeatherDetailsList.add(0,currentWeatherBusinessModel);
 
                     //SHOW CURRENT WEATHER IN THE LIST
+                    adapter.setCurrentWeatherList(iWeatherDetailsList);
 
 
                     //INSERT CURRENT WEATHER INTO DATABASE
@@ -152,6 +161,7 @@ public class WeatherListFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        adapter = new WeatherAdapter(getActivity(),iWeatherDetailsList);
         setHasOptionsMenu(true);
         loadWeatherForecast();
         loadCurrentWeather();
@@ -161,7 +171,14 @@ public class WeatherListFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_weather_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_weather_list, container, false);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_forecast);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(adapter);
+        return view;
     }
 
     @Override

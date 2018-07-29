@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.abhishek.weatherforecast.DBUtils.WeatherUtils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 
@@ -22,7 +21,7 @@ import java.util.List;
 public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private final Context mContext;
-    private final List<IWeatherDetails> iWeatherDetailsList;
+    private List<IWeatherDetails> iWeatherDetailsList;
 
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
@@ -86,6 +85,16 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             return VIEW_TYPE_FUTURE_DAY;
         }
+    }
+
+    public void setCurrentWeatherList(List<IWeatherDetails> weatherList){
+        this.iWeatherDetailsList = weatherList;
+        if(iWeatherDetailsList.get(0) instanceof CurrentWeatherBusinessModel && iWeatherDetailsList.get(0) instanceof WeatherListBusinessModel ){
+            notifyItemChanged(0);
+        }else if(iWeatherDetailsList.get(0) instanceof CurrentWeatherBusinessModel){
+            notifyDataSetChanged();
+        }else
+            notifyDataSetChanged();
     }
 
     class ForecastWeatherViewHolder extends RecyclerView.ViewHolder {

@@ -6,7 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry;
+import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry;
+import com.example.abhishek.weatherforecast.WeatherUtils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCloudsDBModel;
@@ -30,7 +31,7 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherUtils.getAlreadyPresentDatesFromDB;
+import static com.example.abhishek.weatherforecast.WeatherUtils.getAlreadyPresentDatesFromDB;
 
 
 /**
@@ -192,15 +193,15 @@ public class WeatherDBDao {
         long dt = 0;
 
         //GET DATE VALUE PRESENT IN TABLE FOR PARTICULAR CITY
-        String qry = "SELECT "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE+" " +
-                "FROM "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME+"" +
-                " WHERE "+ WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID+" = \""+currentWeatherBusinessModel.getId()+"\"";
+        String qry = "SELECT "+ WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE+" " +
+                "FROM "+ WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME+"" +
+                " WHERE "+ WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID+" = \""+currentWeatherBusinessModel.getId()+"\"";
         SQLiteDatabase db = weatherDBHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery(qry, null);
         if(cursor.getCount() <= 0){
             SQLiteDatabase writeOperation = weatherDBHelper.getWritableDatabase();
             writeOperation.beginTransaction();
-            writeOperation.insert(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME,
+            writeOperation.insert(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME,
                     null,
                     currentWeatherContentValue);
             writeOperation.setTransactionSuccessful();
@@ -208,7 +209,7 @@ public class WeatherDBDao {
         }
         else {
             if(cursor.moveToFirst()){
-                dt = cursor.getLong(cursor.getColumnIndex(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE));
+                dt = cursor.getLong(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE));
             }
             cursor.close();
 
@@ -218,9 +219,9 @@ public class WeatherDBDao {
 
             SQLiteDatabase updateOperation = weatherDBHelper.getWritableDatabase();
             updateOperation.beginTransaction();
-            updateOperation.update(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME,
+            updateOperation.update(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME,
                     currentWeatherContentValue,
-                    "_city_id="+currentWeatherContentValue.get(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID),
+                    "_city_id="+currentWeatherContentValue.get(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID),
                     null);
             updateOperation.setTransactionSuccessful();
             updateOperation.endTransaction();

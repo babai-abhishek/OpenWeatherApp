@@ -1,17 +1,17 @@
-package com.example.abhishek.weatherforecast.DBUtils;
+package com.example.abhishek.weatherforecast;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.format.DateUtils;
-import android.util.Log;
 
+import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract;
+import com.example.abhishek.weatherforecast.DBUtils.WeatherDBHelper;
 import com.example.abhishek.weatherforecast.R;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherDBModel;
 
 import java.text.SimpleDateFormat;
@@ -21,20 +21,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CITY_NAME;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_COUNTRY;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DESCRIPTION;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_HUMIDITY;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_ICON;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LAT;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LON;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MIN_TEMP;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_CONDITION_ID;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WIND_SPEED;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CITY_NAME;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_COUNTRY;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DESCRIPTION;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_HUMIDITY;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_ICON;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LAT;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LON;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MIN_TEMP;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_CONDITION_ID;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID;
+import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WIND_SPEED;
 
 /**
  * Created by abhishek on 19/7/18.
@@ -78,7 +78,7 @@ public class WeatherUtils {
         List<String> dates = new ArrayList<>();
         SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
         String qry = "SELECT "+WEATHER_FORECAST_TABLE_COLUMN_DATE+" FROM "+
-                WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME+" where "
+                WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME+" where "
                 + WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID+" = "+cityId+"";
         Cursor cursor = database.rawQuery(qry, null);
         if(cursor.getCount() <= 0){
@@ -96,19 +96,20 @@ public class WeatherUtils {
 
     public static ContentValues getCurrentWeatherContentValueFromJson(CurrentWeatherDBModel currentWeatherDBModel) {
         ContentValues cv = new ContentValues();
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME, currentWeatherDBModel.getName());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE, currentWeatherDBModel.getDt());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID, currentWeatherDBModel.getId());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE, currentWeatherDBModel.getCurrentWeatherCloudsDBModel().getAll());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_COUNTRY, currentWeatherDBModel.getCurrentWeatherSysDBModel().getCountry());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LAT, currentWeatherDBModel.getCurrentWeatherCoordDBModel().getLat());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LON, currentWeatherDBModel.getCurrentWeatherCoordDBModel().getLon());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_HUMIDITY, currentWeatherDBModel.getCurrentWeatherMainDBModel().getHumidity());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MAX_TEMP, currentWeatherDBModel.getCurrentWeatherMainDBModel().getTempMax());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MIN_TEMP, currentWeatherDBModel.getCurrentWeatherMainDBModel().getTempMin());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WIND_SPEED, currentWeatherDBModel.getCurrentWeatherWindDBModel().getSpeed());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DESCRIPTION, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getDescription());
-        cv.put(WeatherContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_ICON, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getIcon());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME, currentWeatherDBModel.getName());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE, currentWeatherDBModel.getDt());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID, currentWeatherDBModel.getId());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE, currentWeatherDBModel.getCurrentWeatherCloudsDBModel().getAll());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_COUNTRY, currentWeatherDBModel.getCurrentWeatherSysDBModel().getCountry());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LAT, currentWeatherDBModel.getCurrentWeatherCoordDBModel().getLat());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LON, currentWeatherDBModel.getCurrentWeatherCoordDBModel().getLon());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_HUMIDITY, currentWeatherDBModel.getCurrentWeatherMainDBModel().getHumidity());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MAX_TEMP, currentWeatherDBModel.getCurrentWeatherMainDBModel().getTempMax());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MIN_TEMP, currentWeatherDBModel.getCurrentWeatherMainDBModel().getTempMin());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WIND_SPEED, currentWeatherDBModel.getCurrentWeatherWindDBModel().getSpeed());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DESCRIPTION, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getDescription());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_ICON, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getIcon());
+        cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_CONDITION_ID, currentWeatherDBModel.getCurrentWeatherInfoDBModel().get(0).getWeatherId());
         return cv;
     }
 

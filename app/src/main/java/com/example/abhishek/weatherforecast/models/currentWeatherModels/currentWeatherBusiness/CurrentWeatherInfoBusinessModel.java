@@ -6,7 +6,6 @@ import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentW
 
 public class CurrentWeatherInfoBusinessModel {
 
-    private String main;
     private String description;
     private String icon;
     private int weatherId;
@@ -34,7 +33,6 @@ public class CurrentWeatherInfoBusinessModel {
      */
     public CurrentWeatherInfoBusinessModel(String main, String description, String icon, int id) {
         super();
-        this.main = main;
         this.description = description;
         this.icon = icon;
         this.weatherId = weatherId;
@@ -43,15 +41,8 @@ public class CurrentWeatherInfoBusinessModel {
     public CurrentWeatherInfoBusinessModel(CurrentWeatherInfoApiModel current) {
         this.description = current.getDescription();
         this.icon = current.getIcon();
+        this.weatherId = current.getWeatherId();
     }
-
-   /* public String getMain() {
-        return main;
-    }
-
-    public void setMain(String main) {
-        this.main = main;
-    }*/
 
     public String getDescription() {
         return description;

@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
  * Created by abhishek on 18/7/18.
  */
 
-public class WeatherContract {
+public class WeatherDBContract {
 
     public static final class WeatherForecastEntry implements BaseColumns {
 
