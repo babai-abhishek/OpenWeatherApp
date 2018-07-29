@@ -8,7 +8,7 @@ import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentW
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrentWeatherBusinessModel implements IWeatherDetails {
+public class CurrentWeatherBusinessModel implements IWeatherDetails{
 
     private CurrentWeatherCoordBusinessModel currentWeatherCoordBusinessModel;
     private List<CurrentWeatherInfoBusinessModel> currentWeatherInfoBusinessModel = new ArrayList<CurrentWeatherInfoBusinessModel>();

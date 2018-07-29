@@ -27,6 +27,7 @@ import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentW
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 import com.example.abhishek.weatherforecast.networkutils.ApiClient;
 import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
 
@@ -62,6 +63,7 @@ public class WeatherListFragment extends Fragment
 
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
     List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
+    List<IWeatherDetails> iWeatherDetailsList = new ArrayList<>();
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -74,11 +76,31 @@ public class WeatherListFragment extends Fragment
 
                     //RETRIEVE FORECAST DATA EXCLUDING TODAY'S WEATHER
                     weatherListFromTomorrow = WeatherUtils.getWeatherForecastListFromTomorrow(weather);
+
+                    //CONVERT WEATHERLISTAPIMODEL TO WEATHERLISTBUSINESSMODEL
+                    List<WeatherListBusinessModel> listBusinessModels = new ArrayList<>();
                     for(WeatherListApiModel apiModel: weatherListFromTomorrow){
-                        Date dt = new Date(apiModel.getDt()*1000L);
-                        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                        Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt));
+                        listBusinessModels.add(new WeatherListBusinessModel(apiModel));
                     }
+
+                    //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
+                    for(WeatherListBusinessModel weatherListBusinessModel: listBusinessModels){
+                        iWeatherDetailsList.add(weatherListBusinessModel);
+                    }
+                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+
+                    for(IWeatherDetails details: iWeatherDetailsList){
+                        if(details instanceof WeatherListBusinessModel){
+                           WeatherListBusinessModel wb = (WeatherListBusinessModel) details;
+                           Date dt = new Date(wb.getDt()*1000L);
+                            Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt));
+                        }
+                        else if(details instanceof CurrentWeatherBusinessModel){
+                            CurrentWeatherBusinessModel cb = (CurrentWeatherBusinessModel) details;
+                            Log.d("#",cb.getName()+ " Today : "+sdf.format(cb.getDt() *1000L));
+                        }
+
+                 }
 
                     //INSERT WEATHER FORECAST INTO DB
                     WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
@@ -87,13 +109,13 @@ public class WeatherListFragment extends Fragment
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
                     Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
                     CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
-
                     CurrentWeatherBusinessModel currentWeatherBusinessModel = new CurrentWeatherBusinessModel(currentWeatherApiModel);
 
+                    //ADD TO LIST FOR ADAPTER
+                    iWeatherDetailsList.add(0,currentWeatherBusinessModel);
+
                     //SHOW CURRENT WEATHER IN THE LIST
-                    Date dt = new Date(currentWeatherBusinessModel.getDt()*1000L);
-                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-                    Log.d("#",currentWeatherBusinessModel.getName()+ " Today : "+sdf.format(dt));
+
 
                     //INSERT CURRENT WEATHER INTO DATABASE
                     WeatherDBDao.insertCurrentWeatherIntoDB(currentWeatherBusinessModel, getActivity());

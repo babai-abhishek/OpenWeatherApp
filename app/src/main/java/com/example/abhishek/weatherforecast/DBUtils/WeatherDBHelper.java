@@ -25,7 +25,7 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherContract.Curre
 
 public class WeatherDBHelper extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 23;
+    private static final int DATABASE_VERSION = 26;
     public static final String DATABASE_NAME = "weather.db";
 
 
@@ -46,6 +46,7 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
                 WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP   + " REAL NOT NULL, " +
                 WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_HUMIDITY   + " REAL NOT NULL, " +
                 WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WIND_SPEED + " REAL NOT NULL, " +
+                WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_CONDITION_ID + " INTEGER NOT NULL, " +
                 WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_ICON       + " TEXT NOT NULL, " +
                 WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LAT + " REAL NOT NULL, " +
                 WeatherContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LON + " REAL NOT NULL, " +

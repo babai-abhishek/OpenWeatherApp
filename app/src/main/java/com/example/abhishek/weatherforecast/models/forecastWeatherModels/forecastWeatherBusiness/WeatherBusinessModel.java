@@ -7,7 +7,7 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 
 import java.util.ArrayList;
 
-public class WeatherBusinessModel implements IWeatherDetails{
+public class WeatherBusinessModel {
 
     private String cod;
     private java.util.List<WeatherListBusinessModel> weatherListBusinessModel = new ArrayList<WeatherListBusinessModel>();
