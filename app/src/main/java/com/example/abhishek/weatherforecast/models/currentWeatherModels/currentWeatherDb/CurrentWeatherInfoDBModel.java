@@ -7,6 +7,15 @@ public class CurrentWeatherInfoDBModel {
 //    private String main;
     private String description;
     private String icon;
+    private int weatherId;
+
+    public int getWeatherId() {
+        return weatherId;
+    }
+
+    public void setWeatherId(int weatherId) {
+        this.weatherId = weatherId;
+    }
 
     /**
      * No args constructor for use in serialization
@@ -21,11 +30,12 @@ public class CurrentWeatherInfoDBModel {
      * @param description
      * @param main
      */
-    public CurrentWeatherInfoDBModel(String main, String description, String icon) {
+    public CurrentWeatherInfoDBModel(String main, String description, String icon, int id) {
         super();
        // this.main = main;
         this.description = description;
         this.icon = icon;
+        this.weatherId = id;
     }
 
    /* public String getMain() {

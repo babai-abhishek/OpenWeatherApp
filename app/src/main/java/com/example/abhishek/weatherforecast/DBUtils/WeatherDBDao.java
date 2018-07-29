@@ -179,6 +179,7 @@ public class WeatherDBDao {
             CurrentWeatherInfoDBModel infoDBModel = new CurrentWeatherInfoDBModel();
             infoDBModel.setDescription(infoBusinessModel.getDescription());
             infoDBModel.setIcon(infoBusinessModel.getIcon());
+            infoDBModel.setWeatherId(infoBusinessModel.getWeatherId());
             weatherInfoDBModelList.add(infoDBModel);
         }
         currentWeatherDBModel.setCurrentWeatherInfoDBModel(weatherInfoDBModelList);

@@ -16,32 +16,49 @@ public class CurrentWeatherInfoApiModel implements Parcelable
     @SerializedName("icon")
     @Expose
     private String icon;
-    public final static Creator<CurrentWeatherInfoApiModel> CREATOR = new Creator<CurrentWeatherInfoApiModel>() {
+    @SerializedName("id")
+    @Expose
+    private int weatherId;
 
+    protected CurrentWeatherInfoApiModel(Parcel in) {
+        description = in.readString();
+        icon = in.readString();
+        weatherId = in.readInt();
+    }
 
-        @SuppressWarnings({
-            "unchecked"
-        })
+    public static final Creator<CurrentWeatherInfoApiModel> CREATOR = new Creator<CurrentWeatherInfoApiModel>() {
+        @Override
         public CurrentWeatherInfoApiModel createFromParcel(Parcel in) {
             return new CurrentWeatherInfoApiModel(in);
         }
 
+        @Override
         public CurrentWeatherInfoApiModel[] newArray(int size) {
-            return (new CurrentWeatherInfoApiModel[size]);
+            return new CurrentWeatherInfoApiModel[size];
         }
+    };
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(description);
+        dest.writeString(icon);
+        dest.writeInt(weatherId);
     }
-    ;
 
-    protected CurrentWeatherInfoApiModel(Parcel in) {
-        this.description = ((String) in.readValue((String.class.getClassLoader())));
-        this.icon = ((String) in.readValue((String.class.getClassLoader())));
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
+
+    public int getWeatherId() {
+        return weatherId;
+    }
+
+    public void setWeatherId(int weatherId) {
+        this.weatherId = weatherId;
+    }
+
     public CurrentWeatherInfoApiModel() {
     }
 
@@ -74,13 +91,5 @@ public class CurrentWeatherInfoApiModel implements Parcelable
         this.icon = icon;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(description);
-        dest.writeValue(icon);
-    }
-
-    public int describeContents() {
-        return  0;
-    }
 
 }
