@@ -205,10 +205,14 @@ public class WeatherListFragment extends Fragment
         //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
         isInternetAvailAble = NetworkConnectivityManager.isConnected();
 
+        //SHOW AVAILABLE/UNAVAILABLE
         showSnack(isInternetAvailAble);
 
         //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
         if (isInternetAvailAble) {
+
+            if(iWeatherDetailsList.size()>0)
+                iWeatherDetailsList.clear();
 
             //LOAD FORECAST INFO
             loadWeatherForecast();

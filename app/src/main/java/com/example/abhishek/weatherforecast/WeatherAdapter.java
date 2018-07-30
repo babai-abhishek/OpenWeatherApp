@@ -10,9 +10,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.MainBusinessModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherInfoBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,7 +71,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if (holder instanceof CurrentWeatherViewHolder) {
             ((CurrentWeatherViewHolder) holder).bind((CurrentWeatherBusinessModel) item);
-        } else {
+        } else if(holder instanceof ForecastWeatherViewHolder){
             ((ForecastWeatherViewHolder) holder).bind((WeatherListBusinessModel) item);
         }
     }
@@ -84,6 +87,27 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         //CHECK TYPE OF DATA (CURRNET/FORECAST) FROM LIST
         if ( position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && mUseTodayLayout) {
             return VIEW_TYPE_TODAY;
+        }else if ( position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && !mUseTodayLayout) {
+
+            //AS IT IS IN LANDSCAPE MODE HENCE CHANGE THE CURRENTWEATHERBUSINEEMODEL TO WEATHERBUSINESSMODEL
+            //SO THAT IT CAN BE SHOWN AS A VIEW TYPE LIKE FUTURE DAY (IN LANDSCAPE MODE WE SHOULDN'T EXPAND
+            // TODAY'S DATE AS PROTRAIT MODE)
+
+            CurrentWeatherBusinessModel current = (CurrentWeatherBusinessModel) iWeatherDetailsList.get(0);
+            WeatherListBusinessModel forecastWeather = new WeatherListBusinessModel();
+            forecastWeather.setDt(current.getDt());
+            MainBusinessModel mb = new MainBusinessModel();
+            mb.setTempMax(current.getCurrentWeatherMainBusinessModel().getTempMax());
+            mb.setTempMin(current.getCurrentWeatherMainBusinessModel().getTempMin());
+            forecastWeather.setMainBusinessModel(mb);
+            WeatherInfoBusinessModel info = new WeatherInfoBusinessModel();
+            info.setDescription(current.getCurrentWeatherInfoBusinessModel().get(0).getDescription());
+            info.setId(current.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
+            List<WeatherInfoBusinessModel> infoModels = new ArrayList<>();
+            infoModels.add(info);
+            forecastWeather.setWeatherInfoBusinessModel(infoModels);
+            iWeatherDetailsList.set(0, forecastWeather);
+            return VIEW_TYPE_FUTURE_DAY;
         } else {
             return VIEW_TYPE_FUTURE_DAY;
         }
