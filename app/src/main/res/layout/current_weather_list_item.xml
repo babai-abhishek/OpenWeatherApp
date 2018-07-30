@@ -75,4 +75,25 @@
         app:layout_constraintRight_toRightOf="@+id/tv_current_weather_high_temperature"
         tools:text="10\u00b0"/>
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/current_weather_last_update"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/tv_current_weather_high_temperature"
+        app:layout_constraintTop_toBottomOf="@+id/tv_current_weather_low_temperature" />
+
+    <TextView
+        android:id="@+id/tb_current_updated"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        tools:text="8:14 am" />
+
 </android.support.constraint.ConstraintLayout>

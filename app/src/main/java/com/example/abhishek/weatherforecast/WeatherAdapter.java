@@ -12,6 +12,8 @@ import android.widget.TextView;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -151,7 +153,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class CurrentWeatherViewHolder extends RecyclerView.ViewHolder{
 
         TextView tv_current_weather_date, tv_current_weather_description, tv_current_weather_high_temperature,
-                 tv_current_weather_low_temperature;
+                 tv_current_weather_low_temperature, tb_current_updated;
         ImageView img_current_weather_icon;
 
         public CurrentWeatherViewHolder(View itemView) {
@@ -161,6 +163,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tv_current_weather_high_temperature = itemView.findViewById(R.id.tv_current_weather_high_temperature);
             tv_current_weather_low_temperature = itemView.findViewById(R.id.tv_current_weather_low_temperature);
             img_current_weather_icon = itemView.findViewById(R.id.img_current_weather_icon);
+            tb_current_updated = itemView.findViewById(R.id.tb_current_updated);
 
         }
 
@@ -196,9 +199,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             img_current_weather_icon.setImageResource(weatherImageId);
 
             //SET DATE
-            long dateInMillis = currentWeather.getDt();
-            String dateString = WeatherUtils.getDateString(mContext, dateInMillis);
+            long dateinSec = currentWeather.getDt();
+            String dateString = WeatherUtils.getDateString(mContext, dateinSec);
             tv_current_weather_date.setText(dateString);
+
+            //SET LAST UPDATED TIME
+            SimpleDateFormat sfd = new SimpleDateFormat("HH:mm a");
+            tb_current_updated.setText(sfd.format(new Date(dateinSec*1000L)));
+
 
         }
     }

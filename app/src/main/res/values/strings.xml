@@ -109,5 +109,6 @@
 
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+    <string name="current_weather_last_update">Updated at :</string>
 
 </resources>
