@@ -3,12 +3,19 @@ package com.example.abhishek.weatherforecast.models.currentWeatherModels.current
 
 
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherInfoApiModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherInfoDBModel;
 
 public class CurrentWeatherInfoBusinessModel {
 
     private String description;
     private String icon;
     private int weatherId;
+
+    public CurrentWeatherInfoBusinessModel(CurrentWeatherInfoDBModel current) {
+        this.description = current.getDescription();
+        this.icon = current.getIcon();
+        this.weatherId = current.getWeatherId();
+    }
 
     public int getWeatherId() {
         return weatherId;

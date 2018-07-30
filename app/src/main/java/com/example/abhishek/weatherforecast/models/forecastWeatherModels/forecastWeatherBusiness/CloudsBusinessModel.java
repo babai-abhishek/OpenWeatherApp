@@ -3,6 +3,7 @@ package com.example.abhishek.weatherforecast.models.forecastWeatherModels.foreca
 
 
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.CloudsApiModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CloudsDBModel;
 
 public class CloudsBusinessModel {
 
@@ -25,6 +26,10 @@ public class CloudsBusinessModel {
 
     public CloudsBusinessModel(CloudsApiModel cloudsApiModel) {
         this.all = cloudsApiModel.getAll();
+    }
+
+    public CloudsBusinessModel(CloudsDBModel cloudsDBModel) {
+        this.all = cloudsDBModel.getAll();
     }
 
     public long getAll() {

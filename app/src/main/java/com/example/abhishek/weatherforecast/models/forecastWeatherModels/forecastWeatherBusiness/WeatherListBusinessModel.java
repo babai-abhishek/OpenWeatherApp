@@ -4,6 +4,8 @@ package com.example.abhishek.weatherforecast.models.forecastWeatherModels.foreca
 import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherInfoApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherInfoDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherListDBModel;
 
 import java.util.ArrayList;
 
@@ -50,6 +52,17 @@ public class WeatherListBusinessModel implements IWeatherDetails {
         this.cloudsBusinessModel = new CloudsBusinessModel(weatherListApiModel.getCloudsApiModel());
         this.windBusinessModel = new WindBusinessModel(weatherListApiModel.getWindApiModel());
         this.sysBusinessModel = new SysBusinessModel(weatherListApiModel.getSysApiModel());
+    }
+
+    public WeatherListBusinessModel(WeatherListDBModel dbModel) {
+        this.dt = dbModel.getDt();
+        this.mainBusinessModel = new MainBusinessModel(dbModel.getMainDBModel());
+        this.cloudsBusinessModel = new CloudsBusinessModel(dbModel.getCloudsDBModel());
+        this.windBusinessModel = new WindBusinessModel(dbModel.getWindDBModel());
+        this.sysBusinessModel = new SysBusinessModel(dbModel.getSysDBModel());
+        for(WeatherInfoDBModel weatherInfoDbModel: dbModel.getWeatherInfoDBModel()){
+            this.weatherInfoBusinessModel.add(new WeatherInfoBusinessModel(weatherInfoDbModel));
+        }
     }
 
     public long getDt() {

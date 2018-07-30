@@ -34,7 +34,7 @@ public class WeatherInfoDBModel {
         this.icon = icon;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

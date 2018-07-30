@@ -114,14 +114,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void bind(WeatherListBusinessModel weatherListBusinessModel){
 
             //SET DESC
-            String description = WeatherUtils.getStringForWeatherCondition(mContext, weatherListBusinessModel.getWeatherInfoBusinessModel().get(0).getId());
+            String description = Utils.getStringForWeatherCondition(mContext, weatherListBusinessModel.getWeatherInfoBusinessModel().get(0).getId());
             String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
             tv_forecast_weather_description.setText(description);
             tv_forecast_weather_description.setContentDescription(descriptionA11y);
 
             //SET MAX TEMP
             double highInCelsius = weatherListBusinessModel.getMainBusinessModel().getTempMax();
-            String highString = WeatherUtils.formatTemperature(mContext, highInCelsius);
+            String highString = Utils.formatTemperature(mContext, highInCelsius);
             String highA11y = mContext.getString(R.string.a11y_high_temp, highString);
             tv_forecast_weather_high_temperature.setText(highString);
             tv_forecast_weather_high_temperature.setContentDescription(highA11y);
@@ -129,13 +129,13 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             //SET MIN TEMP
             double lowInCelsius = weatherListBusinessModel.getMainBusinessModel().getTempMin();
-            String lowString = WeatherUtils.formatTemperature(mContext, lowInCelsius);
+            String lowString = Utils.formatTemperature(mContext, lowInCelsius);
             String lowA11y = mContext.getString(R.string.a11y_low_temp, lowString);
             tv_forecast_weather_low_temperature.setText(lowString);
             tv_forecast_weather_low_temperature.setContentDescription(lowA11y);
 
             //SET ICON
-            int weatherImageId = WeatherUtils
+            int weatherImageId = Utils
                     .getSmallArtResourceIdForWeatherCondition((weatherListBusinessModel
                             .getWeatherInfoBusinessModel()
                             .get(0)
@@ -144,7 +144,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             //SET DATE
             long dateInMillis = weatherListBusinessModel.getDt();
-            String dateString = WeatherUtils.getDateString(mContext, dateInMillis);
+            String dateString = Utils.getDateString(mContext, dateInMillis);
             tv_forecast_weather_date.setText(dateString);
 
         }
@@ -170,14 +170,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void bind(CurrentWeatherBusinessModel currentWeather){
 
             //SET DESC
-            String description = WeatherUtils.getStringForWeatherCondition(mContext, currentWeather.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
+            String description = Utils.getStringForWeatherCondition(mContext, currentWeather.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
             String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
             tv_current_weather_description.setText(description);
 //            tv_current_weather_description.setContentDescription(descriptionA11y);
 
             //SET MAX TEMP
             double highInCelsius = currentWeather.getCurrentWeatherMainBusinessModel().getTempMax();
-            String highString = WeatherUtils.formatTemperature(mContext, highInCelsius);
+            String highString = Utils.formatTemperature(mContext, highInCelsius);
             String highA11y = mContext.getString(R.string.a11y_high_temp, highString);
             tv_current_weather_high_temperature.setText(highString);
 //            tv_current_weather_high_temperature.setContentDescription(highA11y);
@@ -185,13 +185,13 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             //SET MIN TEMP
             double lowInCelsius = currentWeather.getCurrentWeatherMainBusinessModel().getTempMin();
-            String lowString = WeatherUtils.formatTemperature(mContext, lowInCelsius);
+            String lowString = Utils.formatTemperature(mContext, lowInCelsius);
             String lowA11y = mContext.getString(R.string.a11y_low_temp, lowString);
             tv_current_weather_low_temperature.setText(lowString);
 //            tv_current_weather_low_temperature.setContentDescription(lowA11y);
 
             //SET ICON
-            int weatherImageId = WeatherUtils
+            int weatherImageId = Utils
                     .getLargeArtResourceIdForWeatherCondition((currentWeather
                             .getCurrentWeatherInfoBusinessModel()
                             .get(0)
@@ -200,7 +200,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             //SET DATE
             long dateinSec = currentWeather.getDt();
-            String dateString = WeatherUtils.getDateString(mContext, dateinSec);
+            String dateString = Utils.getDateString(mContext, dateinSec);
             tv_current_weather_date.setText(dateString);
 
             //SET LAST UPDATED TIME

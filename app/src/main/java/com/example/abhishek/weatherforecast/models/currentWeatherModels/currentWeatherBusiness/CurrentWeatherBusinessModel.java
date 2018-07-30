@@ -4,6 +4,8 @@ package com.example.abhishek.weatherforecast.models.currentWeatherModels.current
 import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherInfoApiModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherInfoDBModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,7 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
     private CurrentWeatherMainBusinessModel currentWeatherMainBusinessModel;
     private CurrentWeatherWindBusinessModel currentWeatherWindBusinessModel;
     private CurrentWeatherCloudsBusinessModel currentWeatherCloudsBusinessModel;
-    private int dt;
+    private long dt;
     private CurrentWeatherSysBusinessModel currentWeatherSysBusinessModel;
     private int id;
     private String name;
@@ -65,6 +67,20 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
         }
     }
 
+    public CurrentWeatherBusinessModel(CurrentWeatherDBModel currentWeatherDBModel) {
+        this.dt = currentWeatherDBModel.getDt();
+        this.id = currentWeatherDBModel.getId();
+        this.name = currentWeatherDBModel.getName();
+        this.currentWeatherSysBusinessModel = new CurrentWeatherSysBusinessModel(currentWeatherDBModel.getCurrentWeatherSysDBModel().getCountry());
+        this.currentWeatherCoordBusinessModel = new CurrentWeatherCoordBusinessModel(currentWeatherDBModel.getCurrentWeatherCoordDBModel());
+        this.currentWeatherMainBusinessModel = new CurrentWeatherMainBusinessModel(currentWeatherDBModel.getCurrentWeatherMainDBModel());
+        this.currentWeatherWindBusinessModel = new CurrentWeatherWindBusinessModel(currentWeatherDBModel.getCurrentWeatherWindDBModel());
+        this.currentWeatherCloudsBusinessModel = new CurrentWeatherCloudsBusinessModel(currentWeatherDBModel.getCurrentWeatherCloudsDBModel());
+        for(CurrentWeatherInfoDBModel current: currentWeatherDBModel.getCurrentWeatherInfoDBModel()){
+            this.currentWeatherInfoBusinessModel.add(new CurrentWeatherInfoBusinessModel(current));
+        }
+    }
+
     public CurrentWeatherCoordBusinessModel getCurrentWeatherCoordBusinessModel() {
         return currentWeatherCoordBusinessModel;
     }
@@ -105,7 +121,7 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
         this.currentWeatherCloudsBusinessModel = currentWeatherCloudsBusinessModel;
     }
 
-    public int getDt() {
+    public long getDt() {
         return dt;
     }
 

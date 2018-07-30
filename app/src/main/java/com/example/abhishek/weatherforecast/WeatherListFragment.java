@@ -48,7 +48,7 @@ import retrofit2.Response;
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
 
-    private static final String TEST_LOCATION = "Cherrapunji,in";
+    private static final String TEST_LOCATION = "Kolkata,in";
 
     private static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
     private static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
@@ -81,7 +81,7 @@ public class WeatherListFragment extends Fragment
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
 
                     //RETRIEVE FORECAST DATA EXCLUDING TODAY'S WEATHER
-                    weatherListFromTomorrow = WeatherUtils.getWeatherForecastListFromTomorrow(weather);
+                    weatherListFromTomorrow = Utils.getWeatherForecastListFromTomorrow(weather);
 
                     //CONVERT WEATHERLISTAPIMODEL TO WEATHERLISTBUSINESSMODEL
                     List<WeatherListBusinessModel> listBusinessModels = new ArrayList<>();
@@ -99,8 +99,8 @@ public class WeatherListFragment extends Fragment
 
                     for(IWeatherDetails details: iWeatherDetailsList){
                         if(details instanceof WeatherListBusinessModel){
-                           WeatherListBusinessModel wb = (WeatherListBusinessModel) details;
-                           Date dt = new Date(wb.getDt()*1000L);
+                            WeatherListBusinessModel wb = (WeatherListBusinessModel) details;
+                            Date dt = new Date(wb.getDt()*1000L);
                             Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt)+" max temp "+String.format(context.getString(R.string.format_temperature_celsius), wb.getMainBusinessModel().getTempMax()-273.0)+" min temp "+
                                     String.format(context.getString(R.string.format_temperature_celsius), wb.getMainBusinessModel().getTempMin()-273.0));
                         }
@@ -110,7 +110,7 @@ public class WeatherListFragment extends Fragment
                                     String.format(context.getString(R.string.format_temperature_celsius), cb.getCurrentWeatherMainBusinessModel().getTempMin()-273.0));
                         }
 
-                 }
+                    }
 
                     //INSERT WEATHER FORECAST INTO DB
                     WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
@@ -165,8 +165,7 @@ public class WeatherListFragment extends Fragment
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
         adapter = new WeatherAdapter(getActivity(),iWeatherDetailsList);
         setHasOptionsMenu(true);
-        loadWeatherForecast();
-        loadCurrentWeather();
+
     }
 
     @Override
@@ -192,6 +191,33 @@ public class WeatherListFragment extends Fragment
         filter.addAction(ACTION_WEATHER_FORECAST_API_SUCCESS);
         filter.addAction(ACTION_WEATHER_FORECAST_API_FAILURE);
         broadcastManager.registerReceiver(broadcastReceiver, filter);
+
+        boolean isInternetAvailAble = false;
+
+        //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
+        isInternetAvailAble = Utils.checkInternetConnetion();
+
+        //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
+        if (isInternetAvailAble) {
+
+            //LOAD FORECAST INFO
+            loadWeatherForecast();
+
+            //LOAD CURRENT INFO
+            loadCurrentWeather();
+        } else {
+
+            //CHECK DATA AVAILABLE IN DB
+            List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(TEST_LOCATION, getActivity());
+            if(!availableData.isEmpty()){
+                //IF DATA AVAILABLE SHOW ON SCREEN
+                adapter.setWeatherList(availableData);
+
+            }
+            //IF NO DATA AVAILABLE SHOW ERROR
+
+
+        }
     }
 
     @Override

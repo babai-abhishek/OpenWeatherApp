@@ -29,7 +29,7 @@ public class CurrentWeatherApiModel implements Parcelable
     private CurrentWeatherCloudsApiModel currentWeatherCloudsApiModel;
     @SerializedName("dt")
     @Expose
-    private int dt;
+    private long dt;
     @SerializedName("sys")
     @Expose
     private CurrentWeatherSysApiModel currentWeatherSysApiModel;
@@ -140,11 +140,11 @@ public class CurrentWeatherApiModel implements Parcelable
         this.currentWeatherCloudsApiModel = currentWeatherCloudsApiModel;
     }
 
-    public int getDt() {
+    public long getDt() {
         return dt;
     }
 
-    public void setDt(int dt) {
+    public void setDt(long dt) {
         this.dt = dt;
     }
 

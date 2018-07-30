@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry;
-import com.example.abhishek.weatherforecast.WeatherUtils;
+import com.example.abhishek.weatherforecast.Utils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCloudsDBModel;
@@ -31,7 +31,7 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.abhishek.weatherforecast.WeatherUtils.getAlreadyPresentDatesFromDB;
+import static com.example.abhishek.weatherforecast.Utils.getAlreadyPresentDatesFromDB;
 
 
 /**
@@ -102,7 +102,7 @@ public class WeatherDBDao {
         //SET WEATHERLISTDBMODEL IN WEATHERDBMODEL
         weatherDBModel.setWeatherListDBModel(weatherListDBModel);
 
-        ContentValues[] weatherForecastContentValues = WeatherUtils
+        ContentValues[] weatherForecastContentValues = Utils
                 .getWeatherForecastContentValuesFromJson(weatherDBModel);
 
         weatherDBHelper = new WeatherDBHelper(ctx);
@@ -185,7 +185,7 @@ public class WeatherDBDao {
         }
         currentWeatherDBModel.setCurrentWeatherInfoDBModel(weatherInfoDBModelList);
 
-        ContentValues currentWeatherContentValue = WeatherUtils
+        ContentValues currentWeatherContentValue = Utils
                 .getCurrentWeatherContentValueFromJson(currentWeatherDBModel);
 
         weatherDBHelper = new WeatherDBHelper(ctx);

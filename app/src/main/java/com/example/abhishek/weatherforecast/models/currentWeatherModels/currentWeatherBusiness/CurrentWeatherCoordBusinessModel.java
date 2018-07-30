@@ -3,6 +3,7 @@ package com.example.abhishek.weatherforecast.models.currentWeatherModels.current
 
 
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherCoordApiModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCoordDBModel;
 
 public class CurrentWeatherCoordBusinessModel {
 
@@ -30,6 +31,11 @@ public class CurrentWeatherCoordBusinessModel {
     public CurrentWeatherCoordBusinessModel(CurrentWeatherCoordApiModel currentWeatherCoordApiModel) {
         this.lat = currentWeatherCoordApiModel.getLat();
         this.lon = currentWeatherCoordApiModel.getLon();
+    }
+
+    public CurrentWeatherCoordBusinessModel(CurrentWeatherCoordDBModel currentWeatherCoordDBModel) {
+        this.lat = currentWeatherCoordDBModel.getLat();
+        this.lon = currentWeatherCoordDBModel.getLon();
     }
 
     public double getLon() {
