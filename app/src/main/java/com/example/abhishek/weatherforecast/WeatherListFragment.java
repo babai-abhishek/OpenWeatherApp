@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,6 +21,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -46,7 +50,7 @@ import retrofit2.Response;
  * A simple {@link Fragment} subclass.
  */
 public class WeatherListFragment extends Fragment
-        implements SharedPreferences.OnSharedPreferenceChangeListener{
+        implements SharedPreferences.OnSharedPreferenceChangeListener, NetworkConnectivityManager.ConnectivityReceiverListener{
 
     private static final String TEST_LOCATION = "Kolkata,in";
 
@@ -70,6 +74,7 @@ public class WeatherListFragment extends Fragment
     //VARIABLES FOR SHOWING LIST
     WeatherAdapter adapter;
     private RecyclerView recyclerView;
+    private FrameLayout list_layout;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -173,6 +178,7 @@ public class WeatherListFragment extends Fragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather_list, container, false);
+        list_layout = view.findViewById(R.id.list_layout);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_forecast);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -185,6 +191,8 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
+        MyApplication.getInstance().setConnectivityListener(this);
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_CURRENT_WEATHER_API_SUCCESS);
         filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);
@@ -195,7 +203,9 @@ public class WeatherListFragment extends Fragment
         boolean isInternetAvailAble = false;
 
         //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
-        isInternetAvailAble = Utils.checkInternetConnetion(getActivity());
+        isInternetAvailAble = NetworkConnectivityManager.isConnected();
+
+        showSnack(isInternetAvailAble);
 
         //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
         if (isInternetAvailAble) {
@@ -245,6 +255,11 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
+    }
+
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
     }
 
     public interface SettingsOptionClickListener{
@@ -306,6 +321,21 @@ public class WeatherListFragment extends Fragment
             }
         });
 
+    }
+
+    private void showSnack(boolean isConnected) {
+        String message;
+        int color;
+        if (isConnected) {
+            message = "Connected to Internet";
+        } else {
+            message = "Sorry! Not connected to internet";
+        }
+
+        Snackbar snackbar = Snackbar
+                .make(list_layout, message, Snackbar.LENGTH_LONG);
+
+        snackbar.show();
     }
 
 }
