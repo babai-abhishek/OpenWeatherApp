@@ -204,8 +204,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tv_current_weather_date.setText(dateString);
 
             //SET LAST UPDATED TIME
-            SimpleDateFormat sfd = new SimpleDateFormat("HH:mm a");
-            tb_current_updated.setText(sfd.format(new Date(dateinSec*1000L)));
+            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+
+            tb_current_updated.setText(sdf.format(new Date(dateinSec*1000L)));
 
 
         }
