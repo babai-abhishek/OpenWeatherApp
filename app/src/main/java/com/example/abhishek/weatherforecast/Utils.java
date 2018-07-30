@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract;
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBHelper;
@@ -468,8 +470,21 @@ public class Utils {
         return calendar.getTime();
     }
 
-    public static boolean checkInternetConnetion() {
-        return false;
+    public static boolean checkInternetConnetion(Context ctx) {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+        ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
     public static List<IWeatherDetails> checkCurrentDataForCity(String location, Context ctx) {

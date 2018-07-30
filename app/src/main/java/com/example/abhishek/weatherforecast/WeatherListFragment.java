@@ -195,7 +195,7 @@ public class WeatherListFragment extends Fragment
         boolean isInternetAvailAble = false;
 
         //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
-        isInternetAvailAble = Utils.checkInternetConnetion();
+        isInternetAvailAble = Utils.checkInternetConnetion(getActivity());
 
         //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
         if (isInternetAvailAble) {
