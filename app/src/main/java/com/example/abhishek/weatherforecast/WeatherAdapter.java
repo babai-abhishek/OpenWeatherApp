@@ -87,14 +87,9 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public void setCurrentWeatherList(List<IWeatherDetails> weatherList){
+    public void setWeatherList(List<IWeatherDetails> weatherList){
         this.iWeatherDetailsList = weatherList;
-        if(iWeatherDetailsList.get(0) instanceof CurrentWeatherBusinessModel && iWeatherDetailsList.get(0) instanceof WeatherListBusinessModel ){
-            notifyItemChanged(0);
-        }else if(iWeatherDetailsList.get(0) instanceof CurrentWeatherBusinessModel){
-            notifyDataSetChanged();
-        }else
-            notifyDataSetChanged();
+        notifyDataSetChanged();
     }
 
     class ForecastWeatherViewHolder extends RecyclerView.ViewHolder {
@@ -147,7 +142,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             //SET DATE
             long dateInMillis = weatherListBusinessModel.getDt();
-            String dateString = WeatherUtils.getFriendlyDateString(mContext, dateInMillis, false);
+            String dateString = WeatherUtils.getDateString(mContext, dateInMillis);
             tv_forecast_weather_date.setText(dateString);
 
         }
@@ -169,40 +164,40 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         }
 
-        void bind(CurrentWeatherBusinessModel weatherListBusinessModel){
+        void bind(CurrentWeatherBusinessModel currentWeather){
 
             //SET DESC
-            String description = WeatherUtils.getStringForWeatherCondition(mContext, weatherListBusinessModel.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
+            String description = WeatherUtils.getStringForWeatherCondition(mContext, currentWeather.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
             String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
             tv_current_weather_description.setText(description);
-            tv_current_weather_description.setContentDescription(descriptionA11y);
+//            tv_current_weather_description.setContentDescription(descriptionA11y);
 
             //SET MAX TEMP
-            double highInCelsius = weatherListBusinessModel.getCurrentWeatherMainBusinessModel().getTempMax();
+            double highInCelsius = currentWeather.getCurrentWeatherMainBusinessModel().getTempMax();
             String highString = WeatherUtils.formatTemperature(mContext, highInCelsius);
             String highA11y = mContext.getString(R.string.a11y_high_temp, highString);
             tv_current_weather_high_temperature.setText(highString);
-            tv_current_weather_high_temperature.setContentDescription(highA11y);
+//            tv_current_weather_high_temperature.setContentDescription(highA11y);
 
 
             //SET MIN TEMP
-            double lowInCelsius = weatherListBusinessModel.getCurrentWeatherMainBusinessModel().getTempMin();
+            double lowInCelsius = currentWeather.getCurrentWeatherMainBusinessModel().getTempMin();
             String lowString = WeatherUtils.formatTemperature(mContext, lowInCelsius);
             String lowA11y = mContext.getString(R.string.a11y_low_temp, lowString);
             tv_current_weather_low_temperature.setText(lowString);
-            tv_current_weather_low_temperature.setContentDescription(lowA11y);
+//            tv_current_weather_low_temperature.setContentDescription(lowA11y);
 
             //SET ICON
             int weatherImageId = WeatherUtils
-                    .getLargeArtResourceIdForWeatherCondition((weatherListBusinessModel
+                    .getLargeArtResourceIdForWeatherCondition((currentWeather
                             .getCurrentWeatherInfoBusinessModel()
                             .get(0)
                             .getWeatherId()));
             img_current_weather_icon.setImageResource(weatherImageId);
 
             //SET DATE
-            long dateInMillis = weatherListBusinessModel.getDt();
-            String dateString = WeatherUtils.getFriendlyDateString(mContext, dateInMillis, false);
+            long dateInMillis = currentWeather.getDt();
+            String dateString = WeatherUtils.getDateString(mContext, dateInMillis);
             tv_current_weather_date.setText(dateString);
 
         }

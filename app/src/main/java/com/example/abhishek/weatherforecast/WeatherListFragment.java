@@ -48,7 +48,7 @@ import retrofit2.Response;
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener{
 
-    private static final String TEST_LOCATION = "Kolkata,in";
+    private static final String TEST_LOCATION = "Cherrapunji,in";
 
     private static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
     private static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
@@ -93,7 +93,7 @@ public class WeatherListFragment extends Fragment
                     for(WeatherListBusinessModel weatherListBusinessModel: listBusinessModels){
                         iWeatherDetailsList.add(weatherListBusinessModel);
                     }
-                    adapter.setCurrentWeatherList(iWeatherDetailsList);
+                    adapter.setWeatherList(iWeatherDetailsList);
 
                     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 
@@ -101,11 +101,13 @@ public class WeatherListFragment extends Fragment
                         if(details instanceof WeatherListBusinessModel){
                            WeatherListBusinessModel wb = (WeatherListBusinessModel) details;
                            Date dt = new Date(wb.getDt()*1000L);
-                            Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt));
+                            Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt)+" max temp "+String.format(context.getString(R.string.format_temperature_celsius), wb.getMainBusinessModel().getTempMax()-273.0)+" min temp "+
+                                    String.format(context.getString(R.string.format_temperature_celsius), wb.getMainBusinessModel().getTempMin()-273.0));
                         }
                         else if(details instanceof CurrentWeatherBusinessModel){
                             CurrentWeatherBusinessModel cb = (CurrentWeatherBusinessModel) details;
-                            Log.d("#",cb.getName()+ " Today : "+sdf.format(cb.getDt() *1000L));
+                            Log.d("#",cb.getName()+ " Today : "+sdf.format(cb.getDt() *1000L)+" max temp "+String.format(context.getString(R.string.format_temperature_celsius), cb.getCurrentWeatherMainBusinessModel().getTempMax()-273.0)+" min temp "+
+                                    String.format(context.getString(R.string.format_temperature_celsius), cb.getCurrentWeatherMainBusinessModel().getTempMin()-273.0));
                         }
 
                  }
@@ -123,7 +125,7 @@ public class WeatherListFragment extends Fragment
                     iWeatherDetailsList.add(0,currentWeatherBusinessModel);
 
                     //SHOW CURRENT WEATHER IN THE LIST
-                    adapter.setCurrentWeatherList(iWeatherDetailsList);
+                    adapter.setWeatherList(iWeatherDetailsList);
 
 
                     //INSERT CURRENT WEATHER INTO DATABASE

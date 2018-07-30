@@ -135,14 +135,6 @@ public class WeatherUtils {
         return singleWeatherApiModelPerDay;
     }
 
-    private static Date getNextDate(Date curDate) {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(curDate);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-
-        return calendar.getTime();
-    }
-
     public static int getLargeArtResourceIdForWeatherCondition(int weatherId) {
 
         if (weatherId >= 200 && weatherId <= 232) {
@@ -224,26 +216,13 @@ public class WeatherUtils {
             temperatureFormatResourceId = R.string.format_temperature_fahrenheit;
         }*/
 
-        temperature = celsiusToFahrenheit(temperature);
-        temperatureFormatResourceId = R.string.format_temperature_fahrenheit;
+       /* temperature = celsiusToFahrenheit(temperature);
+        temperatureFormatResourceId = R.string.format_temperature_fahrenheit;*/
 
-        return String.format(context.getString(temperatureFormatResourceId), temperature);
-    }
+       //DEFAULT : KELVIN ; CURRENTLY CONVERT IN CELCIUS/METRIC
+        double celcius = temperature-273.15;
 
-    private static double celsiusToFahrenheit(double temperatureInCelsius) {
-        double temperatureInFahrenheit = (temperatureInCelsius * 1.8) + 32;
-        return temperatureInFahrenheit;
-    }
-
-    public static String formatHighLows(Context context, double high, double low) {
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        String formattedHigh = formatTemperature(context, roundedHigh);
-        String formattedLow = formatTemperature(context, roundedLow);
-
-        String highLowStr = formattedHigh + " / " + formattedLow;
-        return highLowStr;
+        return String.format(context.getString(temperatureFormatResourceId), celcius);
     }
 
     public static String getFormattedWind(Context context, float windSpeed, float degrees) {
@@ -445,82 +424,6 @@ public class WeatherUtils {
         return context.getString(stringId);
     }
 
-    public static String getFriendlyDateString(Context context, long dateInMillis, boolean showFullDate) {
-
-        long localDate = getLocalDateFromUTC(dateInMillis);
-        long dayNumber = getDayNumber(localDate);
-        long currentDayNumber = getDayNumber(System.currentTimeMillis());
-
-        if (dayNumber == currentDayNumber || showFullDate) {
-
-            String dayName = getDayName(context, localDate);
-            String readableDate = getReadableDateString(context, localDate);
-            if (dayNumber - currentDayNumber < 2) {
-                String localizedDayName = new SimpleDateFormat("EEEE").format(localDate);
-                return readableDate.replace(localizedDayName, dayName);
-            } else {
-                return readableDate;
-            }
-        } else if (dayNumber < currentDayNumber + 7) {
-            /* If the input date is less than a week in the future, just return the day name. */
-            return getDayName(context, localDate);
-        } else {
-            int flags = DateUtils.FORMAT_SHOW_DATE
-                    | DateUtils.FORMAT_NO_YEAR
-                    | DateUtils.FORMAT_ABBREV_ALL
-                    | DateUtils.FORMAT_SHOW_WEEKDAY;
-
-            return DateUtils.formatDateTime(context, localDate, flags);
-        }
-    }
-
-    public static long getDayNumber(long date) {
-        TimeZone tz = TimeZone.getDefault();
-        long gmtOffset = tz.getOffset(date);
-        return (date + gmtOffset) / DAY_IN_MILLIS;
-    }
-
-    public static long normalizeDate(long date) {
-        // Normalize the start date to the beginning of the (UTC) day in local time
-        long retValNew = date / DAY_IN_MILLIS * DAY_IN_MILLIS;
-        return retValNew;
-    }
-
-    public static long getLocalDateFromUTC(long utcDate) {
-        TimeZone tz = TimeZone.getDefault();
-        long gmtOffset = tz.getOffset(utcDate);
-        return utcDate - gmtOffset;
-    }
-
-    public static long getUTCDateFromLocal(long localDate) {
-        TimeZone tz = TimeZone.getDefault();
-        long gmtOffset = tz.getOffset(localDate);
-        return localDate + gmtOffset;
-    }
-
-    private static String getReadableDateString(Context context, long timeInMillis) {
-        int flags = DateUtils.FORMAT_SHOW_DATE
-                | DateUtils.FORMAT_NO_YEAR
-                | DateUtils.FORMAT_SHOW_WEEKDAY;
-
-        return DateUtils.formatDateTime(context, timeInMillis, flags);
-    }
-
-    private static String getDayName(Context context, long dateInMillis) {
-
-        long dayNumber = getDayNumber(dateInMillis);
-        long currentDayNumber = getDayNumber(System.currentTimeMillis());
-        if (dayNumber == currentDayNumber) {
-            return context.getString(R.string.today);
-        } else if (dayNumber == currentDayNumber + 1) {
-            return context.getString(R.string.tomorrow);
-        } else {
-
-            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE");
-            return dayFormat.format(dateInMillis);
-        }
-    }
-
     private static long getEpochForTodayMidnight(){
         Date currDate = new Date();
         Calendar cal = Calendar.getInstance();
@@ -534,4 +437,28 @@ public class WeatherUtils {
         return cal.getTimeInMillis()/1000;
     }
 
+    public static String getDateString(Context mContext, long dateInMillis) {
+        Date dt = new Date(dateInMillis*1000L);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+
+        //GET CURRENT DATE
+        Date currentDate = new Date();
+        String curDate = sdf.format(currentDate);
+
+        if(curDate.equals(sdf.format(dt))){
+            return mContext.getString(R.string.today);
+        }else if(sdf.format(getNextDate(currentDate)).equals(sdf.format(dt))){
+            return mContext.getString(R.string.tomorrow);
+        }
+
+        return new SimpleDateFormat("EEEE").format(new Date(dateInMillis*1000L));
+    }
+
+    private static Date getNextDate(Date curDate) {
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(curDate);
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+
+        return calendar.getTime();
+    }
 }
