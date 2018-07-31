@@ -45,6 +45,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.abhishek.weatherforecast.WeatherDownloadTask.loadWeatherForecast;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -52,15 +54,15 @@ import retrofit2.Response;
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener, NetworkConnectivityManager.ConnectivityReceiverListener{
 
-    private static final String TEST_LOCATION = "Kolkata,in";
+    public static final String TEST_LOCATION = "Kolkata,in";
 
-    private static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
-    private static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
-    private static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
-    private static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
-    private static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
-    private static final String KEY_WEATHER_FORECAST = "weather_forecast";
-    private static final String KEY_CURRENT_WEATHER = "currentWeather";
+    public static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
+    public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
+    public static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
+    public static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
+    public static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
+    public static final String KEY_WEATHER_FORECAST = "weather_forecast";
+    public static final String KEY_CURRENT_WEATHER = "currentWeather";
 
     SettingsOptionClickListener clickListener;
     private LocalBroadcastManager broadcastManager = null;
@@ -144,6 +146,10 @@ public class WeatherListFragment extends Fragment
                 case ACTION_CURRENT_WEATHER_API_FAILURE:
                     Toast.makeText(getActivity(), "Current weather Api Failure", Toast.LENGTH_SHORT).show();
                     break;
+
+                case "downloaded":
+                    Log.d("#","download completed");
+                    break;
             }
 
         }
@@ -198,6 +204,7 @@ public class WeatherListFragment extends Fragment
         filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);
         filter.addAction(ACTION_WEATHER_FORECAST_API_SUCCESS);
         filter.addAction(ACTION_WEATHER_FORECAST_API_FAILURE);
+        filter.addAction("downloaded");
         broadcastManager.registerReceiver(broadcastReceiver, filter);
 
         boolean isInternetAvailAble = false;
@@ -210,15 +217,17 @@ public class WeatherListFragment extends Fragment
 
         //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
         if (isInternetAvailAble) {
-
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
-
             //LOAD FORECAST INFO
-            loadWeatherForecast();
+            WeatherDownloadTask.loadWeatherForecast(getContext());
 
             //LOAD CURRENT INFO
-            loadCurrentWeather();
+            WeatherDownloadTask.loadCurrentWeather(getContext());
+
+            /*Intent intent = new Intent(getContext(), CurrentWeatherSyncService.class);
+            getContext().startService(intent);*/
+
         } else {
 
             //CHECK DATA AVAILABLE IN DB
@@ -263,68 +272,17 @@ public class WeatherListFragment extends Fragment
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
+        if(isConnected){
+            if(iWeatherDetailsList.size()>0)
+                iWeatherDetailsList.clear();
+            WeatherDownloadTask.loadCurrentWeather(getContext());
+            loadWeatherForecast(getContext());
+        }
         showSnack(isConnected);
     }
 
     public interface SettingsOptionClickListener{
         void onSettingOptiionClicked(Fragment fragment);
-    }
-
-    private void loadWeatherForecast() {
-        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(TEST_LOCATION,OWM_API_KEY);
-        call.enqueue(new Callback<WeatherApiModel>() {
-            @Override
-            public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {
-                WeatherApiModel weather = null;
-
-                //if response is sucessful
-                if(response.isSuccessful()){
-                    //get data from response
-                    weather = response.body();
-                }
-
-                //register intent for broadcast manager
-                Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_SUCCESS);
-                intent.putExtra(KEY_WEATHER_FORECAST,weather);
-
-                //send broadcast
-                broadcastManager.sendBroadcast(intent);
-
-            }
-
-            @Override
-            public void onFailure(Call<WeatherApiModel> call, Throwable t) {
-                Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_FAILURE);
-                broadcastManager.sendBroadcast(intent);
-            }
-        });
-
-    }
-
-    private void loadCurrentWeather() {
-        Call<CurrentWeatherApiModel> currentWeatherApiModelCall = weatherInterface.getCurrentWeather(TEST_LOCATION, OWM_API_KEY);
-        currentWeatherApiModelCall.enqueue(new Callback<CurrentWeatherApiModel>() {
-            @Override
-            public void onResponse(Call<CurrentWeatherApiModel> call, Response<CurrentWeatherApiModel> response) {
-                CurrentWeatherApiModel currentWeatherApiModel = null;
-                if(response.isSuccessful()){
-                    currentWeatherApiModel = response.body();
-                }
-                //register intent for broadcast manager
-                Intent intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
-                intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
-
-                //send broadcast
-                broadcastManager.sendBroadcast(intent);
-            }
-
-            @Override
-            public void onFailure(Call<CurrentWeatherApiModel> call, Throwable t) {
-                Intent intent = new Intent(ACTION_CURRENT_WEATHER_API_FAILURE);
-                broadcastManager.sendBroadcast(intent);
-            }
-        });
-
     }
 
     private void showSnack(boolean isConnected) {
