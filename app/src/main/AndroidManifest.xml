@@ -5,6 +5,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
 
     <application
         android:name=".MyApplication"
@@ -14,7 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,9 +28,12 @@
 
         <receiver
             android:name=".NetworkConnectivityManager"
+            android:exported="true"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <!--<action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>-->
             </intent-filter>
         </receiver>
 
@@ -38,6 +44,11 @@
             tools:replace="android:value" />
 
         <activity android:name=".settings.SettingsActivity"></activity>
+
+        <service android:name=".CurrentWeatherSyncService"
+            android:exported="false">
+        </service>
+
     </application>
 
 </manifest>

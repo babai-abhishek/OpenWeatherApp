@@ -1,11 +1,23 @@
 package com.example.abhishek.weatherforecast;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract;
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBHelper;
@@ -54,6 +66,8 @@ import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.Wea
  */
 
 public class Utils {
+
+    public static final int REQUEST_CODE = 1001;
 
     public static ContentValues[] getWeatherForecastContentValuesFromJson(WeatherDBModel weather){
 
@@ -594,4 +608,84 @@ public class Utils {
         citySb.append(city.substring(1, city.length()).toLowerCase());
         return String.valueOf(citySb);
 }
+
+    public static void syncCurrentWeatherData(Context context) {
+        setAlarm(context);
+    }
+
+    private static void setAlarm(Context context) {
+        long interval = 30 * 1000;
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, CurrentWeatherSyncService.class);
+        PendingIntent alarmIntent = PendingIntent.getService(context, REQUEST_CODE, intent, 0);
+        alarmManager.setRepeating(AlarmManager.RTC,
+                System.currentTimeMillis(),
+                interval,
+                alarmIntent);
+    }
+
+    public static class NotificationUtils {
+
+        private static final int CURRENT_WEATHER_NOTIFICATION_ID = 1138;
+        private static final int CURRENT_WEATHER_PENDING_INTENT_ID = 1097;
+        private static final String CURRENT_WEATHER_NOTIFICATION_CHANNEL_ID = "reminder_notification_channel";
+
+        public static void showNotificationBecauseNetworkUnAvailAble(Context context) {
+            setNotification(context,context.getString(R.string.charging_reminder_notification_title),
+                    context.getString(R.string.charging_reminder_notification_body),
+                    R.drawable.ic_no_internet);
+        }
+
+
+        private static void setNotification(Context context, String notificationTitle, String notificationText, int iconId){
+            NotificationManager notificationManager = (NotificationManager) context
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                NotificationChannel channel = new NotificationChannel(
+                        CURRENT_WEATHER_NOTIFICATION_CHANNEL_ID,
+                        context.getString(R.string.main_notification_channel_name),
+                        NotificationManager.IMPORTANCE_HIGH
+                );
+                notificationManager.createNotificationChannel(channel);
+            }
+
+            NotificationCompat.Builder builder = new NotificationCompat
+                    .Builder(context, CURRENT_WEATHER_NOTIFICATION_CHANNEL_ID)
+                    .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                    .setSmallIcon(iconId)
+                    .setContentTitle(notificationTitle)
+                    .setContentText(notificationText)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .bigText(notificationText))
+                    .setContentIntent(contentIntent(context))
+                    .setAutoCancel(true);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                    && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+            }
+            Log.d("#", "current time "+String.valueOf(System.currentTimeMillis()));
+            notificationManager.notify(CURRENT_WEATHER_NOTIFICATION_ID, builder.build());
+        }
+
+        private static PendingIntent contentIntent(Context context){
+            Intent startActivityIntent = new Intent(context, MainActivity.class);
+
+            return PendingIntent.getActivity(
+                    context,
+                    CURRENT_WEATHER_PENDING_INTENT_ID,
+                    startActivityIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+            );
+        }
+    }
+
+  /*  private void setBootReceiverEnabled(int componentEnabledState) {
+        ComponentName componentName = new ComponentName(this, BootReceiver.class);
+        PackageManager packageManager = getPackageManager();
+        packageManager.setComponentEnabledSetting(componentName,
+                componentEnabledState,
+                PackageManager.DONT_KILL_APP);
+    }*/
 }

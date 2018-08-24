@@ -30,7 +30,7 @@ public class WeatherDownloadTask {
 
     private static WeatherInterface weatherInterface = ApiClient.getClient().create(WeatherInterface.class);
 
-    public static void loadCurrentWeather(Context ctx) {
+    public synchronized static void loadCurrentWeather(Context ctx, boolean showNotification) {
         final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(ctx);
         Call<CurrentWeatherApiModel> currentWeatherApiModelCall = weatherInterface.getCurrentWeather(TEST_LOCATION, OWM_API_KEY);
         currentWeatherApiModelCall.enqueue(new Callback<CurrentWeatherApiModel>() {
@@ -40,6 +40,7 @@ public class WeatherDownloadTask {
                 if(response.isSuccessful()){
                     currentWeatherApiModel = response.body();
                 }
+
                 //register intent for broadcast manager
                 Intent intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
                 intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
@@ -57,7 +58,7 @@ public class WeatherDownloadTask {
 
     }
 
-    public static void loadWeatherForecast(Context ctx) {
+    public synchronized static void loadWeatherForecast(Context ctx) {
         final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(ctx);
         Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(TEST_LOCATION,OWM_API_KEY);
         call.enqueue(new Callback<WeatherApiModel>() {

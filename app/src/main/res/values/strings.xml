@@ -110,5 +110,8 @@
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="current_weather_last_update">Updated at :</string>
+    <string name="main_notification_channel_name">Primary</string>
+    <string name="charging_reminder_notification_title">No internet connection available</string>
+    <string name="charging_reminder_notification_body">No internet connection available. Current weather can\'t be updated.</string>
 
 </resources>

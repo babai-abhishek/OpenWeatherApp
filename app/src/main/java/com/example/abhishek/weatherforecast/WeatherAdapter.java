@@ -91,7 +91,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             //AS IT IS IN LANDSCAPE MODE HENCE CHANGE THE CURRENTWEATHERBUSINEEMODEL TO WEATHERBUSINESSMODEL
             //SO THAT IT CAN BE SHOWN AS A VIEW TYPE LIKE FUTURE DAY (IN LANDSCAPE MODE WE SHOULDN'T EXPAND
-            // TODAY'S DATE AS PROTRAIT MODE)
+            // )
 
             CurrentWeatherBusinessModel current = (CurrentWeatherBusinessModel) iWeatherDetailsList.get(0);
             WeatherListBusinessModel forecastWeather = new WeatherListBusinessModel();

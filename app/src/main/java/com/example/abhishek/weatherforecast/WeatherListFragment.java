@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -22,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -41,18 +39,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
-import static com.example.abhishek.weatherforecast.WeatherDownloadTask.loadWeatherForecast;
-
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class WeatherListFragment extends Fragment
-        implements SharedPreferences.OnSharedPreferenceChangeListener, NetworkConnectivityManager.ConnectivityReceiverListener{
+        implements SharedPreferences.OnSharedPreferenceChangeListener,
+        NetworkConnectivityManager.ConnectivityReceiverListener{
 
     public static final String TEST_LOCATION = "Kolkata,in";
 
@@ -129,7 +122,11 @@ public class WeatherListFragment extends Fragment
                     CurrentWeatherBusinessModel currentWeatherBusinessModel = new CurrentWeatherBusinessModel(currentWeatherApiModel);
 
                     //ADD TO LIST FOR ADAPTER
-                    iWeatherDetailsList.add(0,currentWeatherBusinessModel);
+                    if(!iWeatherDetailsList.isEmpty()){
+                        iWeatherDetailsList.set(0,currentWeatherBusinessModel);
+                    }else {
+                        iWeatherDetailsList.add(0, currentWeatherBusinessModel);
+                    }
 
                     //SHOW CURRENT WEATHER IN THE LIST
                     adapter.setWeatherList(iWeatherDetailsList);
@@ -223,7 +220,7 @@ public class WeatherListFragment extends Fragment
             WeatherDownloadTask.loadWeatherForecast(getContext());
 
             //LOAD CURRENT INFO
-            WeatherDownloadTask.loadCurrentWeather(getContext());
+            WeatherDownloadTask.loadCurrentWeather(getContext(), false);
 
             /*Intent intent = new Intent(getContext(), CurrentWeatherSyncService.class);
             getContext().startService(intent);*/
@@ -241,6 +238,10 @@ public class WeatherListFragment extends Fragment
 
 
         }
+
+        //START CURRENT WEATHER SYNCRONIZATION PERIODICALLY
+        Utils.syncCurrentWeatherData(getContext());
+
     }
 
     @Override
@@ -275,8 +276,8 @@ public class WeatherListFragment extends Fragment
         if(isConnected){
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
-            WeatherDownloadTask.loadCurrentWeather(getContext());
-            loadWeatherForecast(getContext());
+            WeatherDownloadTask.loadCurrentWeather(getContext(), true);
+            WeatherDownloadTask.loadWeatherForecast(getContext());
         }
         showSnack(isConnected);
     }
