@@ -11,26 +11,27 @@ import android.widget.Toast;
  * Created by abhishek on 30/7/18.
  */
 
-public class NetworkConnectivityManager extends BroadcastReceiver {
+public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
     public static ConnectivityReceiverListener connectivityReceiverListener;
 
-    public NetworkConnectivityManager() {
-        super();
+    public NetworkConnectivityReceiver() {
+
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        ConnectivityManager cm = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null
-                && activeNetwork.isConnectedOrConnecting();
+        boolean isConnected = isConnected();
+        if(MyApplication.getInstance().lastState!=null && MyApplication.getInstance().lastState==isConnected)
+            return;
+
+        MyApplication.getInstance().lastState=isConnected;
 
         if (connectivityReceiverListener != null) {
             connectivityReceiverListener.onNetworkConnectionChanged(isConnected);
         }
+
     }
 
     public static boolean isConnected() {

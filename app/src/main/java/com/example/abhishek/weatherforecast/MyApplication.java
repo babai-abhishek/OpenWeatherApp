@@ -3,12 +3,14 @@ package com.example.abhishek.weatherforecast;
 import android.app.Application;
 
 /**
- * Created by abhishek on 30/7/18.
+ * Created by Ravi Tamada on 15/06/16.
+ * www.androidhive.info
  */
-
-public class MyApplication extends Application{
+public class MyApplication extends Application {
 
     private static MyApplication mInstance;
+
+    public Boolean lastState = null;
 
     @Override
     public void onCreate() {
@@ -21,7 +23,7 @@ public class MyApplication extends Application{
         return mInstance;
     }
 
-    public void setConnectivityListener(NetworkConnectivityManager.ConnectivityReceiverListener listener) {
-        NetworkConnectivityManager.connectivityReceiverListener = listener;
+    public void setConnectivityListener(NetworkConnectivityReceiver.ConnectivityReceiverListener listener) {
+        NetworkConnectivityReceiver.connectivityReceiverListener = listener;
     }
 }

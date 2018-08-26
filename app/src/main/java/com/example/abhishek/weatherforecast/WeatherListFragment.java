@@ -31,8 +31,6 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
-import com.example.abhishek.weatherforecast.networkutils.ApiClient;
-import com.example.abhishek.weatherforecast.networkutils.WeatherInterface;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import java.util.List;
  */
 public class WeatherListFragment extends Fragment
         implements SharedPreferences.OnSharedPreferenceChangeListener,
-        NetworkConnectivityManager.ConnectivityReceiverListener{
+        NetworkConnectivityReceiver.ConnectivityReceiverListener{
 
     public static final String TEST_LOCATION = "Kolkata,in";
 
@@ -53,13 +51,13 @@ public class WeatherListFragment extends Fragment
     public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
     public static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
     public static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
+    public static final String ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS = "periodic.currentweather.result.success";
     public static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
     public static final String KEY_WEATHER_FORECAST = "weather_forecast";
     public static final String KEY_CURRENT_WEATHER = "currentWeather";
 
     SettingsOptionClickListener clickListener;
     private LocalBroadcastManager broadcastManager = null;
-    WeatherInterface weatherInterface = ApiClient.getClient().create(WeatherInterface.class);
 
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
     List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
@@ -76,6 +74,7 @@ public class WeatherListFragment extends Fragment
         public void onReceive(Context context, Intent intent) {
 
             switch (intent.getAction()) {
+
                 case ACTION_WEATHER_FORECAST_API_SUCCESS:
                     Toast.makeText(getActivity(), "Weather forecast Api Success", Toast.LENGTH_SHORT).show();
                     WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
@@ -144,9 +143,6 @@ public class WeatherListFragment extends Fragment
                     Toast.makeText(getActivity(), "Current weather Api Failure", Toast.LENGTH_SHORT).show();
                     break;
 
-                case "downloaded":
-                    Log.d("#","download completed");
-                    break;
             }
 
         }
@@ -170,6 +166,7 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MyApplication.getInstance().setConnectivityListener(this);
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
         adapter = new WeatherAdapter(getActivity(),iWeatherDetailsList);
         setHasOptionsMenu(true);
@@ -194,20 +191,16 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        MyApplication.getInstance().setConnectivityListener(this);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_CURRENT_WEATHER_API_SUCCESS);
         filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);
         filter.addAction(ACTION_WEATHER_FORECAST_API_SUCCESS);
         filter.addAction(ACTION_WEATHER_FORECAST_API_FAILURE);
-        filter.addAction("downloaded");
         broadcastManager.registerReceiver(broadcastReceiver, filter);
 
-        boolean isInternetAvailAble = false;
-
         //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
-        isInternetAvailAble = NetworkConnectivityManager.isConnected();
+        boolean isInternetAvailAble = NetworkConnectivityReceiver.isConnected();
 
         //SHOW AVAILABLE/UNAVAILABLE
         showSnack(isInternetAvailAble);
@@ -221,9 +214,6 @@ public class WeatherListFragment extends Fragment
 
             //LOAD CURRENT INFO
             WeatherDownloadTask.loadCurrentWeather(getContext(), false);
-
-            /*Intent intent = new Intent(getContext(), CurrentWeatherSyncService.class);
-            getContext().startService(intent);*/
 
         } else {
 
@@ -276,7 +266,7 @@ public class WeatherListFragment extends Fragment
         if(isConnected){
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
-            WeatherDownloadTask.loadCurrentWeather(getContext(), true);
+            WeatherDownloadTask.loadCurrentWeather(getContext(), false);
             WeatherDownloadTask.loadWeatherForecast(getContext());
         }
         showSnack(isConnected);
@@ -288,7 +278,6 @@ public class WeatherListFragment extends Fragment
 
     private void showSnack(boolean isConnected) {
         String message;
-        int color;
         if (isConnected) {
             message = "Connected to Internet";
         } else {
