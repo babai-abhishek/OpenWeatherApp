@@ -609,12 +609,16 @@ public class Utils {
         return String.valueOf(citySb);
 }
 
+    public static void restartSyncWeatherData(Context context){
+        syncCurrentWeatherData(context);
+    }
+
     public static void syncCurrentWeatherData(Context context) {
         setAlarm(context);
     }
 
     private static void setAlarm(Context context) {
-        long interval = 30 * 1000;
+        long interval = 10 * 1000;
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, CurrentWeatherSyncService.class);
         PendingIntent alarmIntent = PendingIntent.getService(context, REQUEST_CODE, intent, 0);
@@ -622,6 +626,10 @@ public class Utils {
                 System.currentTimeMillis(),
                 interval,
                 alarmIntent);
+    }
+
+    public static boolean isAlreadyDataPresentInDB(CurrentWeatherBusinessModel cwBusinessModel) {
+        return false;
     }
 
     public static class NotificationUtils {
@@ -679,13 +687,11 @@ public class Utils {
                     PendingIntent.FLAG_UPDATE_CURRENT
             );
         }
+
+        public static void showUpdatedData(Context context, CurrentWeatherBusinessModel cwBusinessModel) {
+            setNotification(context, "Weather Updated",
+                    "Current weather has changed. Open your app for details.", R.drawable.art_clear);
+        }
     }
 
-  /*  private void setBootReceiverEnabled(int componentEnabledState) {
-        ComponentName componentName = new ComponentName(this, BootReceiver.class);
-        PackageManager packageManager = getPackageManager();
-        packageManager.setComponentEnabledSetting(componentName,
-                componentEnabledState,
-                PackageManager.DONT_KILL_APP);
-    }*/
 }

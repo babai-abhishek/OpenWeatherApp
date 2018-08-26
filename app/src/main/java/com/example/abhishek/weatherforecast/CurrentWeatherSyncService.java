@@ -1,6 +1,5 @@
 package com.example.abhishek.weatherforecast;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -20,7 +19,7 @@ public class CurrentWeatherSyncService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-                if(!NetworkConnectivityManager.isConnected()){
+                if(!NetworkConnectivityReceiver.isConnected()){
                     Utils.NotificationUtils.showNotificationBecauseNetworkUnAvailAble(getApplicationContext());
                 }else {
                     WeatherDownloadTask.loadCurrentWeather(getApplicationContext(),true);
