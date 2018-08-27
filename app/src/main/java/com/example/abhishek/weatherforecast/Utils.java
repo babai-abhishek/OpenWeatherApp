@@ -69,11 +69,11 @@ public class Utils {
 
     public static final int REQUEST_CODE = 1001;
 
-    public static ContentValues[] getWeatherForecastContentValuesFromJson(WeatherDBModel weather){
+    public static ContentValues[] getWeatherForecastContentValuesFromJson(WeatherDBModel weather) {
 
         ContentValues[] weatherContentValues = new ContentValues[weather.getWeatherListDBModel().size()];
 
-        for(int i=0; i<weather.getWeatherListDBModel().size(); i++){
+        for (int i = 0; i < weather.getWeatherListDBModel().size(); i++) {
 
             ContentValues weatherContentValue = new ContentValues();
             weatherContentValue.put(WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID, weather.getCityDBModel().getId());
@@ -96,21 +96,21 @@ public class Utils {
         return weatherContentValues;
     }
 
-    public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherDBHelper weatherDBHelper){
+    public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherDBHelper weatherDBHelper) {
         List<String> dates = new ArrayList<>();
         SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
-        String qry = "SELECT "+WEATHER_FORECAST_TABLE_COLUMN_DATE+" FROM "+
-                WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME+" where "
-                + WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID+" = "+cityId+"";
+        String qry = "SELECT " + WEATHER_FORECAST_TABLE_COLUMN_DATE + " FROM " +
+                WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME + " where "
+                + WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID + " = " + cityId + "";
         Cursor cursor = database.rawQuery(qry, null);
-        if(cursor.getCount() <= 0){
+        if (cursor.getCount() <= 0) {
             cursor.close();
             return dates;
         }
-        if (cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 dates.add(String.valueOf(cursor.getString(cursor.getColumnIndex(WEATHER_FORECAST_TABLE_COLUMN_DATE))));
-            }while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         return dates;
@@ -148,8 +148,8 @@ public class Utils {
         //GET TOMORROW'S DATE
         Date tomorrow = getNextDate(currentDate);
 
-        for(WeatherListApiModel apiModel: weatherListApiModelList){
-            if(sdf.format(tomorrow).equals(sdf.format(new Date(apiModel.getDt()*1000L)))){
+        for (WeatherListApiModel apiModel : weatherListApiModelList) {
+            if (sdf.format(tomorrow).equals(sdf.format(new Date(apiModel.getDt() * 1000L)))) {
                 singleWeatherApiModelPerDay.add(apiModel);
                 tomorrow = getNextDate(tomorrow);
             }
@@ -242,7 +242,7 @@ public class Utils {
         temperatureFormatResourceId = R.string.format_temperature_fahrenheit;*/
 
         //DEFAULT : KELVIN ; CURRENTLY CONVERT IN CELCIUS/METRIC
-        double celcius = temperature-273.15;
+        double celcius = temperature - 273.15;
 
         return String.format(context.getString(temperatureFormatResourceId), celcius);
     }
@@ -446,7 +446,7 @@ public class Utils {
         return context.getString(stringId);
     }
 
-    private static long getEpochForTodayMidnight(){
+    private static long getEpochForTodayMidnight() {
         Date currDate = new Date();
         Calendar cal = Calendar.getInstance();
         // compute start of the day for the timestamp
@@ -456,24 +456,24 @@ public class Utils {
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
 
-        return cal.getTimeInMillis()/1000;
+        return cal.getTimeInMillis() / 1000;
     }
 
     public static String getDateString(Context mContext, long dateInMillis) {
-        Date dt = new Date(dateInMillis*1000L);
+        Date dt = new Date(dateInMillis * 1000L);
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 
         //GET CURRENT DATE
         Date currentDate = new Date();
         String curDate = sdf.format(currentDate);
 
-        if(curDate.equals(sdf.format(dt))){
+        if (curDate.equals(sdf.format(dt))) {
             return mContext.getString(R.string.today);
-        }else if(sdf.format(getNextDate(currentDate)).equals(sdf.format(dt))){
+        } else if (sdf.format(getNextDate(currentDate)).equals(sdf.format(dt))) {
             return mContext.getString(R.string.tomorrow);
         }
 
-        return new SimpleDateFormat("EEEE").format(new Date(dateInMillis*1000L));
+        return new SimpleDateFormat("EEEE").format(new Date(dateInMillis * 1000L));
     }
 
     private static Date getNextDate(Date curDate) {
@@ -503,16 +503,31 @@ public class Utils {
 
     public static List<IWeatherDetails> checkCurrentDataForCity(String location, Context ctx) {
         List<IWeatherDetails> weatherInfo = new ArrayList<>();
+
+        CurrentWeatherDBModel currentWeatherDBModel = getAvailableCurrentWeather(location, ctx);
+        weatherInfo.add(new CurrentWeatherBusinessModel(currentWeatherDBModel));
+
+
+        List<WeatherListBusinessModel> weatherForecastList = getAvailAbleForecast( currentWeatherDBModel.getId(),
+                currentWeatherDBModel.getDt(),
+                ctx);
+        for (WeatherListBusinessModel businessModel : weatherForecastList) {
+            weatherInfo.add(businessModel);
+        }
+        return weatherInfo;
+    }
+
+    private static CurrentWeatherDBModel getAvailableCurrentWeather(String location, Context ctx) {
         String[] cityWithCountry = location.split(",");
         String city = formantCity(cityWithCountry[0].trim());
-        String sqry = "SELECT * FROM "+ WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME
-                +" WHERE "+ WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME
-                +" = \""+city+"\"";
+        String sqry = "SELECT * FROM " + WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME
+                + " WHERE " + WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME
+                + " = \"" + city + "\"";
         SQLiteDatabase db = new WeatherDBHelper(ctx).getReadableDatabase();
-        Cursor cursor = db.rawQuery(sqry,null);
-        if(cursor.getCount()>0){
+        Cursor cursor = db.rawQuery(sqry, null);
+        CurrentWeatherDBModel currentWeatherDBModel = new CurrentWeatherDBModel();
+        if (cursor.getCount() > 0) {
             cursor.moveToFirst();
-            CurrentWeatherDBModel currentWeatherDBModel = new CurrentWeatherDBModel();
             currentWeatherDBModel.setDt(cursor.getLong(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE)));
             CurrentWeatherMainDBModel mainDBModel = new CurrentWeatherMainDBModel();
             mainDBModel.setTempMin(cursor.getDouble(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MIN_TEMP)));
@@ -536,27 +551,22 @@ public class Utils {
             coordDBModel.setLon(cursor.getDouble(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LON)));
             coordDBModel.setLat(cursor.getDouble(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_LAT)));
             currentWeatherDBModel.setCurrentWeatherCoordDBModel(coordDBModel);
-            weatherInfo.add(new CurrentWeatherBusinessModel(currentWeatherDBModel));
-
-            List<WeatherListBusinessModel> weatherForecastList = getAvailAbleForecast(cursor.getInt(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID)),
-                    cursor.getLong(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE)),
-                    ctx);
-            for(WeatherListBusinessModel businessModel: weatherForecastList){
-                weatherInfo.add(businessModel);
-            }
         }
-        return weatherInfo;
+
+        return currentWeatherDBModel;
+
     }
 
-    private static List<WeatherListBusinessModel> getAvailAbleForecast(int cityid, long dateTime, Context ctx) {
+    private static List<WeatherListBusinessModel> getAvailAbleForecast ( int cityid,
+                                                                         long dateTime, Context ctx){
         List<WeatherListBusinessModel> listOfSingleWeatherInfoPerDay = new ArrayList<>();
         List<WeatherListDBModel> listOfDbModels = new ArrayList<>();
 
-        String qry = "SELECT * FROM forecastweather WHERE _city_id=\""+cityid+"\" AND date>\""+dateTime+"\"";
+        String qry = "SELECT * FROM forecastweather WHERE _city_id=\"" + cityid + "\" AND date>\"" + dateTime + "\"";
         SQLiteDatabase db = new WeatherDBHelper(ctx).getReadableDatabase();
-        Cursor cursor = db.rawQuery(qry,null);
-        if (cursor.moveToFirst()){
-            do{
+        Cursor cursor = db.rawQuery(qry, null);
+        if (cursor.moveToFirst()) {
+            do {
                 WeatherListDBModel dbModel = new WeatherListDBModel();
                 dbModel.setDt(cursor.getLong(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE)));
 
@@ -577,11 +587,11 @@ public class Utils {
                 dbModel.setCloudsDBModel(new CloudsDBModel());
                 dbModel.setWindDBModel(new WindDBModel());
                 listOfDbModels.add(dbModel);
-            }while(cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         List<WeatherListBusinessModel> businessModels = new ArrayList<>();
-        for(WeatherListDBModel dbModel: listOfDbModels){
+        for (WeatherListDBModel dbModel : listOfDbModels) {
             businessModels.add(new WeatherListBusinessModel(dbModel));
         }
 
@@ -592,8 +602,8 @@ public class Utils {
         //GET TOMORROW'S DATE
         Date tomorrow = getNextDate(currentDate);
 
-        for(WeatherListBusinessModel businessModel: businessModels){
-            if(sdf.format(tomorrow).equals(sdf.format(new Date(businessModel.getDt()*1000L)))){
+        for (WeatherListBusinessModel businessModel : businessModels) {
+            if (sdf.format(tomorrow).equals(sdf.format(new Date(businessModel.getDt() * 1000L)))) {
                 listOfSingleWeatherInfoPerDay.add(businessModel);
                 tomorrow = getNextDate(tomorrow);
             }
@@ -607,9 +617,9 @@ public class Utils {
         citySb.append(city.substring(0, 1).toUpperCase());
         citySb.append(city.substring(1, city.length()).toLowerCase());
         return String.valueOf(citySb);
-}
+    }
 
-    public static void restartSyncWeatherData(Context context){
+    public static void restartSyncWeatherData(Context context) {
         syncCurrentWeatherData(context);
     }
 
@@ -618,19 +628,21 @@ public class Utils {
     }
 
     private static void setAlarm(Context context) {
-        long interval = 10 * 1000;
+        long interval = 30 * 60 * 1000;
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, CurrentWeatherSyncService.class);
         PendingIntent alarmIntent = PendingIntent.getService(context, REQUEST_CODE, intent, 0);
         alarmManager.setRepeating(AlarmManager.RTC,
-                System.currentTimeMillis(),
+                System.currentTimeMillis()+(15 * 60 * 1000),
                 interval,
                 alarmIntent);
     }
 
     public static boolean isAlreadyDataPresentInDB(CurrentWeatherBusinessModel cwBusinessModel) {
+
         return false;
     }
+
 
     public static class NotificationUtils {
 
@@ -690,7 +702,14 @@ public class Utils {
 
         public static void showUpdatedData(Context context, CurrentWeatherBusinessModel cwBusinessModel) {
             setNotification(context, "Weather Updated",
-                    "Current weather has changed. Open your app for details.", R.drawable.art_clear);
+                    "Current weather has changed. Open app for detailed weather information.", R.drawable.art_clear);
+        }
+
+        public static void clearNotifications(Context context) {
+            NotificationManager notificationManager = (NotificationManager) context
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancelAll();
+
         }
     }
 

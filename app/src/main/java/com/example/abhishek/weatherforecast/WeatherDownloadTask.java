@@ -48,15 +48,15 @@ public class WeatherDownloadTask {
                     //register intent for broadcast manager
                     intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
                     intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
+                    //send broadcast
                     broadcastManager.sendBroadcast(intent);
 
                 }else {
                     intent = new Intent(ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS);
                     intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
+                    //send broadcast
                     ctx.sendBroadcast(intent);
                 }
-
-                //send broadcast
 
             }
 

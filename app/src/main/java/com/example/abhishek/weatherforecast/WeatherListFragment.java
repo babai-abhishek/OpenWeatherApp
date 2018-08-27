@@ -51,7 +51,7 @@ public class WeatherListFragment extends Fragment
     public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
     public static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
     public static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
-    public static final String ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS = "periodic.currentweather.result.success";
+    public static final String ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.periodic.currentweather.result.success";
     public static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
     public static final String KEY_WEATHER_FORECAST = "weather_forecast";
     public static final String KEY_CURRENT_WEATHER = "currentWeather";
@@ -148,6 +148,10 @@ public class WeatherListFragment extends Fragment
         }
     };
 
+    public WeatherListFragment() {
+        // Required empty public constructor
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -157,10 +161,6 @@ public class WeatherListFragment extends Fragment
         } else{
             throw new RuntimeException(context.getClass().getSimpleName()+" must implement WeatherListFragment.SettingsOptionClickListener");
         }
-    }
-
-    public WeatherListFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -207,6 +207,7 @@ public class WeatherListFragment extends Fragment
 
         //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
         if (isInternetAvailAble) {
+
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
             //LOAD FORECAST INFO
@@ -264,6 +265,9 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(isConnected){
+            //CLEAR ALL NOTIFICATIONS
+            Utils.NotificationUtils.clearNotifications(getContext());
+
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
             WeatherDownloadTask.loadCurrentWeather(getContext(), false);
