@@ -638,8 +638,18 @@ public class Utils {
                 alarmIntent);
     }
 
-    public static boolean isAlreadyDataPresentInDB(CurrentWeatherBusinessModel cwBusinessModel) {
+    public static boolean isAlreadyDataPresentInDB(CurrentWeatherBusinessModel cwBusinessModel, Context context) {
+        String sqry = "SELECT * FROM " + WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_NAME
+                + " WHERE " + WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_WEATHER_OF_CITY_ID
+                + " = \"" + cwBusinessModel.getId() + "\"";
+        SQLiteDatabase db = new WeatherDBHelper(context).getReadableDatabase();
+        Cursor cursor = db.rawQuery(sqry, null);
 
+        if(cursor.getInt(cursor.getColumnIndex
+                (WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE)) == cwBusinessModel.getDt()){
+            return true;
+        }
+        cursor.close();
         return false;
     }
 
