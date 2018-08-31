@@ -38,24 +38,23 @@ public class WeatherDownloadTask {
             @Override
             public void onResponse(Call<CurrentWeatherApiModel> call, Response<CurrentWeatherApiModel> response) {
                 CurrentWeatherApiModel currentWeatherApiModel = null;
-                if(response.isSuccessful()){
+                if(response.isSuccessful()) {
                     currentWeatherApiModel = response.body();
-                }
+                    Intent intent = null;
 
-                Intent intent = null;
+                    if (!showNotification) {
+                        //register intent for broadcast manager
+                        intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
+                        intent.putExtra(KEY_CURRENT_WEATHER, currentWeatherApiModel);
+                        //send broadcast
+                        broadcastManager.sendBroadcast(intent);
 
-                if(!showNotification){
-                    //register intent for broadcast manager
-                    intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
-                    intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
-                    //send broadcast
-                    broadcastManager.sendBroadcast(intent);
-
-                }else {
-                    intent = new Intent(ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS);
-                    intent.putExtra(KEY_CURRENT_WEATHER,currentWeatherApiModel);
-                    //send broadcast
-                    ctx.sendBroadcast(intent);
+                    } else {
+                        intent = new Intent(ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS);
+                        intent.putExtra(KEY_CURRENT_WEATHER, currentWeatherApiModel);
+                        //send broadcast
+                        ctx.sendBroadcast(intent);
+                    }
                 }
 
             }
@@ -81,14 +80,13 @@ public class WeatherDownloadTask {
                 if(response.isSuccessful()){
                     //get data from response
                     weather = response.body();
+                    //register intent for broadcast manager
+                    Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_SUCCESS);
+                    intent.putExtra(KEY_WEATHER_FORECAST,weather);
+
+                    //send broadcast
+                    broadcastManager.sendBroadcast(intent);
                 }
-
-                //register intent for broadcast manager
-                Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_SUCCESS);
-                intent.putExtra(KEY_WEATHER_FORECAST,weather);
-
-                //send broadcast
-                broadcastManager.sendBroadcast(intent);
 
             }
 

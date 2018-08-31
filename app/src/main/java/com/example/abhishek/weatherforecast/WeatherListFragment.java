@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -131,10 +132,14 @@ public class WeatherListFragment extends Fragment
 
                 case ACTION_WEATHER_FORECAST_API_FAILURE:
                     Toast.makeText(getActivity(), "Weather forecast Api Failure", Toast.LENGTH_SHORT).show();
+                    isWeatherForecastLoaded = true;
+                    postLoad();
                     break;
 
                 case ACTION_CURRENT_WEATHER_API_FAILURE:
                     Toast.makeText(getActivity(), "Current weather Api Failure", Toast.LENGTH_SHORT).show();
+                    isCurrentWeatherLoaded = true;
+                    postLoad();
                     break;
 
             }
@@ -198,6 +203,8 @@ public class WeatherListFragment extends Fragment
         filter.addAction(ACTION_WEATHER_FORECAST_API_FAILURE);
         broadcastManager.registerReceiver(broadcastReceiver, filter);
 
+        showLoading();
+
         //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
         boolean isInternetAvailAble = NetworkConnectivityReceiver.isConnected();
 
@@ -210,27 +217,31 @@ public class WeatherListFragment extends Fragment
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
             //LOAD FORECAST INFO
-            if(!isWeatherForecastLoaded)
-                showLoading();
             WeatherDownloadTask.loadWeatherForecast(getContext());
 
             //LOAD CURRENT INFO
-            if(!isCurrentWeatherLoaded)
-                showLoading();
             WeatherDownloadTask.loadCurrentWeather(getContext(), false);
 
         } else {
 
-            if(!isCurrentWeatherLoaded && !isWeatherForecastLoaded)
-                showLoading();
-            //CHECK DATA AVAILABLE IN DB
-            List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(TEST_LOCATION, getActivity());
-            if(!availableData.isEmpty()){
-                //IF DATA AVAILABLE SHOW ON SCREEN
-                adapter.setWeatherList(availableData);
+            new AsyncTask<Void, Void, List<IWeatherDetails>>() {
+                @Override
+                protected List<IWeatherDetails> doInBackground(Void... voids) {
+                    List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(TEST_LOCATION, getActivity());
+                    return availableData;
+                }
 
-            }
-            //IF NO DATA AVAILABLE SHOW ERROR
+                @Override
+                protected void onPostExecute(List<IWeatherDetails> weatherDetails) {
+                    super.onPostExecute(weatherDetails);
+
+                    //CHECK DATA AVAILABLE IN DB
+                    adapter.setWeatherList(weatherDetails);
+                    isCurrentWeatherLoaded = true;
+                    isWeatherForecastLoaded = true;
+                    postLoad();
+                }
+            }.execute();
 
 
         }
@@ -246,6 +257,8 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onPause() {
         super.onPause();
+        isWeatherForecastLoaded = false;
+        isCurrentWeatherLoaded = false;
         broadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
@@ -278,6 +291,7 @@ public class WeatherListFragment extends Fragment
 
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
+            showLoading();
             WeatherDownloadTask.loadCurrentWeather(getContext(), false);
             WeatherDownloadTask.loadWeatherForecast(getContext());
         }
@@ -308,6 +322,7 @@ public class WeatherListFragment extends Fragment
     }
 
     private void showLoading() {
+        adapter.setLoading(true);
         if (mProgressDialog.isShowing())
             return;
         mProgressDialog.setMessage("Loading.......");
@@ -315,6 +330,7 @@ public class WeatherListFragment extends Fragment
     }
 
     private void hideLoading() {
+        adapter.setLoading(false);
         if (mProgressDialog.isShowing())
             mProgressDialog.dismiss();
     }

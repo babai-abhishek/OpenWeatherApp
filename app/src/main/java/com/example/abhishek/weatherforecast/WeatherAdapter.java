@@ -30,8 +30,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE_DAY = 1;
+    private static final int VIEW_TYPE_EMPTY = 2;
 
     private boolean mUseTodayLayout;
+    private boolean isLoading = false;
 
     public WeatherAdapter(@NonNull Context context, List<IWeatherDetails> iWeatherDetails) {
         this.mContext = context;
@@ -44,78 +46,105 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         int layoutId;
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
+        View view;
 
         switch (viewType) {
 
             case VIEW_TYPE_TODAY: {
                 layoutId = R.layout.current_weather_list_item;
-                View view = inflater.inflate(layoutId, parent, false);
+                view = inflater.inflate(layoutId, parent, false);
                 return new CurrentWeatherViewHolder(view);
             }
 
             case VIEW_TYPE_FUTURE_DAY: {
                 layoutId = R.layout.forecast_weather_list_item;
-                View view = inflater.inflate(layoutId, parent, false);
+                view = inflater.inflate(layoutId, parent, false);
                 return new ForecastWeatherViewHolder(view);
             }
 
             default:
-                throw new IllegalArgumentException("Invalid view type, value of " + viewType);
+                view = inflater.inflate(R.layout.weather_list_item_empty,
+                        parent, false);
+                EmptyListViewHolder emptyListViewHolder = new EmptyListViewHolder(view);
+                return emptyListViewHolder;
         }
 
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        IWeatherDetails item = iWeatherDetailsList.get(position);
 
-        if (holder instanceof CurrentWeatherViewHolder) {
+        if(holder instanceof EmptyListViewHolder){
+            ((EmptyListViewHolder) holder).emptyListMessage.setText(
+                    isLoading() ?
+                    "Loading...." :
+                    "No data found!");
+        }
+        else if (holder instanceof CurrentWeatherViewHolder) {
+            IWeatherDetails item = iWeatherDetailsList.get(position);
             ((CurrentWeatherViewHolder) holder).bind((CurrentWeatherBusinessModel) item);
         } else if(holder instanceof ForecastWeatherViewHolder){
+            IWeatherDetails item = iWeatherDetailsList.get(position);
             ((ForecastWeatherViewHolder) holder).bind((WeatherListBusinessModel) item);
         }
     }
 
     @Override
     public int getItemCount() {
-        return iWeatherDetailsList.size();
+        int listSize = iWeatherDetailsList.size();
+        return listSize < 1 || isLoading() ? 1 : listSize;
+
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        //CHECK TYPE OF DATA (CURRNET/FORECAST) FROM LIST
-        if ( position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && mUseTodayLayout) {
-            return VIEW_TYPE_TODAY;
-        }else if ( position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && !mUseTodayLayout) {
+        if(iWeatherDetailsList.size() < 1 || isLoading()){
+            return VIEW_TYPE_EMPTY;
+        }
+        else {
+            //CHECK TYPE OF DATA (CURRENT/FORECAST) FROM LIST
+            if (position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && mUseTodayLayout) {
+                return VIEW_TYPE_TODAY;
+            } else if (position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && !mUseTodayLayout) {
 
-            //AS IT IS IN LANDSCAPE MODE HENCE CHANGE THE CURRENTWEATHERBUSINEEMODEL TO WEATHERBUSINESSMODEL
-            //SO THAT IT CAN BE SHOWN AS A VIEW TYPE LIKE FUTURE DAY (IN LANDSCAPE MODE WE SHOULDN'T EXPAND
-            // )
+                //AS IT IS IN LANDSCAPE MODE HENCE CHANGE THE CURRENTWEATHERBUSINEEMODEL TO WEATHERBUSINESSMODEL
+                //SO THAT IT CAN BE SHOWN AS A VIEW TYPE LIKE FUTURE DAY (IN LANDSCAPE MODE WE SHOULDN'T EXPAND
+                // )
 
-            CurrentWeatherBusinessModel current = (CurrentWeatherBusinessModel) iWeatherDetailsList.get(0);
-            WeatherListBusinessModel forecastWeather = new WeatherListBusinessModel();
-            forecastWeather.setDt(current.getDt());
-            MainBusinessModel mb = new MainBusinessModel();
-            mb.setTempMax(current.getCurrentWeatherMainBusinessModel().getTempMax());
-            mb.setTempMin(current.getCurrentWeatherMainBusinessModel().getTempMin());
-            forecastWeather.setMainBusinessModel(mb);
-            WeatherInfoBusinessModel info = new WeatherInfoBusinessModel();
-            info.setDescription(current.getCurrentWeatherInfoBusinessModel().get(0).getDescription());
-            info.setId(current.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
-            List<WeatherInfoBusinessModel> infoModels = new ArrayList<>();
-            infoModels.add(info);
-            forecastWeather.setWeatherInfoBusinessModel(infoModels);
-            iWeatherDetailsList.set(0, forecastWeather);
-            return VIEW_TYPE_FUTURE_DAY;
-        } else {
-            return VIEW_TYPE_FUTURE_DAY;
+                CurrentWeatherBusinessModel current = (CurrentWeatherBusinessModel) iWeatherDetailsList.get(0);
+                WeatherListBusinessModel forecastWeather = new WeatherListBusinessModel();
+                forecastWeather.setDt(current.getDt());
+                MainBusinessModel mb = new MainBusinessModel();
+                mb.setTempMax(current.getCurrentWeatherMainBusinessModel().getTempMax());
+                mb.setTempMin(current.getCurrentWeatherMainBusinessModel().getTempMin());
+                forecastWeather.setMainBusinessModel(mb);
+                WeatherInfoBusinessModel info = new WeatherInfoBusinessModel();
+                info.setDescription(current.getCurrentWeatherInfoBusinessModel().get(0).getDescription());
+                info.setId(current.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
+                List<WeatherInfoBusinessModel> infoModels = new ArrayList<>();
+                infoModels.add(info);
+                forecastWeather.setWeatherInfoBusinessModel(infoModels);
+                iWeatherDetailsList.set(0, forecastWeather);
+                return VIEW_TYPE_FUTURE_DAY;
+            } else {
+                return VIEW_TYPE_FUTURE_DAY;
+            }
         }
     }
 
     public void setWeatherList(List<IWeatherDetails> weatherList){
         this.iWeatherDetailsList = weatherList;
         notifyDataSetChanged();
+    }
+
+    public void setLoading(boolean loading) {
+        isLoading = loading;
+        notifyDataSetChanged();
+    }
+
+    public boolean isLoading() {
+        return isLoading;
     }
 
     class ForecastWeatherViewHolder extends RecyclerView.ViewHolder {
@@ -177,7 +206,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class CurrentWeatherViewHolder extends RecyclerView.ViewHolder{
 
         TextView tv_current_weather_date, tv_current_weather_description, tv_current_weather_high_temperature,
-                 tv_current_weather_low_temperature, tb_current_updated;
+                tv_current_weather_low_temperature, tb_current_updated;
         ImageView img_current_weather_icon;
 
         public CurrentWeatherViewHolder(View itemView) {
@@ -235,4 +264,16 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         }
     }
+
+    class EmptyListViewHolder extends RecyclerView.ViewHolder {
+
+        TextView emptyListMessage;
+
+        public EmptyListViewHolder(View itemView) {
+            super(itemView);
+            emptyListMessage = (TextView) itemView.findViewById(R.id.author_empty_message);
+
+        }
+    }
+
 }

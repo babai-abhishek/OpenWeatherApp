@@ -484,35 +484,21 @@ public class Utils {
         return calendar.getTime();
     }
 
-    public static boolean checkInternetConnetion(Context ctx) {
-        boolean haveConnectedWifi = false;
-        boolean haveConnectedMobile = false;
-
-        ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
-        for (NetworkInfo ni : netInfo) {
-            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
-                if (ni.isConnected())
-                    haveConnectedWifi = true;
-            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
-                if (ni.isConnected())
-                    haveConnectedMobile = true;
-        }
-        return haveConnectedWifi || haveConnectedMobile;
-    }
 
     public static List<IWeatherDetails> checkCurrentDataForCity(String location, Context ctx) {
         List<IWeatherDetails> weatherInfo = new ArrayList<>();
 
         CurrentWeatherDBModel currentWeatherDBModel = getAvailableCurrentWeather(location, ctx);
-        weatherInfo.add(new CurrentWeatherBusinessModel(currentWeatherDBModel));
+        if(currentWeatherDBModel != null) {
 
+            weatherInfo.add(new CurrentWeatherBusinessModel(currentWeatherDBModel));
 
-        List<WeatherListBusinessModel> weatherForecastList = getAvailAbleForecast( currentWeatherDBModel.getId(),
-                currentWeatherDBModel.getDt(),
-                ctx);
-        for (WeatherListBusinessModel businessModel : weatherForecastList) {
-            weatherInfo.add(businessModel);
+            List<WeatherListBusinessModel> weatherForecastList = getAvailAbleForecast(currentWeatherDBModel.getId(),
+                    currentWeatherDBModel.getDt(),
+                    ctx);
+            for (WeatherListBusinessModel businessModel : weatherForecastList) {
+                weatherInfo.add(businessModel);
+            }
         }
         return weatherInfo;
     }
@@ -525,9 +511,10 @@ public class Utils {
                 + " = \"" + city + "\"";
         SQLiteDatabase db = new WeatherDBHelper(ctx).getReadableDatabase();
         Cursor cursor = db.rawQuery(sqry, null);
-        CurrentWeatherDBModel currentWeatherDBModel = new CurrentWeatherDBModel();
+        CurrentWeatherDBModel currentWeatherDBModel = null;
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
+            currentWeatherDBModel = new CurrentWeatherDBModel();
             currentWeatherDBModel.setDt(cursor.getLong(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE)));
             CurrentWeatherMainDBModel mainDBModel = new CurrentWeatherMainDBModel();
             mainDBModel.setTempMin(cursor.getDouble(cursor.getColumnIndex(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_MIN_TEMP)));
