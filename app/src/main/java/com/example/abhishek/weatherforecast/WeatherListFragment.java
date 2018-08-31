@@ -1,6 +1,7 @@
 package com.example.abhishek.weatherforecast;
 
 
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -58,6 +59,11 @@ public class WeatherListFragment extends Fragment
 
     SettingsOptionClickListener clickListener;
     private LocalBroadcastManager broadcastManager = null;
+    boolean alarmAlreadyStarted = false;
+    ProgressDialog mProgressDialog;
+    private boolean isCurrentWeatherLoaded = false,
+            isWeatherForecastLoaded = false;
+
 
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
     List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
@@ -94,22 +100,8 @@ public class WeatherListFragment extends Fragment
                     }
                     adapter.setWeatherList(iWeatherDetailsList);
 
-                    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-                    for(IWeatherDetails details: iWeatherDetailsList){
-                        if(details instanceof WeatherListBusinessModel){
-                            WeatherListBusinessModel wb = (WeatherListBusinessModel) details;
-                            Date dt = new Date(wb.getDt()*1000L);
-                            Log.d("#",weather.getCityApiModel().getName()+" on : "+sdf.format(dt)+" max temp "+String.format(context.getString(R.string.format_temperature_celsius), wb.getMainBusinessModel().getTempMax()-273.0)+" min temp "+
-                                    String.format(context.getString(R.string.format_temperature_celsius), wb.getMainBusinessModel().getTempMin()-273.0));
-                        }
-                        else if(details instanceof CurrentWeatherBusinessModel){
-                            CurrentWeatherBusinessModel cb = (CurrentWeatherBusinessModel) details;
-                            Log.d("#",cb.getName()+ " Today : "+sdf.format(cb.getDt() *1000L)+" max temp "+String.format(context.getString(R.string.format_temperature_celsius), cb.getCurrentWeatherMainBusinessModel().getTempMax()-273.0)+" min temp "+
-                                    String.format(context.getString(R.string.format_temperature_celsius), cb.getCurrentWeatherMainBusinessModel().getTempMin()-273.0));
-                        }
-
-                    }
+                    isWeatherForecastLoaded = true;
+                    postLoad();
 
                     //INSERT WEATHER FORECAST INTO DB
                     WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
@@ -130,6 +122,8 @@ public class WeatherListFragment extends Fragment
                     //SHOW CURRENT WEATHER IN THE LIST
                     adapter.setWeatherList(iWeatherDetailsList);
 
+                    isCurrentWeatherLoaded = true;
+                    postLoad();
 
                     //INSERT CURRENT WEATHER INTO DATABASE
                     WeatherDBDao.insertCurrentWeatherIntoDB(currentWeatherBusinessModel, getActivity());
@@ -181,6 +175,11 @@ public class WeatherListFragment extends Fragment
         list_layout = view.findViewById(R.id.list_layout);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_forecast);
 
+        mProgressDialog = new ProgressDialog(getActivity());
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(false);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
@@ -211,13 +210,19 @@ public class WeatherListFragment extends Fragment
             if(iWeatherDetailsList.size()>0)
                 iWeatherDetailsList.clear();
             //LOAD FORECAST INFO
+            if(!isWeatherForecastLoaded)
+                showLoading();
             WeatherDownloadTask.loadWeatherForecast(getContext());
 
             //LOAD CURRENT INFO
+            if(!isCurrentWeatherLoaded)
+                showLoading();
             WeatherDownloadTask.loadCurrentWeather(getContext(), false);
 
         } else {
 
+            if(!isCurrentWeatherLoaded && !isWeatherForecastLoaded)
+                showLoading();
             //CHECK DATA AVAILABLE IN DB
             List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(TEST_LOCATION, getActivity());
             if(!availableData.isEmpty()){
@@ -231,7 +236,10 @@ public class WeatherListFragment extends Fragment
         }
 
         //START CURRENT WEATHER SYNCRONIZATION PERIODICALLY
-        Utils.syncCurrentWeatherData(getContext());
+        if(!alarmAlreadyStarted){
+            Utils.syncCurrentWeatherData(getContext());
+            alarmAlreadyStarted = true;
+        }
 
     }
 
@@ -292,6 +300,23 @@ public class WeatherListFragment extends Fragment
                 .make(list_layout, message, Snackbar.LENGTH_LONG);
 
         snackbar.show();
+    }
+
+    private void postLoad() {
+        if (isCurrentWeatherLoaded && isWeatherForecastLoaded)
+            hideLoading();
+    }
+
+    private void showLoading() {
+        if (mProgressDialog.isShowing())
+            return;
+        mProgressDialog.setMessage("Loading.......");
+        mProgressDialog.show();
+    }
+
+    private void hideLoading() {
+        if (mProgressDialog.isShowing())
+            mProgressDialog.dismiss();
     }
 
 }

@@ -633,7 +633,7 @@ public class Utils {
         Intent intent = new Intent(context, CurrentWeatherSyncService.class);
         PendingIntent alarmIntent = PendingIntent.getService(context, REQUEST_CODE, intent, 0);
         alarmManager.setRepeating(AlarmManager.RTC,
-                System.currentTimeMillis()+(15 * 60 * 1000),
+                System.currentTimeMillis()+ interval,
                 interval,
                 alarmIntent);
     }
@@ -644,15 +644,14 @@ public class Utils {
                 + " = \"" + cwBusinessModel.getId() + "\"";
         SQLiteDatabase db = new WeatherDBHelper(context).getReadableDatabase();
         Cursor cursor = db.rawQuery(sqry, null);
-
-        if(cursor.getInt(cursor.getColumnIndex
-                (WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE)) == cwBusinessModel.getDt()){
-            return true;
+        while (cursor.moveToNext()){
+            if(cursor.getInt(cursor.getColumnIndex
+                    (WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE)) == cwBusinessModel.getDt()){
+                return true;
+            }
         }
-        cursor.close();
         return false;
     }
-
 
     public static class NotificationUtils {
 
