@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,6 +18,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract;
@@ -707,6 +709,71 @@ public class Utils {
             notificationManager.cancelAll();
 
         }
+    }
+
+    public static class Settings{
+
+        public static String getPreferredLocation(Context context) {
+            SharedPreferences sp = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+
+            String keyForLocation = context.getString(R.string.pref_location_key);
+            String defaultLocation = context.getString(R.string.pref_location_default);
+
+            String country = getPreferredCountry(context);
+
+            String loc = sp.getString(keyForLocation, defaultLocation);
+
+            StringBuilder locationWithCountryCode = new StringBuilder();
+            locationWithCountryCode.append(loc);
+            locationWithCountryCode.append(",");
+            locationWithCountryCode.append(country);
+
+
+            return locationWithCountryCode.toString();
+
+        }
+
+        private static String getPreferredCountry(Context context) {
+            SharedPreferences sp = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
+
+            String keyForCountry = context.getString(R.string.pref_country_key);
+            String defaultCountry = context.getString(R.string.pref_country_default);
+
+            return sp.getString(keyForCountry, defaultCountry);
+
+        }
+
+        public static boolean isMetric(Context context) {
+
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(context);
+            String keyForUnits = context.getString(R.string.pref_units_key);
+            String defaultUnits = context.getString(R.string.pref_units_metric);
+            String preferredUnits = prefs.getString(keyForUnits, defaultUnits);
+            String metric = context.getString(R.string.pref_units_metric);
+            boolean userPrefersMetric;
+            if (metric.equals(preferredUnits)) {
+                userPrefersMetric = true;
+            } else {
+                userPrefersMetric = false;
+            }
+            return userPrefersMetric;
+        }
+
+        public static boolean areNotificationsEnabled(Context context) {
+
+            String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
+            boolean shouldDisplayNotificationsByDefault = context
+                    .getResources()
+                    .getBoolean(R.bool.show_notifications_by_default);
+            SharedPreferences sp = android.preference.PreferenceManager
+                    .getDefaultSharedPreferences(context);
+            boolean shouldDisplayNotifications = sp
+                    .getBoolean(displayNotificationsKey, shouldDisplayNotificationsByDefault);
+
+            return shouldDisplayNotifications;
+        }
+
     }
 
 }

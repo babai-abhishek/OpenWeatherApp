@@ -72,6 +72,14 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+        Preference preference = findPreference(key);
+        if (null != preference) {
+            if (!(preference instanceof CheckBoxPreference)) {
+                String val = sharedPreferences.getString(
+                        preference.getKey(), ""
+                );
+                setPreferenceSummary(preference, val);
+            }
+        }
     }
 }

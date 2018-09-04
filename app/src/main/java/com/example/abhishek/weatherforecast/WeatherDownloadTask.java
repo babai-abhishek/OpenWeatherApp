@@ -21,7 +21,6 @@ import static com.example.abhishek.weatherforecast.WeatherListFragment.ACTION_WE
 import static com.example.abhishek.weatherforecast.WeatherListFragment.KEY_CURRENT_WEATHER;
 import static com.example.abhishek.weatherforecast.WeatherListFragment.KEY_WEATHER_FORECAST;
 import static com.example.abhishek.weatherforecast.WeatherListFragment.OWM_API_KEY;
-import static com.example.abhishek.weatherforecast.WeatherListFragment.TEST_LOCATION;
 
 /**
  * Created by abhishek on 31/7/18.
@@ -33,7 +32,7 @@ public class WeatherDownloadTask {
 
     public synchronized static void loadCurrentWeather(final Context ctx, final boolean showNotification) {
         final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(ctx);
-        Call<CurrentWeatherApiModel> currentWeatherApiModelCall = weatherInterface.getCurrentWeather(TEST_LOCATION, OWM_API_KEY);
+        Call<CurrentWeatherApiModel> currentWeatherApiModelCall = weatherInterface.getCurrentWeather(Utils.Settings.getPreferredLocation(ctx), OWM_API_KEY);
         currentWeatherApiModelCall.enqueue(new Callback<CurrentWeatherApiModel>() {
             @Override
             public void onResponse(Call<CurrentWeatherApiModel> call, Response<CurrentWeatherApiModel> response) {
@@ -70,7 +69,7 @@ public class WeatherDownloadTask {
 
     public synchronized static void loadWeatherForecast(Context ctx) {
         final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(ctx);
-        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(TEST_LOCATION,OWM_API_KEY);
+        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(Utils.Settings.getPreferredLocation(ctx),OWM_API_KEY);
         call.enqueue(new Callback<WeatherApiModel>() {
             @Override
             public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {

@@ -44,10 +44,9 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class WeatherListFragment extends Fragment
-        implements SharedPreferences.OnSharedPreferenceChangeListener,
-        NetworkConnectivityReceiver.ConnectivityReceiverListener{
+        implements NetworkConnectivityReceiver.ConnectivityReceiverListener{
 
-    public static final String TEST_LOCATION = "Kolkata,in";
+    public static String LOCATION ;
 
     public static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
     public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
@@ -195,7 +194,7 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-
+        LOCATION = Utils.Settings.getPreferredLocation(getContext());
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_CURRENT_WEATHER_API_SUCCESS);
         filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);
@@ -227,7 +226,7 @@ public class WeatherListFragment extends Fragment
             new AsyncTask<Void, Void, List<IWeatherDetails>>() {
                 @Override
                 protected List<IWeatherDetails> doInBackground(Void... voids) {
-                    List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(TEST_LOCATION, getActivity());
+                    List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(LOCATION, getActivity());
                     return availableData;
                 }
 
@@ -276,11 +275,6 @@ public class WeatherListFragment extends Fragment
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
     }
 
     @Override

@@ -206,7 +206,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     class CurrentWeatherViewHolder extends RecyclerView.ViewHolder{
 
         TextView tv_current_weather_date, tv_current_weather_description, tv_current_weather_high_temperature,
-                tv_current_weather_low_temperature, tb_current_updated;
+                tv_current_weather_low_temperature, tb_current_updated, tvCurrentLocation;
         ImageView img_current_weather_icon;
 
         public CurrentWeatherViewHolder(View itemView) {
@@ -217,10 +217,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             tv_current_weather_low_temperature = itemView.findViewById(R.id.tv_current_weather_low_temperature);
             img_current_weather_icon = itemView.findViewById(R.id.img_current_weather_icon);
             tb_current_updated = itemView.findViewById(R.id.tb_current_updated);
+            tvCurrentLocation = itemView.findViewById(R.id.tvCurrentLocation);
 
         }
 
         void bind(CurrentWeatherBusinessModel currentWeather){
+
+            //SET LOCATION
+            tvCurrentLocation.setText("at, "+Utils.Settings.getPreferredLocation(mContext));
 
             //SET DESC
             String description = Utils.getStringForWeatherCondition(mContext, currentWeather.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
