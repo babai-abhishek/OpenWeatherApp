@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,9 +32,7 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -104,7 +100,7 @@ public class WeatherListFragment extends Fragment
                     postLoad();
 
                     //INSERT WEATHER FORECAST INTO DB
-                    WeatherDBDao.insertForecastData(new WeatherBusinessModel(weather), getActivity());
+                    WeatherDBDao.insertWeatherForecastIntoDB(new WeatherBusinessModel(weather), getActivity());
                     break;
 
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:

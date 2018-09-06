@@ -25,7 +25,7 @@ public class CurrentWeatherUpdateReceiver extends BroadcastReceiver {
             CurrentWeatherBusinessModel cwBusinessModel = new CurrentWeatherBusinessModel(cwApiModel);
 
             //CHECK WHETHER THE CURRENT WEATHER DETAILS ALREADY AVAILABALE IN DB OR NOT
-            boolean isDataAlreadyInDB = Utils.isAlreadyDataPresentInDB(cwBusinessModel, context);
+            boolean isDataAlreadyInDB = Utils.isAlreadyCurrentWeatherInfoPresentInDB(cwBusinessModel, context);
             Log.d("#","isDataAlreadyInDB : "+isDataAlreadyInDB);
             //IF DATA UN-AVAILABALE ,  SHOW NOTIFICATION
             if(!isDataAlreadyInDB){
