@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry;
-import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.Utils;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
@@ -32,8 +31,6 @@ import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecas
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.abhishek.weatherforecast.Utils.getAlreadyPresentDatesFromDB;
-
 
 /**
  * Created by abhishek on 19/7/18.
@@ -44,72 +41,19 @@ public class WeatherDBDao {
     private static WeatherDBHelper weatherDBHelper;
     private static boolean isTimeAlreadyPresent = false;
 
-    public static void insertWeatherForecastIntoDB(WeatherBusinessModel weather, Context ctx) {
+    public static void insertWeatherForecastIntoDB(WeatherDBModel weather, Context ctx) {
 
         //convert business model class into db model class
-        WeatherDBModel weatherDBModel = new WeatherDBModel();
-
-        CityDBModel cityDBModel = new CityDBModel();
-        CoordDBModel coordDBModel = new CoordDBModel();
-        coordDBModel.setLat(weather.getCityBusinessModel().getCoordBusinessModel().getLat());
-        coordDBModel.setLon(weather.getCityBusinessModel().getCoordBusinessModel().getLon());
-        cityDBModel.setName(weather.getCityBusinessModel().getName());
-        cityDBModel.setCountry(weather.getCityBusinessModel().getCountry());
-        cityDBModel.setId(weather.getCityBusinessModel().getId());
-        cityDBModel.setCoordDBModel(coordDBModel);
-
-        //SET CITYDB MODEL IN WEATHERDBMODEL
-        weatherDBModel.setCityDBModel(cityDBModel);
-
-
-        List<WeatherListDBModel> weatherListDBModel = new ArrayList<>();
-        for (int i = 0; i < weather.getWeatherListBusinessModel().size(); i++) {
-
-            WeatherListDBModel dbModel = new WeatherListDBModel();
-            dbModel.setDt(weather.getWeatherListBusinessModel().get(i).getDt());
-
-            MainDBModel mainDBModel = new MainDBModel();
-            mainDBModel.setHumidity(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getHumidity());
-            mainDBModel.setTemp(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTemp());
-            mainDBModel.setTempMax(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTempMax());
-            mainDBModel.setTempMin(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTempMin());
-            dbModel.setMainDBModel(mainDBModel);
-
-            CloudsDBModel cloudsDBModel = new CloudsDBModel();
-            cloudsDBModel.setAll(weather.getWeatherListBusinessModel().get(i).getCloudsBusinessModel().getAll());
-            dbModel.setCloudsDBModel(cloudsDBModel);
-
-            WindDBModel windDBModel = new WindDBModel();
-            windDBModel.setDeg(weather.getWeatherListBusinessModel().get(i).getWindBusinessModel().getDeg());
-            windDBModel.setSpeed(weather.getWeatherListBusinessModel().get(i).getWindBusinessModel().getSpeed());
-            dbModel.setWindDBModel(windDBModel);
-
-            SysDBModel sysDBModel = new SysDBModel();
-            sysDBModel.setPod(weather.getWeatherListBusinessModel().get(i).getSysBusinessModel().getPod());
-            dbModel.setSysDBModel(sysDBModel);
-
-            List<WeatherInfoDBModel> weatherInfoDBModelList = new ArrayList<>();
-            WeatherInfoDBModel infoDBModel = new WeatherInfoDBModel();
-            infoDBModel.setIcon(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getIcon());
-            infoDBModel.setDescription(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getDescription());
-            infoDBModel.setId(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getId());
-            infoDBModel.setMain(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getMain());
-            weatherInfoDBModelList.add(infoDBModel);
-
-            dbModel.setWeatherInfoDBModel(weatherInfoDBModelList);
-            weatherListDBModel.add(dbModel);
-        }
-
-        //SET WEATHERLISTDBMODEL IN WEATHERDBMODEL
-        weatherDBModel.setWeatherListDBModel(weatherListDBModel);
+        WeatherDBModel weatherDBModel = weather;
 
         ContentValues[] weatherForecastContentValues = Utils
-                .getWeatherForecastContentValuesFromJson(weatherDBModel);
+                .convertIntoContentValues(weatherDBModel);
 
         weatherDBHelper = new WeatherDBHelper(ctx);
 
         //GET AVAILABLE DATE VALUES OF THE RESPECTIVE CITY
-        List<String> availableDateAndTime = getAlreadyPresentDatesFromDB(String.valueOf(weather.getCityBusinessModel().getId()), weatherDBHelper);
+        List<String> availableDateAndTime = Utils.DBUtils.getAlreadyPresentDatesFromDB(String.valueOf(weather.getCityDBModel().getId()),
+                weatherDBHelper);
 
         //CHECK WHETHER WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE VALUE
         //MATHCES WITH NEW INCOMING DATE VALUE

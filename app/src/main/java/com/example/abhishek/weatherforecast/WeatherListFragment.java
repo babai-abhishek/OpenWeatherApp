@@ -100,7 +100,8 @@ public class WeatherListFragment extends Fragment
                     postLoad();
 
                     //INSERT WEATHER FORECAST INTO DB
-                    WeatherDBDao.insertWeatherForecastIntoDB(new WeatherBusinessModel(weather), getActivity());
+                    WeatherDBDao.insertWeatherForecastIntoDB(Utils.convertBusinessModelToDBModel(new WeatherBusinessModel(weather)),
+                            getActivity());
                     break;
 
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
@@ -190,7 +191,7 @@ public class WeatherListFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        LOCATION = Utils.Settings.getPreferredLocation(getContext());
+        LOCATION = Utils.SettingsUtils.getPreferredLocation(getContext());
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_CURRENT_WEATHER_API_SUCCESS);
         filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);

@@ -23,8 +23,11 @@ import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentW
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CityDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CloudsDBModel;
+import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CoordDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.MainDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.SysDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherDBModel;
@@ -61,7 +64,7 @@ public class Utils {
 
     public static final int REQUEST_CODE = 1001;
 
-    public static ContentValues[] getWeatherForecastContentValuesFromJson(WeatherDBModel weather) {
+    public static ContentValues[] convertIntoContentValues(WeatherDBModel weather) {
 
         ContentValues[] weatherContentValues = new ContentValues[weather.getWeatherListDBModel().size()];
 
@@ -86,26 +89,6 @@ public class Utils {
         }
 
         return weatherContentValues;
-    }
-
-    public static List<String> getAlreadyPresentDatesFromDB(String cityId, WeatherDBHelper weatherDBHelper) {
-        List<String> dates = new ArrayList<>();
-        SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
-        String qry = "SELECT " + WEATHER_FORECAST_TABLE_COLUMN_DATE + " FROM " +
-                WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME + " where "
-                + WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID + " = " + cityId + "";
-        Cursor cursor = database.rawQuery(qry, null);
-        if (cursor.getCount() <= 0) {
-            cursor.close();
-            return dates;
-        }
-        if (cursor.moveToFirst()) {
-            do {
-                dates.add(String.valueOf(cursor.getString(cursor.getColumnIndex(WEATHER_FORECAST_TABLE_COLUMN_DATE))));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return dates;
     }
 
     public static ContentValues getCurrentWeatherContentValueFromJson(CurrentWeatherDBModel currentWeatherDBModel) {
@@ -237,36 +220,6 @@ public class Utils {
         double celcius = temperature - 273.15;
 
         return String.format(context.getString(temperatureFormatResourceId), celcius);
-    }
-
-    public static String getFormattedWind(Context context, float windSpeed, float degrees) {
-
-        int windFormat = R.string.format_wind_kmh;
-
-        //  if (!SunshinePreferences.isMetric(context)) {
-        windFormat = R.string.format_wind_mph;
-        windSpeed = .621371192237334f * windSpeed;
-        //  }
-
-        String direction = "Unknown";
-        if (degrees >= 337.5 || degrees < 22.5) {
-            direction = "N";
-        } else if (degrees >= 22.5 && degrees < 67.5) {
-            direction = "NE";
-        } else if (degrees >= 67.5 && degrees < 112.5) {
-            direction = "E";
-        } else if (degrees >= 112.5 && degrees < 157.5) {
-            direction = "SE";
-        } else if (degrees >= 157.5 && degrees < 202.5) {
-            direction = "S";
-        } else if (degrees >= 202.5 && degrees < 247.5) {
-            direction = "SW";
-        } else if (degrees >= 247.5 && degrees < 292.5) {
-            direction = "W";
-        } else if (degrees >= 292.5 && degrees < 337.5) {
-            direction = "NW";
-        }
-        return String.format(context.getString(windFormat), windSpeed, direction);
     }
 
     public static String getStringForWeatherCondition(Context context, int weatherId) {
@@ -438,19 +391,6 @@ public class Utils {
         return context.getString(stringId);
     }
 
-    private static long getEpochForTodayMidnight() {
-        Date currDate = new Date();
-        Calendar cal = Calendar.getInstance();
-        // compute start of the day for the timestamp
-        cal.setTime(currDate);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-
-        return cal.getTimeInMillis() / 1000;
-    }
-
     public static String getDateString(Context mContext, long dateInMillis) {
         Date dt = new Date(dateInMillis * 1000L);
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
@@ -568,6 +508,66 @@ public class Utils {
         return false;
     }
 
+    public static WeatherDBModel convertBusinessModelToDBModel(WeatherBusinessModel weather) {
+
+        WeatherDBModel weatherDBModel = new WeatherDBModel();
+        CityDBModel cityDBModel = new CityDBModel();
+        CoordDBModel coordDBModel = new CoordDBModel();
+        coordDBModel.setLat(weather.getCityBusinessModel().getCoordBusinessModel().getLat());
+        coordDBModel.setLon(weather.getCityBusinessModel().getCoordBusinessModel().getLon());
+        cityDBModel.setName(weather.getCityBusinessModel().getName());
+        cityDBModel.setCountry(weather.getCityBusinessModel().getCountry());
+        cityDBModel.setId(weather.getCityBusinessModel().getId());
+        cityDBModel.setCoordDBModel(coordDBModel);
+
+        //SET CITYDB MODEL IN WEATHERDBMODEL
+        weatherDBModel.setCityDBModel(cityDBModel);
+
+
+        List<WeatherListDBModel> weatherListDBModel = new ArrayList<>();
+        for (int i = 0; i < weather.getWeatherListBusinessModel().size(); i++) {
+
+            WeatherListDBModel dbModel = new WeatherListDBModel();
+            dbModel.setDt(weather.getWeatherListBusinessModel().get(i).getDt());
+
+            MainDBModel mainDBModel = new MainDBModel();
+            mainDBModel.setHumidity(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getHumidity());
+            mainDBModel.setTemp(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTemp());
+            mainDBModel.setTempMax(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTempMax());
+            mainDBModel.setTempMin(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTempMin());
+            dbModel.setMainDBModel(mainDBModel);
+
+            CloudsDBModel cloudsDBModel = new CloudsDBModel();
+            cloudsDBModel.setAll(weather.getWeatherListBusinessModel().get(i).getCloudsBusinessModel().getAll());
+            dbModel.setCloudsDBModel(cloudsDBModel);
+
+            WindDBModel windDBModel = new WindDBModel();
+            windDBModel.setDeg(weather.getWeatherListBusinessModel().get(i).getWindBusinessModel().getDeg());
+            windDBModel.setSpeed(weather.getWeatherListBusinessModel().get(i).getWindBusinessModel().getSpeed());
+            dbModel.setWindDBModel(windDBModel);
+
+            SysDBModel sysDBModel = new SysDBModel();
+            sysDBModel.setPod(weather.getWeatherListBusinessModel().get(i).getSysBusinessModel().getPod());
+            dbModel.setSysDBModel(sysDBModel);
+
+            List<WeatherInfoDBModel> weatherInfoDBModelList = new ArrayList<>();
+            WeatherInfoDBModel infoDBModel = new WeatherInfoDBModel();
+            infoDBModel.setIcon(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getIcon());
+            infoDBModel.setDescription(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getDescription());
+            infoDBModel.setId(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getId());
+            infoDBModel.setMain(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getMain());
+            weatherInfoDBModelList.add(infoDBModel);
+
+            dbModel.setWeatherInfoDBModel(weatherInfoDBModelList);
+            weatherListDBModel.add(dbModel);
+        }
+
+        //SET WEATHERLISTDBMODEL IN WEATHERDBMODEL
+        weatherDBModel.setWeatherListDBModel(weatherListDBModel);
+
+        return weatherDBModel;
+    }
+
     public static class NotificationUtils {
 
         private static final int CURRENT_WEATHER_NOTIFICATION_ID = 1138;
@@ -637,7 +637,7 @@ public class Utils {
         }
     }
 
-    public static class Settings{
+    public static class SettingsUtils {
 
         public static String getPreferredLocation(Context context) {
             SharedPreferences sp = android.preference.PreferenceManager.getDefaultSharedPreferences(context);
@@ -700,6 +700,30 @@ public class Utils {
             return shouldDisplayNotifications;
         }
 
+    }
+
+    public static class DBUtils{
+
+        public static List<String> getAlreadyPresentDatesFromDB(String cityId,
+                                                                WeatherDBHelper weatherDBHelper) {
+            List<String> dates = new ArrayList<>();
+            SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
+            String qry = "SELECT " + WEATHER_FORECAST_TABLE_COLUMN_DATE + " FROM " +
+                    WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_NAME + " where "
+                    + WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID + " = " + cityId + "";
+            Cursor cursor = database.rawQuery(qry, null);
+            if (cursor.getCount() <= 0) {
+                cursor.close();
+                return dates;
+            }
+            if (cursor.moveToFirst()) {
+                do {
+                    dates.add(String.valueOf(cursor.getString(cursor.getColumnIndex(WEATHER_FORECAST_TABLE_COLUMN_DATE))));
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            return dates;
+        }
     }
 
 }

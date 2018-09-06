@@ -224,7 +224,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         void bind(CurrentWeatherBusinessModel currentWeather){
 
             //SET LOCATION
-            tvCurrentLocation.setText("at, "+Utils.Settings.getPreferredLocation(mContext));
+            tvCurrentLocation.setText("at, "+ Utils.SettingsUtils.getPreferredLocation(mContext));
 
             //SET DESC
             String description = Utils.getStringForWeatherCondition(mContext, currentWeather.getCurrentWeatherInfoBusinessModel().get(0).getWeatherId());
