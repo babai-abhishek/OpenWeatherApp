@@ -73,47 +73,68 @@ public class WeatherListFragment extends Fragment
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(Context context, final Intent intent) {
 
             switch (intent.getAction()) {
 
                 case ACTION_WEATHER_FORECAST_API_SUCCESS:
                     Toast.makeText(getActivity(), "Weather forecast Api Success", Toast.LENGTH_SHORT).show();
-                    WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
+                    final WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
 
-                    //RETRIEVE FORECAST DATA EXCLUDING TODAY'S WEATHER
-                    weatherListFromTomorrow = Utils.getWeatherForecastListFromTomorrow(weather);
 
-                    //CONVERT WEATHERLISTAPIMODEL TO WEATHERLISTBUSINESSMODEL
-                    List<WeatherListBusinessModel> listBusinessModels = new ArrayList<>();
-                    for(WeatherListApiModel apiModel: weatherListFromTomorrow){
-                        listBusinessModels.add(new WeatherListBusinessModel(apiModel));
-                    }
 
-                    //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
-                    for(WeatherListBusinessModel weatherListBusinessModel: listBusinessModels){
-                        iWeatherDetailsList.add(weatherListBusinessModel);
-                    }
-                    adapter.setWeatherList(iWeatherDetailsList);
+                    new AsyncTask<Void, Void, List<WeatherListBusinessModel>>() {
+                        @Override
+                        protected List<WeatherListBusinessModel> doInBackground(Void... voids) {
+                            //INSERT WEATHER FORECAST INTO DB
+                            WeatherDBDao.insertWeatherForecastIntoDB(Utils
+                                            .convertBusinessModelToDBModel(new WeatherBusinessModel(weather)),
+                                    getActivity());
 
-                    isWeatherForecastLoaded = true;
-                    postLoad();
+                            //GET DATA FROM DB
+                            List<WeatherListBusinessModel> mWeatherListBusinessModelList = Utils
+                                    .getForecastWeatherForLocationFromDB((int) weather.getCityApiModel().getId(),
+                                            System.currentTimeMillis()/1000,
+                                            getActivity());
 
-                    //INSERT WEATHER FORECAST INTO DB
-                    WeatherDBDao.insertWeatherForecastIntoDB(Utils.convertBusinessModelToDBModel(new WeatherBusinessModel(weather)),
-                            getActivity());
+                            return mWeatherListBusinessModelList;
+                        }
+                        @Override
+                        protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
+                            super.onPostExecute(weatherListBusinessModels);
+
+                            //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
+                            for(WeatherListBusinessModel weatherListBusinessModel: weatherListBusinessModels){
+                                iWeatherDetailsList.add(weatherListBusinessModel);
+                            }
+                            adapter.setWeatherList(iWeatherDetailsList);
+
+                            isWeatherForecastLoaded = true;
+                            postLoad();
+                        }
+                    }.execute();
+
                     break;
 
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
                     Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
                     CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
-                    CurrentWeatherBusinessModel currentWeatherBusinessModel = new CurrentWeatherBusinessModel(currentWeatherApiModel);
+
+                    //INSERT CURRENT WEATHER INTO DATABASE
+                    WeatherDBDao.insertCurrentWeatherIntoDB(Utils
+                            .convertCurrentWeatherBusinessModelToCurrentWeatherDBModel(
+                            new CurrentWeatherBusinessModel(currentWeatherApiModel)), getActivity());
+
+                    //GET DATA FROM DB AND SHOW ON SCREEN
+                    CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = Utils
+                            .getCurrentWeatherForLocationFromDB(currentWeatherApiModel.getName(), getActivity());
+
 
                     //ADD TO LIST FOR ADAPTER
                     if(!iWeatherDetailsList.isEmpty()){
-                        iWeatherDetailsList.set(0,currentWeatherBusinessModel);
+                        iWeatherDetailsList.set(0,mCurrentWeatherBusinessModel);
                     }else {
-                        iWeatherDetailsList.add(0, currentWeatherBusinessModel);
+                        iWeatherDetailsList.add(0, mCurrentWeatherBusinessModel);
                     }
 
                     //SHOW CURRENT WEATHER IN THE LIST
@@ -122,8 +143,6 @@ public class WeatherListFragment extends Fragment
                     isCurrentWeatherLoaded = true;
                     postLoad();
 
-                    //INSERT CURRENT WEATHER INTO DATABASE
-                    WeatherDBDao.insertCurrentWeatherIntoDB(currentWeatherBusinessModel, getActivity());
                     break;
 
                 case ACTION_WEATHER_FORECAST_API_FAILURE:

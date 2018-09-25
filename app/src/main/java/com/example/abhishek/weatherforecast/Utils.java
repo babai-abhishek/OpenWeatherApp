@@ -20,7 +20,14 @@ import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract;
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
 import com.example.abhishek.weatherforecast.DBUtils.WeatherDBHelper;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCloudsDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCoordDBModel;
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherInfoDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherMainDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherSysDBModel;
+import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherWindDBModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
@@ -91,7 +98,7 @@ public class Utils {
         return weatherContentValues;
     }
 
-    public static ContentValues getCurrentWeatherContentValueFromJson(CurrentWeatherDBModel currentWeatherDBModel) {
+    public static ContentValues convertIntoContentValues(CurrentWeatherDBModel currentWeatherDBModel) {
         ContentValues cv = new ContentValues();
         cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_CITY_NAME, currentWeatherDBModel.getName());
         cv.put(WeatherDBContract.CurrentWeatherEntry.CURRENT_WEATHER_TABLE_COLUMN_DATE, currentWeatherDBModel.getDt());
@@ -437,12 +444,24 @@ public class Utils {
         return weatherInfo;
     }
 
-    //HELPER METHOD TO GET CURRENTWEATHER FOR THE LOCATION FROM DB
+    public static CurrentWeatherBusinessModel getCurrentWeatherForLocationFromDB(String location, Context ctx) {
+        CurrentWeatherDBModel mCurrentWeatherDBModel = getAvailableCurrentWeatherForLocationFromDB(location, ctx);
+        CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = new CurrentWeatherBusinessModel(mCurrentWeatherDBModel);
+        return  mCurrentWeatherBusinessModel;
+    }
+
+        //HELPER METHOD TO GET CURRENTWEATHER FOR THE LOCATION FROM DB
     private static CurrentWeatherDBModel getAvailableCurrentWeatherForLocationFromDB(String location, Context ctx) {
         String[] cityWithCountry = location.split(",");
         String city = Utils.formantCity(cityWithCountry[0].trim());
         CurrentWeatherDBModel mCurrentWeatherDBModel = WeatherDBDao.getCurrentWeather(city, ctx);
         return mCurrentWeatherDBModel;
+    }
+
+    public static List<WeatherListBusinessModel> getForecastWeatherForLocationFromDB(int cityid, long dateTime, Context ctx) {
+        List<WeatherListBusinessModel> mWeatherListBusinessModelList =
+                getAvailAbleForecastWeatherForLocationFromDB(cityid, dateTime, ctx);
+        return mWeatherListBusinessModelList;
     }
 
     //HELPER METHOD TO GET FORECASTWEATHER FOR THE LOCATION FROM DB AND
@@ -568,6 +587,50 @@ public class Utils {
         return weatherDBModel;
     }
 
+    public static CurrentWeatherDBModel convertCurrentWeatherBusinessModelToCurrentWeatherDBModel(CurrentWeatherBusinessModel
+                                                                                                          currentWeatherBusinessModel) {
+        //CONVERT BUSINESS MODEL CLASS TO DB MODEL CLASS
+        CurrentWeatherDBModel currentWeatherDBModel = new CurrentWeatherDBModel();
+
+        currentWeatherDBModel.setName(currentWeatherBusinessModel.getName());
+        currentWeatherDBModel.setId(currentWeatherBusinessModel.getId());
+        currentWeatherDBModel.setDt(currentWeatherBusinessModel.getDt());
+
+        CurrentWeatherCoordDBModel coordDBModel = new CurrentWeatherCoordDBModel();
+        coordDBModel.setLat(currentWeatherBusinessModel.getCurrentWeatherCoordBusinessModel().getLat());
+        coordDBModel.setLon(currentWeatherBusinessModel.getCurrentWeatherCoordBusinessModel().getLon());
+        currentWeatherDBModel.setCurrentWeatherCoordDBModel(coordDBModel);
+
+        CurrentWeatherMainDBModel mainDBModel = new CurrentWeatherMainDBModel();
+        mainDBModel.setHumidity(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getHumidity());
+        mainDBModel.setTempMax(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getTempMax());
+        mainDBModel.setTempMin(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getTempMin());
+        currentWeatherDBModel.setCurrentWeatherMainDBModel(mainDBModel);
+
+        CurrentWeatherWindDBModel windDBModel = new CurrentWeatherWindDBModel();
+        windDBModel.setSpeed(currentWeatherBusinessModel.getCurrentWeatherWindBusinessModel().getSpeed());
+        currentWeatherDBModel.setCurrentWeatherWindDBModel(windDBModel);
+
+        CurrentWeatherSysDBModel sysDBModel = new CurrentWeatherSysDBModel();
+        sysDBModel.setCountry(currentWeatherBusinessModel.getCurrentWeatherSysBusinessModel().getCountry());
+        currentWeatherDBModel.setCurrentWeatherSysDBModel(sysDBModel);
+
+        CurrentWeatherCloudsDBModel cloudsDBModel = new CurrentWeatherCloudsDBModel();
+        cloudsDBModel.setAll(currentWeatherBusinessModel.getCurrentWeatherCloudsBusinessModel().getAll());
+        currentWeatherDBModel.setCurrentWeatherCloudsDBModel(cloudsDBModel);
+
+        List<CurrentWeatherInfoDBModel> weatherInfoDBModelList = new ArrayList<>();
+        for(CurrentWeatherInfoBusinessModel infoBusinessModel: currentWeatherBusinessModel.getCurrentWeatherInfoBusinessModel()){
+            CurrentWeatherInfoDBModel infoDBModel = new CurrentWeatherInfoDBModel();
+            infoDBModel.setDescription(infoBusinessModel.getDescription());
+            infoDBModel.setIcon(infoBusinessModel.getIcon());
+            infoDBModel.setWeatherId(infoBusinessModel.getWeatherId());
+            weatherInfoDBModelList.add(infoDBModel);
+        }
+        currentWeatherDBModel.setCurrentWeatherInfoDBModel(weatherInfoDBModelList);
+
+        return currentWeatherDBModel;
+    }
     public static class NotificationUtils {
 
         private static final int CURRENT_WEATHER_NOTIFICATION_ID = 1138;
