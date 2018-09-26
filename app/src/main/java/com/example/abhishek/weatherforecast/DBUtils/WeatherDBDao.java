@@ -167,10 +167,10 @@ public class WeatherDBDao {
 
     }
 
-    public static List<WeatherListDBModel> getForecastWeather(int cityid, long dateTime, Context ctx){
+    public static List<WeatherListDBModel> getForecastWeather(int cityid, long fromDateTime, Context ctx){
         List<WeatherListDBModel> listOfDbModels = new ArrayList<>();
 
-        String qry = "SELECT * FROM forecastweather WHERE _city_id=\"" + cityid + "\" AND date>\"" + dateTime + "\"";
+        String qry = "SELECT * FROM forecastweather WHERE _city_id=\"" + cityid + "\" AND date>\"" + fromDateTime + "\"";
         SQLiteDatabase db = new WeatherDBHelper(ctx).getReadableDatabase();
         Cursor cursor = db.rawQuery(qry, null);
         if (cursor.moveToFirst()) {
@@ -202,5 +202,39 @@ public class WeatherDBDao {
         return listOfDbModels;
     }
 
+    public static List<WeatherListDBModel> getForecastWeather(int cityid, Context ctx) {
+        List<WeatherListDBModel> listOfDbModels = new ArrayList<>();
+
+        String qry = "SELECT * FROM forecastweather WHERE _city_id=\"" + cityid + "\"";
+        SQLiteDatabase db = new WeatherDBHelper(ctx).getReadableDatabase();
+        Cursor cursor = db.rawQuery(qry, null);
+        if (cursor.moveToFirst()) {
+            do {
+                WeatherListDBModel dbModel = new WeatherListDBModel();
+                dbModel.setDt(cursor.getLong(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE)));
+
+                WeatherInfoDBModel weatherInfoDBModel = new WeatherInfoDBModel();
+                weatherInfoDBModel.setId(cursor.getInt(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_CONDITION_ID)));
+                weatherInfoDBModel.setDescription(cursor.getString(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DESCRIPTION)));
+                weatherInfoDBModel.setIcon(cursor.getString(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_ICON)));
+                List<WeatherInfoDBModel> dbModelList = new ArrayList<>();
+                dbModelList.add(weatherInfoDBModel);
+                dbModel.setWeatherInfoDBModel(dbModelList);
+
+                MainDBModel mainDBModel = new MainDBModel();
+                mainDBModel.setTempMax(cursor.getDouble(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP)));
+                mainDBModel.setTempMin(cursor.getDouble(cursor.getColumnIndex(WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MIN_TEMP)));
+                dbModel.setMainDBModel(mainDBModel);
+
+                dbModel.setSysDBModel(new SysDBModel());
+                dbModel.setCloudsDBModel(new CloudsDBModel());
+                dbModel.setWindDBModel(new WindDBModel());
+                listOfDbModels.add(dbModel);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return listOfDbModels;
+    }
 }
 
