@@ -40,9 +40,7 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class WeatherListFragment extends Fragment
-        implements NetworkConnectivityReceiver.ConnectivityReceiverListener{
-
-    public static String LOCATION ;
+        implements NetworkConnectivityReceiver.ConnectivityReceiverListener {
 
     public static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
     public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
@@ -52,25 +50,22 @@ public class WeatherListFragment extends Fragment
     public static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
     public static final String KEY_WEATHER_FORECAST = "weather_forecast";
     public static final String KEY_CURRENT_WEATHER = "currentWeather";
-
+    public static String LOCATION;
     SettingsOptionClickListener clickListener;
-    private LocalBroadcastManager broadcastManager = null;
     boolean alarmAlreadyStarted = false;
     ProgressDialog mProgressDialog;
-    private boolean isCurrentWeatherLoaded = false,
-            isWeatherForecastLoaded = false;
-
-
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
     List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
     List<IWeatherDetails> iWeatherDetailsList = new ArrayList<>();
-
-
     //VARIABLES FOR SHOWING LIST
     WeatherAdapter adapter;
+    private LocalBroadcastManager broadcastManager = null;
+    private boolean isCurrentWeatherLoaded = false,
+            isWeatherForecastLoaded = false;
     private RecyclerView recyclerView;
     private FrameLayout list_layout;
 
+    //  NetworkConnectivityReceiver connectivityReceiverListener;
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, final Intent intent) {
@@ -82,35 +77,41 @@ public class WeatherListFragment extends Fragment
                     final WeatherApiModel weather = intent.getParcelableExtra(KEY_WEATHER_FORECAST);
 
 
-
                     new AsyncTask<Void, Void, List<WeatherListBusinessModel>>() {
+                        List<WeatherListBusinessModel> mWeatherListBusinessModelList;
+
                         @Override
                         protected List<WeatherListBusinessModel> doInBackground(Void... voids) {
-                            //INSERT WEATHER FORECAST INTO DB
-                            WeatherDBDao.insertWeatherForecastIntoDB(Utils
-                                            .convertBusinessModelToDBModel(new WeatherBusinessModel(weather)),
-                                    getActivity());
 
-                            //GET DATA FROM DB
-                            List<WeatherListBusinessModel> mWeatherListBusinessModelList = Utils
-                                    .getForecastWeatherForLocationFromDB((int) weather.getCityApiModel().getId(),
-                                            System.currentTimeMillis()/1000,
-                                            getActivity());
+                            if (weather != null) {
+                                //INSERT WEATHER FORECAST INTO DB
+                                WeatherDBDao.insertWeatherForecastIntoDB(Utils
+                                                .convertBusinessModelToDBModel(new WeatherBusinessModel(weather)),
+                                        getActivity());
 
+                                //GET DATA FROM DB
+                                mWeatherListBusinessModelList = Utils
+                                        .getForecastWeatherForLocationFromDB((int) weather.getCityApiModel().getId(),
+                                                System.currentTimeMillis() / 1000,
+                                                getActivity());
+                            }
                             return mWeatherListBusinessModelList;
                         }
+
                         @Override
                         protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
                             super.onPostExecute(weatherListBusinessModels);
 
-                            //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
-                            for(WeatherListBusinessModel weatherListBusinessModel: weatherListBusinessModels){
-                                iWeatherDetailsList.add(weatherListBusinessModel);
+                            if(weatherListBusinessModels!=null) {
+                                //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
+                                for (WeatherListBusinessModel weatherListBusinessModel : weatherListBusinessModels) {
+                                    iWeatherDetailsList.add(weatherListBusinessModel);
+                                }
                             }
                             adapter.setWeatherList(iWeatherDetailsList);
-
                             isWeatherForecastLoaded = true;
                             postLoad();
+
                         }
                     }.execute();
 
@@ -118,30 +119,48 @@ public class WeatherListFragment extends Fragment
 
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
                     Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
-                    CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
+                    final CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
 
-                    //INSERT CURRENT WEATHER INTO DATABASE
-                    WeatherDBDao.insertCurrentWeatherIntoDB(Utils
-                            .convertCurrentWeatherBusinessModelToCurrentWeatherDBModel(
-                            new CurrentWeatherBusinessModel(currentWeatherApiModel)), getActivity());
+                    new AsyncTask<Void, Void, CurrentWeatherBusinessModel>() {
+                        CurrentWeatherBusinessModel mCurrentWeatherBusinessModel;
+                        @Override
+                        protected CurrentWeatherBusinessModel doInBackground(Void... voids) {
+                            if (currentWeatherApiModel != null) {
+                                //INSERT CURRENT WEATHER INTO DATABASE
+                                WeatherDBDao.insertCurrentWeatherIntoDB(Utils
+                                        .convertCurrentWeatherBusinessModelToCurrentWeatherDBModel(
+                                                new CurrentWeatherBusinessModel(currentWeatherApiModel)), getActivity());
 
-                    //GET DATA FROM DB AND SHOW ON SCREEN
-                    CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = Utils
-                            .getCurrentWeatherForLocationFromDB(currentWeatherApiModel.getName(), getActivity());
+                                //GET DATA FROM DB AND SHOW ON SCREEN
+                                mCurrentWeatherBusinessModel= Utils
+                                        .getCurrentWeatherForLocationFromDB(currentWeatherApiModel.getName(), getActivity());
+
+                            }
+
+                            return mCurrentWeatherBusinessModel;
+                        }
 
 
-                    //ADD TO LIST FOR ADAPTER
-                    if(!iWeatherDetailsList.isEmpty()){
-                        iWeatherDetailsList.set(0,mCurrentWeatherBusinessModel);
-                    }else {
-                        iWeatherDetailsList.add(0, mCurrentWeatherBusinessModel);
-                    }
+                        @Override
+                        protected void onPostExecute(CurrentWeatherBusinessModel currentWeatherBusinessModel) {
+                            super.onPostExecute(currentWeatherBusinessModel);
 
-                    //SHOW CURRENT WEATHER IN THE LIST
-                    adapter.setWeatherList(iWeatherDetailsList);
+                            if(currentWeatherBusinessModel!=null) {
+                                //ADD TO LIST FOR ADAPTER
+                                if (!iWeatherDetailsList.isEmpty()) {
+                                    iWeatherDetailsList.set(0, currentWeatherBusinessModel);
+                                } else {
+                                    iWeatherDetailsList.add(0, currentWeatherBusinessModel);
+                                }
+                            }
+                            //SHOW CURRENT WEATHER IN THE LIST
+                            adapter.setWeatherList(iWeatherDetailsList);
 
-                    isCurrentWeatherLoaded = true;
-                    postLoad();
+                            isCurrentWeatherLoaded = true;
+                            postLoad();
+                        }
+                    }.execute();
+
 
                     break;
 
@@ -170,10 +189,10 @@ public class WeatherListFragment extends Fragment
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if(context instanceof SettingsOptionClickListener){
-            clickListener= (SettingsOptionClickListener) context;
-        } else{
-            throw new RuntimeException(context.getClass().getSimpleName()+" must implement WeatherListFragment.SettingsOptionClickListener");
+        if (context instanceof SettingsOptionClickListener) {
+            clickListener = (SettingsOptionClickListener) context;
+        } else {
+            throw new RuntimeException(context.getClass().getSimpleName() + " must implement WeatherListFragment.SettingsOptionClickListener");
         }
     }
 
@@ -181,8 +200,9 @@ public class WeatherListFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MyApplication.getInstance().setConnectivityListener(this);
+        //  connectivityReceiverListener = new NetworkConnectivityReceiver(this);
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        adapter = new WeatherAdapter(getActivity(),iWeatherDetailsList);
+        adapter = new WeatherAdapter(getActivity(), iWeatherDetailsList);
         setHasOptionsMenu(true);
 
     }
@@ -229,7 +249,7 @@ public class WeatherListFragment extends Fragment
         //IF YES : (MEANING ONLINE) GET DATA FROM WEB , SHOW IT ON SCREEN , SAVE INTO DB
         if (isInternetAvailAble) {
 
-            if(iWeatherDetailsList.size()>0)
+            if (iWeatherDetailsList.size() > 0)
                 iWeatherDetailsList.clear();
             //LOAD FORECAST INFO
             WeatherDownloadTask.loadWeatherForecast(getContext());
@@ -262,7 +282,7 @@ public class WeatherListFragment extends Fragment
         }
 
         //START CURRENT WEATHER SYNCRONIZATION PERIODICALLY
-        if(!alarmAlreadyStarted){
+        if (!alarmAlreadyStarted) {
             Utils.syncCurrentWeatherData(getContext());
             alarmAlreadyStarted = true;
         }
@@ -295,21 +315,17 @@ public class WeatherListFragment extends Fragment
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
-        if(isConnected){
+        if (isConnected) {
             //CLEAR ALL NOTIFICATIONS
             Utils.NotificationUtils.clearNotifications(getContext());
 
-            if(iWeatherDetailsList.size()>0)
+            if (iWeatherDetailsList.size() > 0)
                 iWeatherDetailsList.clear();
             showLoading();
             WeatherDownloadTask.loadCurrentWeather(getContext(), false);
             WeatherDownloadTask.loadWeatherForecast(getContext());
         }
         showSnack(isConnected);
-    }
-
-    public interface SettingsOptionClickListener{
-        void onSettingOptiionClicked(Fragment fragment);
     }
 
     private void showSnack(boolean isConnected) {
@@ -343,6 +359,10 @@ public class WeatherListFragment extends Fragment
         adapter.setLoading(false);
         if (mProgressDialog.isShowing())
             mProgressDialog.dismiss();
+    }
+
+    public interface SettingsOptionClickListener {
+        void onSettingOptiionClicked(Fragment fragment);
     }
 
 }
