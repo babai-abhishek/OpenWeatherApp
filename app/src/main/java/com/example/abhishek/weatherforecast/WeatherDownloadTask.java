@@ -3,6 +3,7 @@ package com.example.abhishek.weatherforecast;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
@@ -37,25 +38,22 @@ public class WeatherDownloadTask {
             @Override
             public void onResponse(Call<CurrentWeatherApiModel> call, Response<CurrentWeatherApiModel> response) {
                 CurrentWeatherApiModel currentWeatherApiModel = null;
-                if(response.isSuccessful()) {
-                    currentWeatherApiModel = response.body();
-                    Intent intent = null;
+                currentWeatherApiModel = response.body();
+                Intent intent = null;
 
-                    if (!showNotification) {
-                        //register intent for broadcast manager
-                        intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
-                        intent.putExtra(KEY_CURRENT_WEATHER, currentWeatherApiModel);
-                        //send broadcast
-                        broadcastManager.sendBroadcast(intent);
+                if (!showNotification) {
+                    //register intent for broadcast manager
+                    intent = new Intent(ACTION_CURRENT_WEATHER_API_SUCCESS);
+                    intent.putExtra(KEY_CURRENT_WEATHER, currentWeatherApiModel);
+                    //send broadcast
+                    broadcastManager.sendBroadcast(intent);
 
-                    } else {
-                        intent = new Intent(ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS);
-                        intent.putExtra(KEY_CURRENT_WEATHER, currentWeatherApiModel);
-                        //send broadcast
-                        ctx.sendBroadcast(intent);
-                    }
+                } else {
+                    intent = new Intent(ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS);
+                    intent.putExtra(KEY_CURRENT_WEATHER, currentWeatherApiModel);
+                    //send broadcast
+                    ctx.sendBroadcast(intent);
                 }
-
             }
 
             @Override
@@ -69,24 +67,20 @@ public class WeatherDownloadTask {
 
     public synchronized static void loadWeatherForecast(Context ctx) {
         final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(ctx);
-        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(Utils.SettingsUtils.getPreferredLocation(ctx),OWM_API_KEY);
+        Call<WeatherApiModel> call = weatherInterface.getListOfWeatherForecast(Utils.SettingsUtils.getPreferredLocation(ctx), OWM_API_KEY);
         call.enqueue(new Callback<WeatherApiModel>() {
             @Override
             public void onResponse(Call<WeatherApiModel> call, Response<WeatherApiModel> response) {
                 WeatherApiModel weather = null;
 
-                //if response is sucessful
-                if(response.isSuccessful()){
-                    //get data from response
-                    weather = response.body();
-                    //register intent for broadcast manager
-                    Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_SUCCESS);
-                    intent.putExtra(KEY_WEATHER_FORECAST,weather);
+                //get data from response
+                weather = response.body();
+                //register intent for broadcast manager
+                Intent intent = new Intent(ACTION_WEATHER_FORECAST_API_SUCCESS);
+                intent.putExtra(KEY_WEATHER_FORECAST, weather);
 
-                    //send broadcast
-                    broadcastManager.sendBroadcast(intent);
-                }
-
+                //send broadcast
+                broadcastManager.sendBroadcast(intent);
             }
 
             @Override

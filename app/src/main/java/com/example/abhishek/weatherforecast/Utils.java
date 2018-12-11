@@ -526,7 +526,7 @@ public class Utils {
         return  mCurrentWeatherBusinessModel;
     }
 
-        //HELPER METHOD TO GET CURRENTWEATHER FOR THE LOCATION FROM DB
+    //HELPER METHOD TO GET CURRENTWEATHER FOR THE LOCATION FROM DB
     private static CurrentWeatherDBModel getAvailableCurrentWeatherForLocationFromDB(String location, Context ctx) {
         String[] cityWithCountry = location.split(",");
         String city = Utils.formantCity(cityWithCountry[0].trim());

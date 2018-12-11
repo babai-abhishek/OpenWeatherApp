@@ -15,9 +15,15 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
 
     public static ConnectivityReceiverListener connectivityReceiverListener;
 
-    public NetworkConnectivityReceiver() {
+    public NetworkConnectivityReceiver(){
 
     }
+/*
+
+    public NetworkConnectivityReceiver(ConnectivityReceiverListener connectivityReceiverListener) {
+        this.connectivityReceiverListener = connectivityReceiverListener;
+    }
+*/
 
     @Override
     public void onReceive(Context context, Intent intent) {

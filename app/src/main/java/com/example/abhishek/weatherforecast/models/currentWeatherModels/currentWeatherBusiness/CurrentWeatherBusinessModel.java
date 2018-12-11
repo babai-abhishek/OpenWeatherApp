@@ -21,36 +21,21 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
     private CurrentWeatherSysBusinessModel currentWeatherSysBusinessModel;
     private int id;
     private String name;
+    private int cod;
+
+    public int getCod() {
+        return cod;
+    }
+
+    public void setCod(int cod) {
+        this.cod = cod;
+    }
 
     /**
      * No args constructor for use in serialization
      *
      */
     public CurrentWeatherBusinessModel() {
-    }
-
-    /**
-     * 
-     * @param id
-     * @param dt
-     * @param currentWeatherCloudsBusinessModel
-     * @param currentWeatherCoordBusinessModel
-     * @param currentWeatherWindBusinessModel
-     * @param currentWeatherSysBusinessModel
-     * @param name
-     * @param currentWeatherInfoBusinessModel
-     * @param currentWeatherMainBusinessModel
-     */
-    public CurrentWeatherBusinessModel(CurrentWeatherCoordBusinessModel currentWeatherCoordBusinessModel, List<CurrentWeatherInfoBusinessModel> currentWeatherInfoBusinessModel, CurrentWeatherMainBusinessModel currentWeatherMainBusinessModel, CurrentWeatherWindBusinessModel currentWeatherWindBusinessModel, CurrentWeatherCloudsBusinessModel currentWeatherCloudsBusinessModel, int dt, CurrentWeatherSysBusinessModel currentWeatherSysBusinessModel, int id, String name) {
-        this.currentWeatherCoordBusinessModel = currentWeatherCoordBusinessModel;
-        this.currentWeatherInfoBusinessModel = currentWeatherInfoBusinessModel;
-        this.currentWeatherMainBusinessModel = currentWeatherMainBusinessModel;
-        this.currentWeatherWindBusinessModel = currentWeatherWindBusinessModel;
-        this.currentWeatherCloudsBusinessModel = currentWeatherCloudsBusinessModel;
-        this.dt = dt;
-        this.currentWeatherSysBusinessModel = currentWeatherSysBusinessModel;
-        this.id = id;
-        this.name = name;
     }
 
     public CurrentWeatherBusinessModel(CurrentWeatherApiModel currentWeather) {
@@ -65,6 +50,7 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
         for(CurrentWeatherInfoApiModel current: currentWeather.getCurrentWeatherInfoApiModel()){
             this.currentWeatherInfoBusinessModel.add(new CurrentWeatherInfoBusinessModel(current));
         }
+        this.cod = currentWeather.getCod();
     }
 
     public CurrentWeatherBusinessModel(CurrentWeatherDBModel currentWeatherDBModel) {

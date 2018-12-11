@@ -40,22 +40,13 @@ public class CurrentWeatherApiModel implements Parcelable
     @Expose
     private String name;
 
+    @SerializedName("cod")
+    @Expose
+    private int cod;
+
     public CurrentWeatherApiModel() {
     }
 
-
-    public CurrentWeatherApiModel(CurrentWeatherCoordApiModel currentWeatherCoordApiModel, List<CurrentWeatherInfoApiModel> currentWeatherInfoApiModel, CurrentWeatherMainApiModel currentWeatherMainApiModel, CurrentWeatherWindApiModel currentWeatherWindApiModel, CurrentWeatherCloudsApiModel currentWeatherCloudsApiModel, int dt, CurrentWeatherSysApiModel currentWeatherSysApiModel, int id, String name) {
-        super();
-        this.currentWeatherCoordApiModel = currentWeatherCoordApiModel;
-        this.currentWeatherInfoApiModel = currentWeatherInfoApiModel;
-        this.currentWeatherMainApiModel = currentWeatherMainApiModel;
-        this.currentWeatherWindApiModel = currentWeatherWindApiModel;
-        this.currentWeatherCloudsApiModel = currentWeatherCloudsApiModel;
-        this.dt = dt;
-        this.currentWeatherSysApiModel = currentWeatherSysApiModel;
-        this.id = id;
-        this.name = name;
-    }
 
     protected CurrentWeatherApiModel(Parcel in) {
         currentWeatherCoordApiModel = in.readParcelable(CurrentWeatherCoordApiModel.class.getClassLoader());
@@ -67,6 +58,7 @@ public class CurrentWeatherApiModel implements Parcelable
         currentWeatherSysApiModel = in.readParcelable(CurrentWeatherSysApiModel.class.getClassLoader());
         id = in.readInt();
         name = in.readString();
+        cod = in.readInt();
     }
 
     public static final Creator<CurrentWeatherApiModel> CREATOR = new Creator<CurrentWeatherApiModel>() {
@@ -83,6 +75,14 @@ public class CurrentWeatherApiModel implements Parcelable
 
     public CurrentWeatherCoordApiModel getCurrentWeatherCoordApiModel() {
         return currentWeatherCoordApiModel;
+    }
+
+    public int getCod() {
+        return cod;
+    }
+
+    public void setCod(int cod) {
+        this.cod = cod;
     }
 
     public void setCurrentWeatherCoordApiModel(CurrentWeatherCoordApiModel currentWeatherCoordApiModel) {
@@ -153,6 +153,7 @@ public class CurrentWeatherApiModel implements Parcelable
         this.name = name;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -169,5 +170,6 @@ public class CurrentWeatherApiModel implements Parcelable
         dest.writeParcelable(currentWeatherSysApiModel, flags);
         dest.writeInt(id);
         dest.writeString(name);
+        dest.writeInt(cod);
     }
 }
