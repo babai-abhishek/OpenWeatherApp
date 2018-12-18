@@ -15,7 +15,7 @@ public abstract class WeatherDatabase extends RoomDatabase {
     private static final String DB_NAME = "weatherDatabase.db";
     private static volatile WeatherDatabase instance;
 
-    static synchronized WeatherDatabase getInstance(Context context) {
+   public static synchronized WeatherDatabase getInstance(Context context) {
         if (instance == null) {
             instance = create(context);
         }

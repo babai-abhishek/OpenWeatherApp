@@ -11,19 +11,19 @@ import android.arch.persistence.room.PrimaryKey;
 public class CurrentWeather {
 
     @PrimaryKey
-    String cityId;
+    public final int cityId;
 
-    String cityName;
-    String country;
-    double date;
-    int weatherId;
-    double minTemp;
-    double maxTemp;
-    int iconId;
-    String weatherDescription;
+    public final String cityName;
+    public final String country;
+    public final double date;
+    public final int weatherId;
+    public final double minTemp;
+    public final double maxTemp;
+    public final String iconId;
+    public final String weatherDescription;
 
 
-    public CurrentWeather(String cityId, String cityName, String country, double date, int weatherId, double minTemp, double maxTemp, int iconId, String weatherDescription) {
+    public CurrentWeather(int cityId, String cityName, String country, double date, int weatherId, double minTemp, double maxTemp, String iconId, String weatherDescription) {
         this.cityId = cityId;
         this.cityName = cityName;
         this.country = country;

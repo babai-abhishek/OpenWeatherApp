@@ -21,22 +21,20 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 public class ForecastWeather {
 
     @PrimaryKey
-    String cityId;
+    public final long cityId;
 
-    String cityName;
-    String country;
-    double date;
-    int weatherId;
-    double minTemp;
-    double maxTemp;
-    int iconId;
-    String weatherDescription;
+    public final String cityName;
+    public final double date;
+    public final int weatherId;
+    public final double minTemp;
+    public final double maxTemp;
+    public final String iconId;
+    public final String weatherDescription;
 
 
-    public ForecastWeather(String cityId, String cityName, String country, double date, int weatherId, double minTemp, double maxTemp, int iconId, String weatherDescription) {
+    public ForecastWeather(long cityId, String cityName, double date, int weatherId, double minTemp, double maxTemp, String iconId, String weatherDescription) {
         this.cityId = cityId;
         this.cityName = cityName;
-        this.country = country;
         this.date = date;
         this.weatherId = weatherId;
         this.minTemp = minTemp;

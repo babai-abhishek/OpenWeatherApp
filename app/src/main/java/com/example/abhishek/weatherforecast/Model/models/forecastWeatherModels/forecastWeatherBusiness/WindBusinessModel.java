@@ -3,7 +3,6 @@ package com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.
 
 
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WindApiModel;
-import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherDb.WindDBModel;
 
 public class WindBusinessModel {
 
@@ -33,10 +32,10 @@ public class WindBusinessModel {
         this.deg = windApiModel.getDeg();
     }
 
-    public WindBusinessModel(WindDBModel windDBModel) {
+/*    public WindBusinessModel(WindDBModel windDBModel) {
         this.speed = windDBModel.getSpeed();
         this.deg = windDBModel.getDeg();
-    }
+    }*/
 
     public double getSpeed() {
         return speed;

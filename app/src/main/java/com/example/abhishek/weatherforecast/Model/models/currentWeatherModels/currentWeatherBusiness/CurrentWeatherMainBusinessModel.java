@@ -3,7 +3,6 @@ package com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.c
 
 
 import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherMainApiModel;
-import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherDb.CurrentWeatherMainDBModel;
 
 public class CurrentWeatherMainBusinessModel {
 
@@ -37,11 +36,11 @@ public class CurrentWeatherMainBusinessModel {
         this.tempMin = currentWeatherMainApiModel.getTempMin();
     }
 
-    public CurrentWeatherMainBusinessModel(CurrentWeatherMainDBModel currentWeatherMainDBModel) {
+   /* public CurrentWeatherMainBusinessModel(CurrentWeatherMainDBModel currentWeatherMainDBModel) {
         this.humidity = currentWeatherMainDBModel.getHumidity();
         this.tempMin = currentWeatherMainDBModel.getTempMin();
         this.tempMax = currentWeatherMainDBModel.getTempMax();
-    }
+    }*/
 
     public int getHumidity() {
         return humidity;

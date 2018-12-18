@@ -16,52 +16,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract;
-import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
-import com.example.abhishek.weatherforecast.DBUtils.WeatherDBHelper;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherInfoBusinessModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherMainBusinessModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherCloudsDBModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherDBModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherInfoDBModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherMainDBModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherSysDBModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherDb.CurrentWeatherWindDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CityDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CloudsDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.CoordDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.MainDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.SysDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherInfoDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WeatherListDBModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherDb.WindDBModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherRoomDBEntity.CurrentWeather;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CITY_NAME;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_CLOUDS_IN_PERCENTAGE;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_COUNTRY;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DATE;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_DESCRIPTION;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_HUMIDITY;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_ICON;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LAT;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_LON;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MAX_TEMP;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_MIN_TEMP;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_CONDITION_ID;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WEATHER_OF_CITY_ID;
-import static com.example.abhishek.weatherforecast.DBUtils.WeatherDBContract.WeatherForecastEntry.WEATHER_FORECAST_TABLE_COLUMN_WIND_SPEED;
 
 /**
  * Created by abhishek on 19/7/18.
@@ -71,7 +35,7 @@ public class Utils {
 
     public static final int REQUEST_CODE = 1001;
 
-    public static ContentValues[] convertIntoContentValues(WeatherDBModel weather) {
+   /* public static ContentValues[] convertIntoContentValues(WeatherDBModel weather) {
 
         ContentValues[] weatherContentValues = new ContentValues[weather.getWeatherListDBModel().size()];
 
@@ -137,7 +101,7 @@ public class Utils {
             }
         }
         return singleWeatherApiModelPerDay;
-    }
+    }*/
 
     public static int getLargeArtResourceIdForWeatherCondition(int weatherId) {
 
@@ -423,7 +387,7 @@ public class Utils {
         return calendar.getTime();
     }
 
-    public static List<IWeatherDetails> checkCurrentDataForCity(String location, Context ctx) {
+/*    public static List<IWeatherDetails> checkCurrentDataForCity(String location, Context ctx) {
 
         List<IWeatherDetails> weatherInfo = new ArrayList<>();
 
@@ -564,7 +528,7 @@ public class Utils {
         }
 
         return listOfSingleWeatherInfoPerDay;
-    }
+    }*/
 
     public static String formantCity(String city) {
         StringBuilder citySb = new StringBuilder();
@@ -591,6 +555,7 @@ public class Utils {
                 interval,
                 alarmIntent);
     }
+/*
 
     public static boolean isAlreadyCurrentWeatherInfoPresentInDB(CurrentWeatherBusinessModel cwBusinessModel, Context context) {
         CurrentWeatherDBModel mCurrentWeatherDBModel = WeatherDBDao.getCurrentWeather(formantCity(cwBusinessModel.getName() ), context);
@@ -706,6 +671,43 @@ public class Utils {
 
         return currentWeatherDBModel;
     }
+*/
+
+    public static List<ForecastWeather> getListOfForecastWeatherFromDownloadedDataToStoreIntoDB(WeatherApiModel weather) {
+
+        List<ForecastWeather> mForecastWeatherList = new ArrayList<>();
+
+        for(int i=0; i<weather.getWeatherListApiModel().size(); i++){
+            mForecastWeatherList.add(new ForecastWeather(
+                    weather.getCityApiModel().getId(),
+                    weather.getCityApiModel().getName(),
+                    weather.getWeatherListApiModel().get(i).getDt(),
+                    weather.getWeatherListApiModel().get(i).getWeatherInfoApiModel().get(0).getId(),
+                    weather.getWeatherListApiModel().get(i).getMainApiModel().getTempMin(),
+                    weather.getWeatherListApiModel().get(i).getMainApiModel().getTempMax(),
+                    weather.getWeatherListApiModel().get(i).getWeatherInfoApiModel().get(0).getIcon(),
+                    weather.getWeatherListApiModel().get(i).getWeatherInfoApiModel().get(0).getDescription()
+                    ));
+        }
+        return mForecastWeatherList;
+    }
+
+    public static CurrentWeather getCurrentWeatherFromDownloadedDataToStoreIntoDB(CurrentWeatherApiModel currentWeatherApiModel) {
+        CurrentWeather mCurrentWeather = new CurrentWeather(
+                currentWeatherApiModel.getId(),
+                currentWeatherApiModel.getName(),
+                currentWeatherApiModel.getCurrentWeatherSysApiModel().getCountry(),
+                currentWeatherApiModel.getDt(),
+                currentWeatherApiModel.getCurrentWeatherInfoApiModel().get(0).getWeatherId(),
+                currentWeatherApiModel.getCurrentWeatherMainApiModel().getTempMin(),
+                currentWeatherApiModel.getCurrentWeatherMainApiModel().getTempMax(),
+                currentWeatherApiModel.getCurrentWeatherInfoApiModel().get(0).getIcon(),
+                currentWeatherApiModel.getCurrentWeatherInfoApiModel().get(0).getDescription()
+        );
+
+        return mCurrentWeather;
+    }
+
     public static class NotificationUtils {
 
         private static final int CURRENT_WEATHER_NOTIFICATION_ID = 1138;
@@ -761,11 +763,13 @@ public class Utils {
                     PendingIntent.FLAG_UPDATE_CURRENT
             );
         }
+/*
 
         public static void showUpdatedData(Context context, CurrentWeatherBusinessModel cwBusinessModel) {
             setNotification(context, "Weather Updated",
                     "Current weather has changed. Open app for detailed weather information.", R.drawable.art_clear);
         }
+*/
 
         public static void clearNotifications(Context context) {
             NotificationManager notificationManager = (NotificationManager) context
@@ -842,7 +846,7 @@ public class Utils {
 
     public static class DBUtils{
 
-        public static List<String> getAlreadyPresentDatesFromDB(String cityId,
+/*        public static List<String> getAlreadyPresentDatesFromDB(String cityId,
                                                                 WeatherDBHelper weatherDBHelper) {
             List<String> dates = new ArrayList<>();
             SQLiteDatabase database = weatherDBHelper.getReadableDatabase();
@@ -861,7 +865,7 @@ public class Utils {
             }
             cursor.close();
             return dates;
-        }
+        }*/
     }
 
 }

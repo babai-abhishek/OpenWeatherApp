@@ -3,7 +3,6 @@ package com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.
 
 
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.SysApiModel;
-import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherDb.SysDBModel;
 
 public class SysBusinessModel {
 
@@ -29,9 +28,11 @@ public class SysBusinessModel {
         this.pod = sysApiModel.getPod();
     }
 
+/*
     public SysBusinessModel(SysDBModel sysDBModel) {
         this.pod = sysDBModel.getPod();
     }
+*/
 
     public String getPod() {
         return pod;

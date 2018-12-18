@@ -3,7 +3,6 @@ package com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.c
 
 
 import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherWindApiModel;
-import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherDb.CurrentWeatherWindDBModel;
 
 public class CurrentWeatherWindBusinessModel {
 
@@ -29,10 +28,10 @@ public class CurrentWeatherWindBusinessModel {
         this.speed = currentWeatherWindApiModel.getSpeed();
     }
 
-    public CurrentWeatherWindBusinessModel(CurrentWeatherWindDBModel currentWeatherWindDBModel) {
+   /* public CurrentWeatherWindBusinessModel(CurrentWeatherWindDBModel currentWeatherWindDBModel) {
         this.speed = currentWeatherWindDBModel.getSpeed();
     }
-
+*/
     public double getSpeed() {
         return speed;
     }

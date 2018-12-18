@@ -1,7 +1,7 @@
 package com.example.abhishek.weatherforecast.networkutils;
 
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -19,5 +19,5 @@ public interface WeatherInterface {
 
     @GET("weather")
     Call<CurrentWeatherApiModel> getCurrentWeather(@Query("q") String location,
-                                                          @Query("appid") String key);
+                                                   @Query("appid") String key);
 }

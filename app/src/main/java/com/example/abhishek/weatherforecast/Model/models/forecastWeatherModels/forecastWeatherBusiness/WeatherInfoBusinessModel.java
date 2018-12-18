@@ -3,7 +3,6 @@ package com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.
 
 
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherInfoApiModel;
-import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherDb.WeatherInfoDBModel;
 
 public class WeatherInfoBusinessModel {
 
@@ -39,6 +38,7 @@ public class WeatherInfoBusinessModel {
         this.description = weatherInfoApiModel.getDescription();
         this.icon = weatherInfoApiModel.getIcon();
     }
+/*
 
     public WeatherInfoBusinessModel(WeatherInfoDBModel weatherInfoDbModel) {
         this.id = weatherInfoDbModel.getId();
@@ -46,6 +46,7 @@ public class WeatherInfoBusinessModel {
         this.description = weatherInfoDbModel.getDescription();
         this.icon = weatherInfoDbModel.getIcon();
     }
+*/
 
     public int getId() {
         return id;

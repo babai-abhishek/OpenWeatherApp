@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
 
 import static com.example.abhishek.weatherforecast.WeatherListFragment.ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS;
 import static com.example.abhishek.weatherforecast.WeatherListFragment.KEY_CURRENT_WEATHER;
@@ -25,12 +25,12 @@ public class CurrentWeatherUpdateReceiver extends BroadcastReceiver {
             CurrentWeatherBusinessModel cwBusinessModel = new CurrentWeatherBusinessModel(cwApiModel);
 
             //CHECK WHETHER THE CURRENT WEATHER DETAILS ALREADY AVAILABALE IN DB OR NOT
-            boolean isDataAlreadyInDB = Utils.isAlreadyCurrentWeatherInfoPresentInDB(cwBusinessModel, context);
+          /*  boolean isDataAlreadyInDB = Utils.isAlreadyCurrentWeatherInfoPresentInDB(cwBusinessModel, context);
             Log.d("#","isDataAlreadyInDB : "+isDataAlreadyInDB);
             //IF DATA UN-AVAILABALE ,  SHOW NOTIFICATION
             if(!isDataAlreadyInDB){
                 Utils.NotificationUtils.showUpdatedData(context, cwBusinessModel);
-            }
+            }*/
         }
     }
 }

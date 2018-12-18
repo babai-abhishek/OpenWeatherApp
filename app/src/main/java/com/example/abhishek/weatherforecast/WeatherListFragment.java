@@ -24,11 +24,14 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
+import com.example.abhishek.weatherforecast.Model.dbUtils.WeatherDatabase;
 import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherRoomDBEntity.CurrentWeather;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,15 +88,18 @@ public class WeatherListFragment extends Fragment
 
                             if (weather != null) {
                                 //INSERT WEATHER FORECAST INTO DB
-                                WeatherDBDao.insertWeatherForecastIntoDB(Utils
-                                                .convertBusinessModelToDBModel(new WeatherBusinessModel(weather)),
-                                        getActivity());
+                                List<ForecastWeather> mForecastWeatherList = Utils.
+                                        getListOfForecastWeatherFromDownloadedDataToStoreIntoDB(weather);
 
-                                //GET DATA FROM DB
+                                WeatherDatabase.getInstance(getActivity())
+                                        .getForecastWeatherDao()
+                                        .insert(mForecastWeatherList);
+
+                               /* //GET DATA FROM DB
                                 mWeatherListBusinessModelList = Utils
                                         .getForecastWeatherForLocationFromDB((int) weather.getCityApiModel().getId(),
                                                 System.currentTimeMillis() / 1000,
-                                                getActivity());
+                                                getActivity());*/
                             }
                             return mWeatherListBusinessModelList;
                         }
@@ -127,14 +133,11 @@ public class WeatherListFragment extends Fragment
                         protected CurrentWeatherBusinessModel doInBackground(Void... voids) {
                             if (currentWeatherApiModel != null) {
                                 //INSERT CURRENT WEATHER INTO DATABASE
-                                WeatherDBDao.insertCurrentWeatherIntoDB(Utils
-                                        .convertCurrentWeatherBusinessModelToCurrentWeatherDBModel(
-                                                new CurrentWeatherBusinessModel(currentWeatherApiModel)), getActivity());
-
-                                //GET DATA FROM DB AND SHOW ON SCREEN
-                                mCurrentWeatherBusinessModel= Utils
-                                        .getCurrentWeatherForLocationFromDB(currentWeatherApiModel.getName(), getActivity());
-
+                                CurrentWeather mCurrentWeather = Utils.
+                                        getCurrentWeatherFromDownloadedDataToStoreIntoDB(currentWeatherApiModel);
+                                WeatherDatabase.getInstance(getActivity())
+                                        .getCurrentWeatherDao()
+                                        .insert(mCurrentWeather);
                             }
 
                             return mCurrentWeatherBusinessModel;
@@ -259,7 +262,7 @@ public class WeatherListFragment extends Fragment
 
         } else {
 
-            new AsyncTask<Void, Void, List<IWeatherDetails>>() {
+           /* new AsyncTask<Void, Void, List<IWeatherDetails>>() {
                 @Override
                 protected List<IWeatherDetails> doInBackground(Void... voids) {
                     List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(LOCATION, getActivity());
@@ -276,7 +279,7 @@ public class WeatherListFragment extends Fragment
                     isWeatherForecastLoaded = true;
                     postLoad();
                 }
-            }.execute();
+            }.execute();*/
 
 
         }
