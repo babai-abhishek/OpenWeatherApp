@@ -99,7 +99,7 @@ public class WeatherListFragment extends Fragment
                                 //GET DATA FROM DB
                                 List<ForecastWeather> mForecastWeathers = mWeatherDatabase
                                         .getForecastWeatherDao()
-                                        .getAllforecastWeathers(weather.getCityApiModel().getId());
+                                        .getAllforecastWeathersById(weather.getCityApiModel().getId());
 
                                 mWeatherListBusinessModelList = Utils
                                         .convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(mForecastWeathers);
@@ -283,9 +283,31 @@ public class WeatherListFragment extends Fragment
 
         } else {
 
-           /* new AsyncTask<Void, Void, List<IWeatherDetails>>() {
+            new AsyncTask<Void, Void, List<IWeatherDetails>>() {
                 @Override
                 protected List<IWeatherDetails> doInBackground(Void... voids) {
+
+                    //check currentWeather table
+                    WeatherDatabase mWeatherDatabase = WeatherDatabase.getInstance(getActivity());
+
+                    List<CurrentWeather> mCurrentWeathers = mWeatherDatabase
+                            .getCurrentWeatherDao()
+                            .getAllCurrentWeathers();
+                    for (int i = 0; i < mCurrentWeathers.size(); i++) {
+                        if(Utils.convertUtcToDate(mCurrentWeathers.get(i).date) == Utils.getCurrentDate()){
+                            if (mCurrentWeathers.get(i).cityName.equalsIgnoreCase(LOCATION)) {
+                                //show on list
+                                CurrentWeather mWeather = mCurrentWeathers.get(i);
+                                mCurrentWeatherBusinessModel = Utils.
+                                        convertCurrentWeatherDbToCurrentWeatherBusinessModel(mWeather);
+                            }
+                        }else{
+                            //delete old data
+                        }
+
+                    }
+
+
                     List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(LOCATION, getActivity());
                     return availableData;
                 }
@@ -300,7 +322,7 @@ public class WeatherListFragment extends Fragment
                     isWeatherForecastLoaded = true;
                     postLoad();
                 }
-            }.execute();*/
+            }.execute();
 
 
         }

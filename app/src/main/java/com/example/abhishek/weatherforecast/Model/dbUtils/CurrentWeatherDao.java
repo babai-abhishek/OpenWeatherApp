@@ -30,4 +30,6 @@ public interface CurrentWeatherDao {
     @Query("SELECT * FROM currentWeather")
     List<CurrentWeather> getAllCurrentWeathers();
 
+    @Query("SELECT * FROM currentWeather WHERE cityId=:cityId")
+    List<CurrentWeather> getAllCurrentWeatherById(long cityId);
 }

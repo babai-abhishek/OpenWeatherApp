@@ -37,30 +37,6 @@ public class Utils {
 
     public static final int REQUEST_CODE = 1001;
 
-   /*
-
-    public static List<WeatherListApiModel> getWeatherForecastListFromTomorrow(WeatherApiModel weather) {
-
-        List<WeatherListApiModel> weatherListApiModelList = weather.getWeatherListApiModel();
-
-        List<WeatherListApiModel> singleWeatherApiModelPerDay = new ArrayList<>();
-
-        //GET TODAY'S DATE
-        Date currentDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-        //GET TOMORROW'S DATE
-        Date tomorrow = getNextDate(currentDate);
-
-        for (WeatherListApiModel apiModel : weatherListApiModelList) {
-            if (sdf.format(tomorrow).equals(sdf.format(new Date(apiModel.getDt() * 1000L)))) {
-                singleWeatherApiModelPerDay.add(apiModel);
-                tomorrow = getNextDate(tomorrow);
-            }
-        }
-        return singleWeatherApiModelPerDay;
-    }*/
-
     public static int getLargeArtResourceIdForWeatherCondition(int weatherId) {
 
         if (weatherId >= 200 && weatherId <= 232) {
@@ -345,34 +321,6 @@ public class Utils {
         return calendar.getTime();
     }
 
-/*
-    //HELPER METHOD TO GET FORECASTWEATHER FOR THE LOCATION FROM DB AND
-    //SEARCH WEATHERINFO FROM TODAY ONWARDS ONLY
-    private static List<WeatherListBusinessModel> getAvailAbleForecastWeatherExcludingToday(int cityid, long dateTime, Context ctx){
-        List<WeatherListBusinessModel> listOfSingleWeatherInfoPerDay = new ArrayList<>();
-        List<WeatherListDBModel> listOfDbModels = WeatherDBDao.getForecastWeather(cityid, dateTime, ctx);
-        List<WeatherListBusinessModel> businessModels = new ArrayList<>();
-        for (WeatherListDBModel dbModel : listOfDbModels) {
-            businessModels.add(new WeatherListBusinessModel(dbModel));
-        }
-
-        //GET TODAY'S DATE
-        Date currentDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-        //GET TOMORROW'S DATE
-        Date tomorrow = getNextDate(currentDate);
-
-        for (WeatherListBusinessModel businessModel : businessModels) {
-            if (sdf.format(tomorrow).equals(sdf.format(new Date(businessModel.getDt() * 1000L)))) {
-                listOfSingleWeatherInfoPerDay.add(businessModel);
-                tomorrow = getNextDate(tomorrow);
-            }
-        }
-
-        return listOfSingleWeatherInfoPerDay;
-    }*/
-
     public static String formantCity(String city) {
         StringBuilder citySb = new StringBuilder();
         citySb.append(city.substring(0, 1).toUpperCase());
@@ -398,7 +346,6 @@ public class Utils {
                 interval,
                 alarmIntent);
     }
-
 
     public static List<ForecastWeather> getListOfForecastWeatherFromDownloadedDataToStoreIntoDB(WeatherApiModel weather) {
 
