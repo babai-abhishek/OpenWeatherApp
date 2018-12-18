@@ -24,13 +24,11 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
-import com.example.abhishek.weatherforecast.DBUtils.WeatherDBDao;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
-import com.example.abhishek.weatherforecast.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherBusinessModel;
-import com.example.abhishek.weatherforecast.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherBusiness.CurrentWeatherBusinessModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherApiModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherBusiness.WeatherListBusinessModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +52,11 @@ public class WeatherListFragment extends Fragment
     SettingsOptionClickListener clickListener;
     boolean alarmAlreadyStarted = false;
     ProgressDialog mProgressDialog;
+
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
     List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
     List<IWeatherDetails> iWeatherDetailsList = new ArrayList<>();
+
     //VARIABLES FOR SHOWING LIST
     WeatherAdapter adapter;
     private LocalBroadcastManager broadcastManager = null;
