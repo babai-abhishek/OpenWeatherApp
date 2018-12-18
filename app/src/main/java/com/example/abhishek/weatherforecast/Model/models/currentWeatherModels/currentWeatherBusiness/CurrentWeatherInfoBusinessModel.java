@@ -10,12 +10,12 @@ public class CurrentWeatherInfoBusinessModel {
     private String icon;
     private int weatherId;
 
-   /* public CurrentWeatherInfoBusinessModel(CurrentWeatherInfoDBModel current) {
-        this.description = current.getDescription();
-        this.icon = current.getIcon();
-        this.weatherId = current.getWeatherId();
+    public CurrentWeatherInfoBusinessModel(String weatherDescription, String iconId, int weatherId) {
+        this.description = weatherDescription;
+        this.icon= iconId;
+        this.weatherId = weatherId;
     }
-*/
+
     public int getWeatherId() {
         return weatherId;
     }

@@ -9,18 +9,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class MainApiModel implements Parcelable{
 
-    @SerializedName("temp")
-    @Expose
-    private double temp;
+
     @SerializedName("temp_min")
     @Expose
     private double tempMin;
     @SerializedName("temp_max")
     @Expose
     private double tempMax;
-    @SerializedName("humidity")
-    @Expose
-    private long humidity;
 
     /**
      * No args constructor for use in serialization
@@ -38,17 +33,14 @@ public class MainApiModel implements Parcelable{
      */
     public MainApiModel(double temp, double tempMin, double tempMax, long humidity) {
         super();
-        this.temp = temp;
         this.tempMin = tempMin;
         this.tempMax = tempMax;
-        this.humidity = humidity;
     }
 
     protected MainApiModel(Parcel in) {
-        temp = in.readDouble();
+
         tempMin = in.readDouble();
         tempMax = in.readDouble();
-        humidity = in.readLong();
     }
 
     public static final Creator<MainApiModel> CREATOR = new Creator<MainApiModel>() {
@@ -63,13 +55,6 @@ public class MainApiModel implements Parcelable{
         }
     };
 
-    public double getTemp() {
-        return temp;
-    }
-
-    public void setTemp(double temp) {
-        this.temp = temp;
-    }
 
     public double getTempMin() {
         return tempMin;
@@ -87,13 +72,6 @@ public class MainApiModel implements Parcelable{
         this.tempMax = tempMax;
     }
 
-    public long getHumidity() {
-        return humidity;
-    }
-
-    public void setHumidity(long humidity) {
-        this.humidity = humidity;
-    }
 
     @Override
     public int describeContents() {
@@ -102,9 +80,7 @@ public class MainApiModel implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeDouble(temp);
         dest.writeDouble(tempMin);
         dest.writeDouble(tempMax);
-        dest.writeLong(humidity);
     }
 }

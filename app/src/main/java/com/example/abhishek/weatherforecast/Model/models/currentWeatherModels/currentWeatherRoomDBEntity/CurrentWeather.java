@@ -12,7 +12,6 @@ public class CurrentWeather {
 
     @PrimaryKey
     public final int cityId;
-
     public final String cityName;
     public final String country;
     public final double date;

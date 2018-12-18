@@ -4,6 +4,7 @@ package com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.c
 import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherApiModel;
 import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherApi.CurrentWeatherInfoApiModel;
+import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.currentWeatherRoomDBEntity.CurrentWeather;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,22 +19,18 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
     private CurrentWeatherSysBusinessModel currentWeatherSysBusinessModel;
     private int id;
     private String name;
-    private int cod;
 
-    public int getCod() {
-        return cod;
+    public CurrentWeatherBusinessModel(CurrentWeather currentWeather) {
+        this.dt = (long) currentWeather.date;
+        this.id = currentWeather.cityId;
+        this.name = currentWeather.cityName;
+        this.currentWeatherSysBusinessModel = new CurrentWeatherSysBusinessModel(currentWeather.country);
+        this.currentWeatherInfoBusinessModel.add(new CurrentWeatherInfoBusinessModel(currentWeather.weatherDescription,
+                currentWeather.iconId, currentWeather.weatherId));
+        this.currentWeatherMainBusinessModel = new CurrentWeatherMainBusinessModel(currentWeather.minTemp,
+                currentWeather.maxTemp);
     }
 
-    public void setCod(int cod) {
-        this.cod = cod;
-    }
-
-    /**
-     * No args constructor for use in serialization
-     *
-     */
-    public CurrentWeatherBusinessModel() {
-    }
 
     public CurrentWeatherBusinessModel(CurrentWeatherApiModel currentWeather) {
         this.dt = currentWeather.getDt();
@@ -46,7 +43,10 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
         for(CurrentWeatherInfoApiModel current: currentWeather.getCurrentWeatherInfoApiModel()){
             this.currentWeatherInfoBusinessModel.add(new CurrentWeatherInfoBusinessModel(current));
         }
-        this.cod = currentWeather.getCod();
+    }
+
+    public CurrentWeatherBusinessModel() {
+
     }
 
     public List<CurrentWeatherInfoBusinessModel> getCurrentWeatherInfoBusinessModel() {

@@ -26,6 +26,6 @@ public interface ForecastWeatherDao {
     @Delete
     void delete(ForecastWeather forecastWeathers);
 
-    @Query("SELECT * FROM forecastWeather")
-    List<ForecastWeather> getAllforecastWeathers();
+    @Query("SELECT * FROM forecastWeather WHERE cityId=:cityId")
+    List<ForecastWeather> getAllforecastWeathers(long cityId);
 }

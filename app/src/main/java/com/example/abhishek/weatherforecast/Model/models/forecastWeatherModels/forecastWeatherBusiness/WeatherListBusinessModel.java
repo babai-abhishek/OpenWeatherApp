@@ -4,6 +4,7 @@ package com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.
 import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherInfoApiModel;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
+import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 import java.util.ArrayList;
 
@@ -12,9 +13,7 @@ public class WeatherListBusinessModel implements IWeatherDetails {
     private long dt;
     private MainBusinessModel mainBusinessModel;
     private java.util.List<WeatherInfoBusinessModel> weatherInfoBusinessModel = new ArrayList<WeatherInfoBusinessModel>();
-    private CloudsBusinessModel cloudsBusinessModel;
-    private WindBusinessModel windBusinessModel;
-    private SysBusinessModel sysBusinessModel;
+
 
     /**
      * No args constructor for use in serialization
@@ -36,9 +35,7 @@ public class WeatherListBusinessModel implements IWeatherDetails {
         this.dt = dt;
         this.mainBusinessModel = mainBusinessModel;
         this.weatherInfoBusinessModel = weatherInfoBusinessModel;
-        this.cloudsBusinessModel = cloudsBusinessModel;
-        this.windBusinessModel = windBusinessModel;
-        this.sysBusinessModel = sysBusinessModel;
+
     }
 
     public WeatherListBusinessModel(WeatherListApiModel weatherListApiModel) {
@@ -47,9 +44,14 @@ public class WeatherListBusinessModel implements IWeatherDetails {
         for(WeatherInfoApiModel weatherInfoApiModel: weatherListApiModel.getWeatherInfoApiModel()){
             this.weatherInfoBusinessModel.add(new WeatherInfoBusinessModel(weatherInfoApiModel));
         }
-        this.cloudsBusinessModel = new CloudsBusinessModel(weatherListApiModel.getCloudsApiModel());
-        this.windBusinessModel = new WindBusinessModel(weatherListApiModel.getWindApiModel());
-        this.sysBusinessModel = new SysBusinessModel(weatherListApiModel.getSysApiModel());
+
+    }
+
+    public WeatherListBusinessModel(ForecastWeather forecastWeather) {
+        this.dt = (long) forecastWeather.date;
+        this.mainBusinessModel = new MainBusinessModel(forecastWeather.minTemp, forecastWeather.maxTemp);
+        this.weatherInfoBusinessModel.add(new WeatherInfoBusinessModel(forecastWeather.weatherId, forecastWeather.weatherDescription, forecastWeather.iconId));
+
     }
 
     public long getDt() {
@@ -74,30 +76,6 @@ public class WeatherListBusinessModel implements IWeatherDetails {
 
     public void setWeatherInfoBusinessModel(java.util.List<WeatherInfoBusinessModel> weatherInfoBusinessModel) {
         this.weatherInfoBusinessModel = weatherInfoBusinessModel;
-    }
-
-    public CloudsBusinessModel getCloudsBusinessModel() {
-        return cloudsBusinessModel;
-    }
-
-    public void setCloudsBusinessModel(CloudsBusinessModel cloudsBusinessModel) {
-        this.cloudsBusinessModel = cloudsBusinessModel;
-    }
-
-    public WindBusinessModel getWindBusinessModel() {
-        return windBusinessModel;
-    }
-
-    public void setWindBusinessModel(WindBusinessModel windBusinessModel) {
-        this.windBusinessModel = windBusinessModel;
-    }
-
-    public SysBusinessModel getSysBusinessModel() {
-        return sysBusinessModel;
-    }
-
-    public void setSysBusinessModel(SysBusinessModel sysBusinessModel) {
-        this.sysBusinessModel = sysBusinessModel;
     }
 
 }

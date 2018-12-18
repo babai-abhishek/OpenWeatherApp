@@ -13,6 +13,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
  */
 
 @Entity(tableName = "forecastWeather",
+        primaryKeys = { "cityId", "date" },
         foreignKeys = @ForeignKey(entity = CurrentWeather.class,
         parentColumns = "cityId",
         childColumns = "cityId",
@@ -20,7 +21,6 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 public class ForecastWeather {
 
-    @PrimaryKey
     public final long cityId;
 
     public final String cityName;

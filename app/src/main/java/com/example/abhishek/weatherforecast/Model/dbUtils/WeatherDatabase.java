@@ -9,7 +9,7 @@ import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.cu
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 @Database(entities = { CurrentWeather.class, ForecastWeather.class },
-        version = 1)
+        version = 4)
 public abstract class WeatherDatabase extends RoomDatabase {
 
     private static final String DB_NAME = "weatherDatabase.db";

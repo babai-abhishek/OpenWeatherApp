@@ -91,15 +91,18 @@ public class WeatherListFragment extends Fragment
                                 List<ForecastWeather> mForecastWeatherList = Utils.
                                         getListOfForecastWeatherFromDownloadedDataToStoreIntoDB(weather);
 
-                                WeatherDatabase.getInstance(getActivity())
+                                WeatherDatabase mWeatherDatabase = WeatherDatabase.getInstance(getActivity());
+                                mWeatherDatabase
                                         .getForecastWeatherDao()
                                         .insert(mForecastWeatherList);
 
-                               /* //GET DATA FROM DB
+                                //GET DATA FROM DB
+                                List<ForecastWeather> mForecastWeathers = mWeatherDatabase
+                                        .getForecastWeatherDao()
+                                        .getAllforecastWeathers(weather.getCityApiModel().getId());
+
                                 mWeatherListBusinessModelList = Utils
-                                        .getForecastWeatherForLocationFromDB((int) weather.getCityApiModel().getId(),
-                                                System.currentTimeMillis() / 1000,
-                                                getActivity());*/
+                                        .convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(mForecastWeathers);
                             }
                             return mWeatherListBusinessModelList;
                         }
@@ -108,7 +111,7 @@ public class WeatherListFragment extends Fragment
                         protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
                             super.onPostExecute(weatherListBusinessModels);
 
-                            if(weatherListBusinessModels!=null) {
+                            if (weatherListBusinessModels != null) {
                                 //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
                                 for (WeatherListBusinessModel weatherListBusinessModel : weatherListBusinessModels) {
                                     iWeatherDetailsList.add(weatherListBusinessModel);
@@ -129,15 +132,33 @@ public class WeatherListFragment extends Fragment
 
                     new AsyncTask<Void, Void, CurrentWeatherBusinessModel>() {
                         CurrentWeatherBusinessModel mCurrentWeatherBusinessModel;
+
                         @Override
                         protected CurrentWeatherBusinessModel doInBackground(Void... voids) {
                             if (currentWeatherApiModel != null) {
+
+                                WeatherDatabase mWeatherDatabase = WeatherDatabase.getInstance(getActivity());
+
                                 //INSERT CURRENT WEATHER INTO DATABASE
                                 CurrentWeather mCurrentWeather = Utils.
                                         getCurrentWeatherFromDownloadedDataToStoreIntoDB(currentWeatherApiModel);
-                                WeatherDatabase.getInstance(getActivity())
+                                mWeatherDatabase
                                         .getCurrentWeatherDao()
                                         .insert(mCurrentWeather);
+
+                                //GET DATA FROM DB
+                                List<CurrentWeather> mCurrentWeathers = mWeatherDatabase
+                                        .getCurrentWeatherDao()
+                                        .getAllCurrentWeathers();
+                                for (int i = 0; i < mCurrentWeathers.size(); i++) {
+                                    if (mCurrentWeathers.get(i).cityId == currentWeatherApiModel.getId()) {
+                                        //show on list
+                                        CurrentWeather mWeather = mCurrentWeathers.get(i);
+                                        mCurrentWeatherBusinessModel = Utils.
+                                                convertCurrentWeatherDbToCurrentWeatherBusinessModel(mWeather);
+                                    }
+                                }
+
                             }
 
                             return mCurrentWeatherBusinessModel;
@@ -148,7 +169,7 @@ public class WeatherListFragment extends Fragment
                         protected void onPostExecute(CurrentWeatherBusinessModel currentWeatherBusinessModel) {
                             super.onPostExecute(currentWeatherBusinessModel);
 
-                            if(currentWeatherBusinessModel!=null) {
+                            if (currentWeatherBusinessModel != null) {
                                 //ADD TO LIST FOR ADAPTER
                                 if (!iWeatherDetailsList.isEmpty()) {
                                     iWeatherDetailsList.set(0, currentWeatherBusinessModel);
