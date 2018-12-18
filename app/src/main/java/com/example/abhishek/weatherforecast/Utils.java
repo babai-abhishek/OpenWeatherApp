@@ -345,122 +345,7 @@ public class Utils {
         return calendar.getTime();
     }
 
-/*    public static List<IWeatherDetails> checkCurrentDataForCity(String location, Context ctx) {
-
-        List<IWeatherDetails> weatherInfo = new ArrayList<>();
-
-        CurrentWeatherDBModel currentWeatherDBModel =
-                getAvailableCurrentWeatherForLocationFromDB(location, ctx);
-
-        //CHECK ANY DATA AVAILABLE IN DB
-        if (currentWeatherDBModel != null) {
-
-            //GET TODAY'S DATE
-            Date currentDate = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-            //CHECK CURRENTWEATHERDATA IS FROM CURRENT DAY OR NOT
-            boolean isCurrentDataIsFromCurrentDay = sdf.format(currentDate)
-                    .equals(sdf.format(new Date(currentWeatherDBModel.getDt() * 1000L)));
-
-            if (isCurrentDataIsFromCurrentDay) {
-
-                weatherInfo.add(new CurrentWeatherBusinessModel(currentWeatherDBModel));
-                List<WeatherListBusinessModel> weatherForecastList =
-                        getAvailAbleForecastWeatherExcludingToday(currentWeatherDBModel.getId(),
-                                currentWeatherDBModel.getDt(), ctx);
-                for (WeatherListBusinessModel businessModel : weatherForecastList) {
-                    weatherInfo.add(businessModel);
-                }
-
-            } else {
-                List<WeatherListBusinessModel> weatherForecastList =
-                        getAvailAbleForecastWeatherIncludingToday(currentWeatherDBModel.getId(), ctx);
-
-                //GET TODAY'S DATE
-                Date today = new Date();
-                SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-
-                if(weatherForecastList.size()>0) {
-
-                    WeatherListBusinessModel mListBusinessModel = weatherForecastList.get(0);
-                    if (mSimpleDateFormat.format(today).equals(mSimpleDateFormat.format(new Date(mListBusinessModel.getDt() * 1000L)))) {
-                        CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = setForecastWeatherToCurrentWeather(mListBusinessModel);
-                        weatherForecastList.remove(0);
-                        weatherInfo.add(0, mCurrentWeatherBusinessModel);
-                    }
-                    for (WeatherListBusinessModel businessModel : weatherForecastList) {
-                        weatherInfo.add(businessModel);
-                    }
-                }
-
-            }
-        }
-        return weatherInfo;
-    }
-
-    private static List<WeatherListBusinessModel> getAvailAbleForecastWeatherIncludingToday(int cityid, Context ctx) {
-        List<WeatherListBusinessModel> listOfSingleWeatherInfoPerDay = new ArrayList<>();
-        List<WeatherListDBModel> listOfDbModels = WeatherDBDao.getForecastWeather(cityid, ctx);
-        List<WeatherListBusinessModel> businessModels = new ArrayList<>();
-        for (WeatherListDBModel dbModel : listOfDbModels) {
-            businessModels.add(new WeatherListBusinessModel(dbModel));
-        }
-
-        //GET TODAY'S DATE
-        Date currentDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-        for (WeatherListBusinessModel businessModel : businessModels) {
-            if (sdf.format(currentDate).equals(sdf.format(new Date(businessModel.getDt() * 1000L)))) {
-                listOfSingleWeatherInfoPerDay.add(businessModel);
-                currentDate = getNextDate(currentDate);
-            }
-        }
-
-        return listOfSingleWeatherInfoPerDay;
-    }
-
-    private static CurrentWeatherBusinessModel setForecastWeatherToCurrentWeather(WeatherListBusinessModel listBusinessModel) {
-        CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = new CurrentWeatherBusinessModel();
-        mCurrentWeatherBusinessModel.setDt((int) listBusinessModel.getDt());
-
-        String description = listBusinessModel.getWeatherInfoBusinessModel().get(0).getDescription();
-        int weatherId = listBusinessModel.getWeatherInfoBusinessModel().get(0).getId();
-        CurrentWeatherInfoBusinessModel mCurrentWeatherInfoBusinessModel = new CurrentWeatherInfoBusinessModel();
-        mCurrentWeatherInfoBusinessModel.setDescription(description);
-        mCurrentWeatherInfoBusinessModel.setWeatherId(weatherId);
-        List<CurrentWeatherInfoBusinessModel> mCurrentWeatherInfoBusinessModelList = new ArrayList<>();
-        mCurrentWeatherInfoBusinessModelList.add(mCurrentWeatherInfoBusinessModel);
-        mCurrentWeatherBusinessModel.setCurrentWeatherInfoBusinessModel(mCurrentWeatherInfoBusinessModelList);
-
-        CurrentWeatherMainBusinessModel mCurrentWeatherMainBusinessModel = new CurrentWeatherMainBusinessModel();
-        mCurrentWeatherMainBusinessModel.setTempMax(listBusinessModel.getMainBusinessModel().getTempMax());
-        mCurrentWeatherMainBusinessModel.setTempMin(listBusinessModel.getMainBusinessModel().getTempMin());
-        mCurrentWeatherBusinessModel.setCurrentWeatherMainBusinessModel(mCurrentWeatherMainBusinessModel);
-        return mCurrentWeatherBusinessModel;
-    }
-
-    public static CurrentWeatherBusinessModel getCurrentWeatherForLocationFromDB(String location, Context ctx) {
-        CurrentWeatherDBModel mCurrentWeatherDBModel = getAvailableCurrentWeatherForLocationFromDB(location, ctx);
-        CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = new CurrentWeatherBusinessModel(mCurrentWeatherDBModel);
-        return  mCurrentWeatherBusinessModel;
-    }
-
-    //HELPER METHOD TO GET CURRENTWEATHER FOR THE LOCATION FROM DB
-    private static CurrentWeatherDBModel getAvailableCurrentWeatherForLocationFromDB(String location, Context ctx) {
-        String[] cityWithCountry = location.split(",");
-        String city = Utils.formantCity(cityWithCountry[0].trim());
-        CurrentWeatherDBModel mCurrentWeatherDBModel = WeatherDBDao.getCurrentWeather(city, ctx);
-        return mCurrentWeatherDBModel;
-    }
-
-    public static List<WeatherListBusinessModel> getForecastWeatherForLocationFromDB(int cityid, long dateTime, Context ctx) {
-        List<WeatherListBusinessModel> mWeatherListBusinessModelList =
-                getAvailAbleForecastWeatherExcludingToday(cityid, dateTime, ctx);
-        return mWeatherListBusinessModelList;
-    }
-
+/*
     //HELPER METHOD TO GET FORECASTWEATHER FOR THE LOCATION FROM DB AND
     //SEARCH WEATHERINFO FROM TODAY ONWARDS ONLY
     private static List<WeatherListBusinessModel> getAvailAbleForecastWeatherExcludingToday(int cityid, long dateTime, Context ctx){
@@ -513,123 +398,7 @@ public class Utils {
                 interval,
                 alarmIntent);
     }
-/*
 
-    public static boolean isAlreadyCurrentWeatherInfoPresentInDB(CurrentWeatherBusinessModel cwBusinessModel, Context context) {
-        CurrentWeatherDBModel mCurrentWeatherDBModel = WeatherDBDao.getCurrentWeather(formantCity(cwBusinessModel.getName() ), context);
-        if(mCurrentWeatherDBModel != null){
-            if(mCurrentWeatherDBModel.getDt() == cwBusinessModel.getDt()){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static WeatherDBModel convertBusinessModelToDBModel(WeatherBusinessModel weather) {
-
-        WeatherDBModel weatherDBModel = new WeatherDBModel();
-        CityDBModel cityDBModel = new CityDBModel();
-        CoordDBModel coordDBModel = new CoordDBModel();
-        coordDBModel.setLat(weather.getCityBusinessModel().getCoordBusinessModel().getLat());
-        coordDBModel.setLon(weather.getCityBusinessModel().getCoordBusinessModel().getLon());
-        cityDBModel.setName(weather.getCityBusinessModel().getName());
-        cityDBModel.setCountry(weather.getCityBusinessModel().getCountry());
-        cityDBModel.setId(weather.getCityBusinessModel().getId());
-        cityDBModel.setCoordDBModel(coordDBModel);
-
-        //SET CITYDB MODEL IN WEATHERDBMODEL
-        weatherDBModel.setCityDBModel(cityDBModel);
-
-
-        List<WeatherListDBModel> weatherListDBModel = new ArrayList<>();
-        for (int i = 0; i < weather.getWeatherListBusinessModel().size(); i++) {
-
-            WeatherListDBModel dbModel = new WeatherListDBModel();
-            dbModel.setDt(weather.getWeatherListBusinessModel().get(i).getDt());
-
-            MainDBModel mainDBModel = new MainDBModel();
-            mainDBModel.setHumidity(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getHumidity());
-            mainDBModel.setTemp(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTemp());
-            mainDBModel.setTempMax(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTempMax());
-            mainDBModel.setTempMin(weather.getWeatherListBusinessModel().get(i).getMainBusinessModel().getTempMin());
-            dbModel.setMainDBModel(mainDBModel);
-
-            CloudsDBModel cloudsDBModel = new CloudsDBModel();
-            cloudsDBModel.setAll(weather.getWeatherListBusinessModel().get(i).getCloudsBusinessModel().getAll());
-            dbModel.setCloudsDBModel(cloudsDBModel);
-
-            WindDBModel windDBModel = new WindDBModel();
-            windDBModel.setDeg(weather.getWeatherListBusinessModel().get(i).getWindBusinessModel().getDeg());
-            windDBModel.setSpeed(weather.getWeatherListBusinessModel().get(i).getWindBusinessModel().getSpeed());
-            dbModel.setWindDBModel(windDBModel);
-
-            SysDBModel sysDBModel = new SysDBModel();
-            sysDBModel.setPod(weather.getWeatherListBusinessModel().get(i).getSysBusinessModel().getPod());
-            dbModel.setSysDBModel(sysDBModel);
-
-            List<WeatherInfoDBModel> weatherInfoDBModelList = new ArrayList<>();
-            WeatherInfoDBModel infoDBModel = new WeatherInfoDBModel();
-            infoDBModel.setIcon(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getIcon());
-            infoDBModel.setDescription(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getDescription());
-            infoDBModel.setId(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getId());
-            infoDBModel.setMain(weather.getWeatherListBusinessModel().get(i).getWeatherInfoBusinessModel().get(0).getMain());
-            weatherInfoDBModelList.add(infoDBModel);
-
-            dbModel.setWeatherInfoDBModel(weatherInfoDBModelList);
-            weatherListDBModel.add(dbModel);
-        }
-
-        //SET WEATHERLISTDBMODEL IN WEATHERDBMODEL
-        weatherDBModel.setWeatherListDBModel(weatherListDBModel);
-
-        return weatherDBModel;
-    }
-
-    public static CurrentWeatherDBModel convertCurrentWeatherBusinessModelToCurrentWeatherDBModel(CurrentWeatherBusinessModel
-                                                                                                          currentWeatherBusinessModel) {
-        //CONVERT BUSINESS MODEL CLASS TO DB MODEL CLASS
-        CurrentWeatherDBModel currentWeatherDBModel = new CurrentWeatherDBModel();
-
-        currentWeatherDBModel.setName(currentWeatherBusinessModel.getName());
-        currentWeatherDBModel.setId(currentWeatherBusinessModel.getId());
-        currentWeatherDBModel.setDt(currentWeatherBusinessModel.getDt());
-
-        CurrentWeatherCoordDBModel coordDBModel = new CurrentWeatherCoordDBModel();
-        coordDBModel.setLat(currentWeatherBusinessModel.getCurrentWeatherCoordBusinessModel().getLat());
-        coordDBModel.setLon(currentWeatherBusinessModel.getCurrentWeatherCoordBusinessModel().getLon());
-        currentWeatherDBModel.setCurrentWeatherCoordDBModel(coordDBModel);
-
-        CurrentWeatherMainDBModel mainDBModel = new CurrentWeatherMainDBModel();
-        mainDBModel.setHumidity(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getHumidity());
-        mainDBModel.setTempMax(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getTempMax());
-        mainDBModel.setTempMin(currentWeatherBusinessModel.getCurrentWeatherMainBusinessModel().getTempMin());
-        currentWeatherDBModel.setCurrentWeatherMainDBModel(mainDBModel);
-
-        CurrentWeatherWindDBModel windDBModel = new CurrentWeatherWindDBModel();
-        windDBModel.setSpeed(currentWeatherBusinessModel.getCurrentWeatherWindBusinessModel().getSpeed());
-        currentWeatherDBModel.setCurrentWeatherWindDBModel(windDBModel);
-
-        CurrentWeatherSysDBModel sysDBModel = new CurrentWeatherSysDBModel();
-        sysDBModel.setCountry(currentWeatherBusinessModel.getCurrentWeatherSysBusinessModel().getCountry());
-        currentWeatherDBModel.setCurrentWeatherSysDBModel(sysDBModel);
-
-        CurrentWeatherCloudsDBModel cloudsDBModel = new CurrentWeatherCloudsDBModel();
-        cloudsDBModel.setAll(currentWeatherBusinessModel.getCurrentWeatherCloudsBusinessModel().getAll());
-        currentWeatherDBModel.setCurrentWeatherCloudsDBModel(cloudsDBModel);
-
-        List<CurrentWeatherInfoDBModel> weatherInfoDBModelList = new ArrayList<>();
-        for(CurrentWeatherInfoBusinessModel infoBusinessModel: currentWeatherBusinessModel.getCurrentWeatherInfoBusinessModel()){
-            CurrentWeatherInfoDBModel infoDBModel = new CurrentWeatherInfoDBModel();
-            infoDBModel.setDescription(infoBusinessModel.getDescription());
-            infoDBModel.setIcon(infoBusinessModel.getIcon());
-            infoDBModel.setWeatherId(infoBusinessModel.getWeatherId());
-            weatherInfoDBModelList.add(infoDBModel);
-        }
-        currentWeatherDBModel.setCurrentWeatherInfoDBModel(weatherInfoDBModelList);
-
-        return currentWeatherDBModel;
-    }
-*/
 
     public static List<ForecastWeather> getListOfForecastWeatherFromDownloadedDataToStoreIntoDB(WeatherApiModel weather) {
 
@@ -686,8 +455,19 @@ public class Utils {
 
     public static List<WeatherListBusinessModel> convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(List<ForecastWeather> forecastWeathers) {
         List<WeatherListBusinessModel> mWeatherListBusinessModels = new ArrayList<>();
+
+        //GET TODAY'S DATE
+        Date currentDate = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+
+        //GET TOMORROW'S DATE
+        Date tomorrow = getNextDate(currentDate);
+
         for(ForecastWeather mForecastWeather: forecastWeathers){
-            mWeatherListBusinessModels.add(new WeatherListBusinessModel(mForecastWeather));
+            if(sdf.format(tomorrow).equals(sdf.format(new Date((long) (mForecastWeather.date*1000L))))){
+                mWeatherListBusinessModels.add(new WeatherListBusinessModel(mForecastWeather));
+                tomorrow = getNextDate(tomorrow);
+            }
         }
         return mWeatherListBusinessModels;
     }
