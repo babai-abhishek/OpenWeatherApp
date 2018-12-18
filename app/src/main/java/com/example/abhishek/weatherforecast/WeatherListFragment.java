@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -286,29 +287,36 @@ public class WeatherListFragment extends Fragment
             new AsyncTask<Void, Void, List<IWeatherDetails>>() {
                 @Override
                 protected List<IWeatherDetails> doInBackground(Void... voids) {
-
+                    List<IWeatherDetails> availableData = new ArrayList<>();
                     //check currentWeather table
-                    WeatherDatabase mWeatherDatabase = WeatherDatabase.getInstance(getActivity());
+                    WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
 
-                    List<CurrentWeather> mCurrentWeathers = mWeatherDatabase
+                    List<CurrentWeather> mCurrentWeathers = weatherDatabase
                             .getCurrentWeatherDao()
                             .getAllCurrentWeathers();
-                    for (int i = 0; i < mCurrentWeathers.size(); i++) {
-                        if(Utils.convertUtcToDate(mCurrentWeathers.get(i).date) == Utils.getCurrentDate()){
-                            if (mCurrentWeathers.get(i).cityName.equalsIgnoreCase(LOCATION)) {
-                                //show on list
-                                CurrentWeather mWeather = mCurrentWeathers.get(i);
-                                mCurrentWeatherBusinessModel = Utils.
-                                        convertCurrentWeatherDbToCurrentWeatherBusinessModel(mWeather);
+                    if(mCurrentWeathers.size()>0) {
+                        for (int i = 0; i < mCurrentWeathers.size(); i++) {
+                            if (Utils.convertUtcToDate(mCurrentWeathers.get(i).date).equals(Utils.getCurrentDate())) {
+                                if (mCurrentWeathers.get(i).cityName.equalsIgnoreCase(Utils.getCityFromLocation(LOCATION))) {
+                                    //show on list
+                                    CurrentWeather mWeather = mCurrentWeathers.get(i);
+                                    CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = Utils.
+                                            convertCurrentWeatherDbToCurrentWeatherBusinessModel(mWeather);
+                                    availableData.add(mCurrentWeatherBusinessModel);
+                                    List<ForecastWeather> mForecastWeatherList = weatherDatabase.getForecastWeatherDao().getAllforecastWeathersById(mCurrentWeathers.get(i).cityId);
+                                    List<WeatherListBusinessModel> mWeatherListBusinessModelList = Utils
+                                            .convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(mForecastWeatherList);
+                                    for (WeatherListBusinessModel weather : mWeatherListBusinessModelList) {
+                                        availableData.add(weather);
+                                    }
+
+                                }
+                            } else {
+                                //delete old data
+                                weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
                             }
-                        }else{
-                            //delete old data
                         }
-
                     }
-
-
-                    List<IWeatherDetails> availableData = Utils.checkCurrentDataForCity(LOCATION, getActivity());
                     return availableData;
                 }
 

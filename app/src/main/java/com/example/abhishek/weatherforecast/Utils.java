@@ -419,6 +419,14 @@ public class Utils {
         return mWeatherListBusinessModels;
     }
 
+    public static String getCityFromLocation(String location) {
+
+        String[] cityWithCountry = location.split(",");
+        String city = Utils.formantCity(cityWithCountry[0].trim());
+
+        return formantCity(city);
+    }
+
     public static class NotificationUtils {
 
         private static final int CURRENT_WEATHER_NOTIFICATION_ID = 1138;
