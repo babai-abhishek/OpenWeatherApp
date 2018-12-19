@@ -3,6 +3,7 @@ package com.example.abhishek.weatherforecast.Model.dbUtils;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
@@ -17,7 +18,8 @@ import java.util.List;
 
 @Dao
 public interface ForecastWeatherDao {
-    @Insert
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(List<ForecastWeather> forecastWeatherList);
 
     @Update
@@ -25,6 +27,9 @@ public interface ForecastWeatherDao {
 
     @Delete
     void delete(ForecastWeather forecastWeathers);
+
+    @Query("DELETE FROM forecastWeather WHERE cityId = :id")
+    void deleteById(int id);
 
     @Query("SELECT * FROM forecastWeather")
     List<ForecastWeather> getAllforecastWeathers();

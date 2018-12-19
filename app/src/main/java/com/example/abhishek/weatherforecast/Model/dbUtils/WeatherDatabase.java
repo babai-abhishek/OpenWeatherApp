@@ -9,7 +9,7 @@ import com.example.abhishek.weatherforecast.Model.models.currentWeatherModels.cu
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 @Database(entities = { CurrentWeather.class, ForecastWeather.class },
-        version = 4)
+        version = 6)
 public abstract class WeatherDatabase extends RoomDatabase {
 
     private static final String DB_NAME = "weatherDatabase.db";
@@ -26,7 +26,7 @@ public abstract class WeatherDatabase extends RoomDatabase {
         return Room.databaseBuilder(
                 context,
                 WeatherDatabase.class,
-                DB_NAME).build();
+                DB_NAME).fallbackToDestructiveMigration().build();
     }
 
     public abstract CurrentWeatherDao getCurrentWeatherDao();

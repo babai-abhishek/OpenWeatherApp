@@ -16,8 +16,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         primaryKeys = { "cityId", "date" },
         foreignKeys = @ForeignKey(entity = CurrentWeather.class,
         parentColumns = "cityId",
-        childColumns = "cityId",
-        onDelete = CASCADE))
+        childColumns = "cityId"))
 
 public class ForecastWeather {
 

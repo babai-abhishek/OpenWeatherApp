@@ -1,6 +1,9 @@
 
 package com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherBusiness;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.example.abhishek.weatherforecast.IWeatherDetails;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherInfoApiModel;
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherApi.WeatherListApiModel;
@@ -8,7 +11,7 @@ import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.f
 
 import java.util.ArrayList;
 
-public class WeatherListBusinessModel implements IWeatherDetails {
+public class WeatherListBusinessModel implements IWeatherDetails, Parcelable {
 
     private long dt;
     private MainBusinessModel mainBusinessModel;
@@ -54,6 +57,22 @@ public class WeatherListBusinessModel implements IWeatherDetails {
 
     }
 
+    protected WeatherListBusinessModel(Parcel in) {
+        dt = in.readLong();
+    }
+
+    public static final Creator<WeatherListBusinessModel> CREATOR = new Creator<WeatherListBusinessModel>() {
+        @Override
+        public WeatherListBusinessModel createFromParcel(Parcel in) {
+            return new WeatherListBusinessModel(in);
+        }
+
+        @Override
+        public WeatherListBusinessModel[] newArray(int size) {
+            return new WeatherListBusinessModel[size];
+        }
+    };
+
     public long getDt() {
         return dt;
     }
@@ -78,4 +97,13 @@ public class WeatherListBusinessModel implements IWeatherDetails {
         this.weatherInfoBusinessModel = weatherInfoBusinessModel;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(dt);
+    }
 }
