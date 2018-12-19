@@ -8,13 +8,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -58,7 +58,6 @@ public class WeatherListFragment extends Fragment
     ProgressDialog mProgressDialog;
 
     //LIST FOR STORING INFORMATION ABOUT WEATHER FORECAST EXCLUDING TODAY
-    List<WeatherListApiModel> weatherListFromTomorrow = new ArrayList<>();
     List<IWeatherDetails> iWeatherDetailsList = new ArrayList<>();
 
     //VARIABLES FOR SHOWING LIST
@@ -265,6 +264,8 @@ public class WeatherListFragment extends Fragment
 
         showLoading();
 
+        deleteOldData();
+
         //CHECK INTERNET CONNECTION AVAILABLE (YES/NO ?)
         boolean isInternetAvailAble = NetworkConnectivityReceiver.isConnected();
 
@@ -276,48 +277,33 @@ public class WeatherListFragment extends Fragment
 
             if (iWeatherDetailsList.size() > 0)
                 iWeatherDetailsList.clear();
-            //LOAD FORECAST INFO
-            WeatherDownloadTask.loadWeatherForecast(getContext());
 
-            //LOAD CURRENT INFO
-            WeatherDownloadTask.loadCurrentWeather(getContext(), false);
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    //CHECK LOCATION ALREADY PRESENT IN DB OR NOT
+                    List<IWeatherDetails> availableData = checkCurrentLocationPresentInDb();
+
+                    if (availableData.size() == 0) {
+
+                        //LOAD FORECAST INFO
+                        WeatherDownloadTask.loadWeatherForecast(getContext());
+
+                    }
+                    //LOAD CURRENT INFO
+                    WeatherDownloadTask.loadCurrentWeather(getContext(), false);
+
+                    return null;
+                }
+            }.execute();
+
 
         } else {
 
             new AsyncTask<Void, Void, List<IWeatherDetails>>() {
                 @Override
                 protected List<IWeatherDetails> doInBackground(Void... voids) {
-                    List<IWeatherDetails> availableData = new ArrayList<>();
-                    //check currentWeather table
-                    WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
-
-                    List<CurrentWeather> mCurrentWeathers = weatherDatabase
-                            .getCurrentWeatherDao()
-                            .getAllCurrentWeathers();
-                    if(mCurrentWeathers.size()>0) {
-                        for (int i = 0; i < mCurrentWeathers.size(); i++) {
-                            if (Utils.convertUtcToDate(mCurrentWeathers.get(i).date).equals(Utils.getCurrentDate())) {
-                                if (mCurrentWeathers.get(i).cityName.equalsIgnoreCase(Utils.getCityFromLocation(LOCATION))) {
-                                    //show on list
-                                    CurrentWeather mWeather = mCurrentWeathers.get(i);
-                                    CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = Utils.
-                                            convertCurrentWeatherDbToCurrentWeatherBusinessModel(mWeather);
-                                    availableData.add(mCurrentWeatherBusinessModel);
-                                    List<ForecastWeather> mForecastWeatherList = weatherDatabase.getForecastWeatherDao().getAllforecastWeathersById(mCurrentWeathers.get(i).cityId);
-                                    List<WeatherListBusinessModel> mWeatherListBusinessModelList = Utils
-                                            .convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(mForecastWeatherList);
-                                    for (WeatherListBusinessModel weather : mWeatherListBusinessModelList) {
-                                        availableData.add(weather);
-                                    }
-
-                                }
-                            } else {
-                                //delete old data
-                                weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
-                            }
-                        }
-                    }
-                    return availableData;
+                    return checkCurrentLocationPresentInDb();
                 }
 
                 @Override
@@ -340,6 +326,61 @@ public class WeatherListFragment extends Fragment
             Utils.syncCurrentWeatherData(getContext());
             alarmAlreadyStarted = true;
         }
+
+    }
+
+    @NonNull
+    private List<IWeatherDetails> checkCurrentLocationPresentInDb() {
+        List<IWeatherDetails> availableData = new ArrayList<>();
+        //check currentWeather table
+        WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
+
+        List<CurrentWeather> mCurrentWeathers = weatherDatabase
+                .getCurrentWeatherDao()
+                .getAllCurrentWeathers();
+        if (mCurrentWeathers.size() > 0) {
+            for (int i = 0; i < mCurrentWeathers.size(); i++) {
+                if (mCurrentWeathers.get(i).cityName.equalsIgnoreCase(Utils.getCityFromLocation(LOCATION))) {
+                    //show on list
+                    CurrentWeather mWeather = mCurrentWeathers.get(i);
+                    CurrentWeatherBusinessModel mCurrentWeatherBusinessModel = Utils.
+                            convertCurrentWeatherDbToCurrentWeatherBusinessModel(mWeather);
+                    availableData.add(mCurrentWeatherBusinessModel);
+                    List<ForecastWeather> mForecastWeatherList = weatherDatabase.getForecastWeatherDao().getAllforecastWeathersById(mCurrentWeathers.get(i).cityId);
+                    List<WeatherListBusinessModel> mWeatherListBusinessModelList = Utils
+                            .convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(mForecastWeatherList);
+                    for (WeatherListBusinessModel weather : mWeatherListBusinessModelList) {
+                        availableData.add(weather);
+                    }
+
+                }
+            }
+        }
+        return availableData;
+    }
+
+    private void deleteOldData() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                //check currentWeather table
+                WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
+
+                List<CurrentWeather> mCurrentWeathers = weatherDatabase
+                        .getCurrentWeatherDao()
+                        .getAllCurrentWeathers();
+                if (mCurrentWeathers.size() > 0) {
+                    for (int i = 0; i < mCurrentWeathers.size(); i++) {
+                        if (!Utils.convertUtcToDate(mCurrentWeathers.get(i).date).equals(Utils.getCurrentDate())) {
+                            //delete old data
+                            weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
+                        }
+                    }
+                }
+                return null;
+            }
+
+        }.execute();
 
     }
 
