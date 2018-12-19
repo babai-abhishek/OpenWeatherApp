@@ -43,14 +43,12 @@ public class WeatherListFragment extends Fragment
         implements NetworkConnectivityReceiver.ConnectivityReceiverListener {
 
     public static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
-    public static final String ACTION_LOAD_WEATHER_FORECAST_DOWNLOAD_FROM_DB_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.db.weatherforecast.result.success";
     public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
     public static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
     public static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
     public static final String ACTION_PERIODIC_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.periodic.currentweather.result.success";
     public static final String ACTION_CURRENT_WEATHER_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.fail";
     public static final String KEY_WEATHER_FORECAST = "weather_forecast";
-    public static final String KEY_WEATHER_FORECAST_FROM_DB = "weather_forecast";
     public static final String KEY_CURRENT_WEATHER = "currentWeather";
     public static String LOCATION;
     SettingsOptionClickListener clickListener;
@@ -126,34 +124,6 @@ public class WeatherListFragment extends Fragment
 
                     break;
 
-                case ACTION_LOAD_WEATHER_FORECAST_DOWNLOAD_FROM_DB_SUCCESS:
-                    isOnline = NetworkConnectivityReceiver.isConnected();
-                    Toast.makeText(getActivity(), "Weather forecast DB Success", Toast.LENGTH_SHORT).show();
-                    final List<WeatherListBusinessModel> weatherList = intent.getParcelableArrayListExtra(KEY_WEATHER_FORECAST_FROM_DB);
-
-                    if (!isOnline) {
-                        if (weatherList != null) {
-                            //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
-                            for (WeatherListBusinessModel weatherListBusinessModel : weatherList) {
-                                weatherDetailsForOffline.add(weatherListBusinessModel);
-                            }
-                        }
-                        adapter.setWeatherList(weatherDetailsForOffline);
-                    } else {
-                        if (weatherList != null) {
-                            //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
-                            for (WeatherListBusinessModel weatherListBusinessModel : weatherList) {
-                                iWeatherDetailsList.add(weatherListBusinessModel);
-                            }
-                        }
-                        adapter.setWeatherList(iWeatherDetailsList);
-                    }
-                    isWeatherForecastLoaded = true;
-                    postLoad();
-
-
-                    break;
-
                 case ACTION_CURRENT_WEATHER_API_SUCCESS:
                     Toast.makeText(getActivity(), "Current weather Api Success", Toast.LENGTH_SHORT).show();
                     final CurrentWeatherApiModel currentWeatherApiModel = intent.getParcelableExtra(KEY_CURRENT_WEATHER);
@@ -164,8 +134,6 @@ public class WeatherListFragment extends Fragment
                         @Override
                         protected CurrentWeatherBusinessModel doInBackground(Void... voids) {
                             if (currentWeatherApiModel != null) {
-
-                                WeatherDatabase mWeatherDatabase = WeatherDatabase.getInstance(getActivity());
 
                                 //INSERT CURRENT WEATHER INTO DATABASE
                                 CurrentWeather mCurrentWeather = Utils.
@@ -289,7 +257,6 @@ public class WeatherListFragment extends Fragment
         filter.addAction(ACTION_CURRENT_WEATHER_API_SUCCESS);
         filter.addAction(ACTION_CURRENT_WEATHER_API_FAILURE);
         filter.addAction(ACTION_WEATHER_FORECAST_API_SUCCESS);
-        filter.addAction(ACTION_LOAD_WEATHER_FORECAST_DOWNLOAD_FROM_DB_SUCCESS);
         filter.addAction(ACTION_WEATHER_FORECAST_API_FAILURE);
         broadcastManager.registerReceiver(broadcastReceiver, filter);
 
@@ -333,8 +300,8 @@ public class WeatherListFragment extends Fragment
                 @Override
                 protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
                     super.onPostExecute(weatherListBusinessModels);
-                    //      deleteOldData();
-                    if(weatherListBusinessModels!=null) {
+                    deleteOldData();
+                    if (weatherListBusinessModels != null) {
                         for (WeatherListBusinessModel mWeatherListBusinessModel : weatherListBusinessModels) {
                             iWeatherDetailsList.add(mWeatherListBusinessModel);
                         }
@@ -361,16 +328,19 @@ public class WeatherListFragment extends Fragment
                 @Override
                 protected void onPostExecute(CurrentWeatherBusinessModel weatherDetails) {
                     super.onPostExecute(weatherDetails);
+                    deleteOldData();
                     if (weatherDetails != null) {
-                        weatherDetailsForOffline.add(weatherDetails);
-                        loadForecastDataFromDB(weatherDetails.getId());
+                        weatherDetailsForOffline.add(0, weatherDetails);
+                        List<WeatherListBusinessModel> mWeatherListBusinessModels = loadForecastDataFromDB(weatherDetails.getId());
+                        for (WeatherListBusinessModel weather : mWeatherListBusinessModels) {
+                            weatherDetailsForOffline.add(weather);
+                        }
                     }
                     //CHECK DATA AVAILABLE IN DB
                     adapter.setWeatherList(weatherDetailsForOffline);
                     isCurrentWeatherLoaded = true;
                     isWeatherForecastLoaded = true;
                     postLoad();
-                    //     deleteOldData();
 
                 }
             }.execute();
@@ -389,12 +359,7 @@ public class WeatherListFragment extends Fragment
     private List<WeatherListBusinessModel> loadForecastDataFromDB(final int cityId) {
 
 
-        //   new AsyncTask<Void, Void, List<WeatherListBusinessModel>>() {
         List<WeatherListBusinessModel> mWeatherListBusinessModelList;
-
-       /*     @Override
-            protected List<WeatherListBusinessModel> doInBackground(Void... voids) {
-*/
         //GET DATA FROM DB
         List<ForecastWeather> mForecastWeathers = mDbInstance
                 .getForecastWeatherDao()
@@ -403,22 +368,6 @@ public class WeatherListFragment extends Fragment
                 .convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(mForecastWeathers);
 
         return mWeatherListBusinessModelList;
-           /* }
-
-            @Override
-            protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
-                super.onPostExecute(weatherListBusinessModels);
-
-                if (weatherListBusinessModels != null) {
-                    final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-                    Intent intent = new Intent(ACTION_LOAD_WEATHER_FORECAST_DOWNLOAD_FROM_DB_SUCCESS);
-                    intent.putParcelableArrayListExtra(KEY_WEATHER_FORECAST_FROM_DB, (ArrayList<? extends Parcelable>) weatherListBusinessModels);
-                    broadcastManager.sendBroadcast(intent);
-
-                }
-
-            }
-        }.execute();*/
     }
 
     private CurrentWeatherBusinessModel checkCurrentLocationPresentInDb() {
@@ -439,7 +388,6 @@ public class WeatherListFragment extends Fragment
         return availableData;
     }
 
-/*
     private void deleteOldData() {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -465,7 +413,6 @@ public class WeatherListFragment extends Fragment
         }.execute();
 
     }
-*/
 
     @Override
     public void onPause() {

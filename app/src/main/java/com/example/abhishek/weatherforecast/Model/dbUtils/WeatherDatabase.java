@@ -26,7 +26,7 @@ public abstract class WeatherDatabase extends RoomDatabase {
         return Room.databaseBuilder(
                 context,
                 WeatherDatabase.class,
-                DB_NAME).fallbackToDestructiveMigration().build();
+                DB_NAME).fallbackToDestructiveMigration().allowMainThreadQueries().build();
     }
 
     public abstract CurrentWeatherDao getCurrentWeatherDao();
