@@ -300,7 +300,7 @@ public class WeatherListFragment extends Fragment
                 @Override
                 protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
                     super.onPostExecute(weatherListBusinessModels);
-                    deleteOldData();
+//                    deleteOldData();
                     if (weatherListBusinessModels != null) {
                         for (WeatherListBusinessModel mWeatherListBusinessModel : weatherListBusinessModels) {
                             iWeatherDetailsList.add(mWeatherListBusinessModel);
@@ -371,6 +371,7 @@ public class WeatherListFragment extends Fragment
     }
 
     private CurrentWeatherBusinessModel checkCurrentLocationPresentInDb() {
+        deleteOldData();
         CurrentWeatherBusinessModel availableData = null;
         //check currentWeather table
         List<CurrentWeather> mCurrentWeathers = mDbInstance
@@ -389,9 +390,9 @@ public class WeatherListFragment extends Fragment
     }
 
     private void deleteOldData() {
-        new AsyncTask<Void, Void, Void>() {
+      /*  new AsyncTask<Void, Void, Void>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            protected Void doInBackground(Void... voids) {*/
                 //check currentWeather table
                 WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
 
@@ -402,15 +403,15 @@ public class WeatherListFragment extends Fragment
                     for (int i = 0; i < mCurrentWeathers.size(); i++) {
                         if (!Utils.convertUtcToDate(mCurrentWeathers.get(i).date).equals(Utils.getCurrentDate())) {
                             //delete old data
-                            weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
                             weatherDatabase.getForecastWeatherDao().deleteById(mCurrentWeathers.get(i).cityId);
+                            weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
                         }
                     }
                 }
-                return null;
+           /*     return null;
             }
 
-        }.execute();
+        }.execute();*/
 
     }
 
