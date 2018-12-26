@@ -337,7 +337,9 @@ public class WeatherListFragment extends Fragment
                     deleteOldData();
                     if (weatherDetails != null) {
                         weatherDetailsForOffline.add(0, weatherDetails);
-//                        populateForecastWeatherIntoList(loadForecastDataFromDB(weatherDetails.getId());
+                        populateForecastWeatherIntoList(loadForecastDataFromDB(weatherDetails.getId()));
+                    }else {
+                        forecastWeatherRecyclerView.setVisibility(View.GONE);
                     }
                     //CHECK DATA AVAILABLE IN DB
                     adapter.setWeatherList(weatherDetailsForOffline);
