@@ -116,6 +116,8 @@ public class WeatherListFragment extends Fragment
                             if (weatherListBusinessModels != null) {
                                 populateForecastWeatherIntoList(weatherListBusinessModels);
 
+                            }else {
+                                forecastWeatherRecyclerView.setVisibility(View.GONE);
                             }
 
                             isWeatherForecastLoaded = true;
@@ -496,6 +498,11 @@ public class WeatherListFragment extends Fragment
     }
 
     private void populateForecastWeatherIntoList(List<WeatherListBusinessModel> weatherListBusinessModels) {
+
+        if(forecastWeatherRecyclerView.getVisibility() == View.GONE){
+            forecastWeatherRecyclerView.setVisibility(View.VISIBLE);
+        }
+
         List<WeatherListBusinessModel> mWeatherListBusinessModelList = weatherListBusinessModels;
         LinkedHashMap<String, List<WeatherListBusinessModel>> mMap = new LinkedHashMap<>();
         for (WeatherListBusinessModel mWeatherListBusinessModel : mWeatherListBusinessModelList) {
@@ -514,6 +521,7 @@ public class WeatherListFragment extends Fragment
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         forecastWeatherRecyclerView.setLayoutManager(layoutManager);
         forecastWeatherRecyclerView.setHasFixedSize(true);
+        mForecastAdapter.notifyDataSetChanged();
         forecastWeatherRecyclerView.setAdapter(mForecastAdapter);
     }
 }
