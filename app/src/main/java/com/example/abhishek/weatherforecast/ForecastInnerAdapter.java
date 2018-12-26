@@ -40,11 +40,7 @@ public class ForecastInnerAdapter extends RecyclerView.Adapter<ForecastInnerAdap
 
         double highInCelsius = list.get(position).getMainBusinessModel().getTempMax();
         String highString = Utils.formatTemperature(context, highInCelsius);
-        String highA11y = context.getString(R.string.a11y_high_temp, highString);
-
         holder.tv_forecast_update_temperature.setText(highString);
-        holder.tv_forecast_update_temperature.setText(highA11y);
-
         holder.tv_forecast_update_weather_description.setText(list.get(position).getWeatherInfoBusinessModel().get(0).getDescription());
         holder.tv_weather_update_time.setText(Utils.getTime(context,list.get(position).getDt()));
 
