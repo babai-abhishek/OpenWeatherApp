@@ -14,14 +14,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SnapHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 
@@ -34,7 +35,6 @@ import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.f
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -67,8 +67,8 @@ public class WeatherListFragment extends Fragment
     private LocalBroadcastManager broadcastManager = null;
     private boolean isCurrentWeatherLoaded = false,
             isWeatherForecastLoaded = false;
-    private RecyclerView recyclerView;
-    RecyclerView recyclerview_forecast;
+    private RecyclerView currentWeatherRecyclerView;
+    RecyclerView forecastWeatherRecyclerView;
     private CoordinatorLayout list_layout;
 
     //  NetworkConnectivityReceiver connectivityReceiverListener;
@@ -115,8 +115,9 @@ public class WeatherListFragment extends Fragment
 
                             if (weatherListBusinessModels != null) {
                                 populateForecastWeatherIntoList(weatherListBusinessModels);
+
                             }
-                            //      adapter.setWeatherList(iWeatherDetailsList);
+
                             isWeatherForecastLoaded = true;
                             postLoad();
 
@@ -236,8 +237,8 @@ public class WeatherListFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather_list, container, false);
         list_layout = view.findViewById(R.id.list_layout);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_current);
-        recyclerview_forecast = view.findViewById(R.id.recyclerview_forecast);
+        currentWeatherRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_current);
+        forecastWeatherRecyclerView = view.findViewById(R.id.recyclerview_forecast);
 
         mProgressDialog = new ProgressDialog(getActivity());
         mProgressDialog.setIndeterminate(true);
@@ -245,9 +246,12 @@ public class WeatherListFragment extends Fragment
         mProgressDialog.setCancelable(false);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);
+        currentWeatherRecyclerView.setLayoutManager(layoutManager);
+        currentWeatherRecyclerView.setHasFixedSize(true);
+        currentWeatherRecyclerView.setAdapter(adapter);
+        SnapHelper snapHelper = new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(currentWeatherRecyclerView);
+
         return view;
     }
 
@@ -305,10 +309,10 @@ public class WeatherListFragment extends Fragment
                     deleteOldData();
                     if (weatherListBusinessModels != null) {
                         populateForecastWeatherIntoList(weatherListBusinessModels);
+
+                        isWeatherForecastLoaded = true;
+                        postLoad();
                     }
-                    //      adapter.setWeatherList(iWeatherDetailsList);
-                    isWeatherForecastLoaded = true;
-                    postLoad();
 
                 }
             }.execute();
@@ -508,8 +512,8 @@ public class WeatherListFragment extends Fragment
         }
         ForecastAdapter mForecastAdapter = new ForecastAdapter(mMap, getContext());
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(mForecastAdapter);
+        forecastWeatherRecyclerView.setLayoutManager(layoutManager);
+        forecastWeatherRecyclerView.setHasFixedSize(true);
+        forecastWeatherRecyclerView.setAdapter(mForecastAdapter);
     }
 }
