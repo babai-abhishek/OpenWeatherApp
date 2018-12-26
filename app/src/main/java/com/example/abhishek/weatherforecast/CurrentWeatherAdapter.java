@@ -24,7 +24,7 @@ import java.util.List;
  * Created by abhishek on 28/7/18.
  */
 
-public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+public class CurrentWeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private final Context mContext;
     private List<IWeatherDetails> iWeatherDetailsList;
@@ -36,7 +36,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private boolean mUseTodayLayout;
     private boolean isLoading = false;
 
-    public WeatherAdapter(@NonNull Context context, List<IWeatherDetails> iWeatherDetails) {
+    public CurrentWeatherAdapter(@NonNull Context context, List<IWeatherDetails> iWeatherDetails) {
         this.mContext = context;
         this.iWeatherDetailsList = iWeatherDetails;
         this.mUseTodayLayout = mContext.getResources().getBoolean(R.bool.use_today_layout);
@@ -55,14 +55,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 layoutId = R.layout.current_weather_list_item;
                 view = inflater.inflate(layoutId, parent, false);
                 return new CurrentWeatherViewHolder(view);
-            }
+            }/*
 
             case VIEW_TYPE_FUTURE_DAY: {
-                layoutId = R.layout.forecast_weather_list_item;
+                layoutId = R.layout.forecast_weather_list;
                 view = inflater.inflate(layoutId, parent, false);
                 return new ForecastWeatherViewHolder(view);
             }
-
+*/
             default:
                 view = inflater.inflate(R.layout.weather_list_item_empty,
                         parent, false);
@@ -84,10 +84,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         else if (holder instanceof CurrentWeatherViewHolder) {
             IWeatherDetails item = iWeatherDetailsList.get(position);
             ((CurrentWeatherViewHolder) holder).bind((CurrentWeatherBusinessModel) item);
-        } else if(holder instanceof ForecastWeatherViewHolder){
+        } /*else if(holder instanceof ForecastWeatherViewHolder){
             IWeatherDetails item = iWeatherDetailsList.get(position);
             ((ForecastWeatherViewHolder) holder).bind((WeatherListBusinessModel) item);
-        }
+        }*/
     }
 
     @Override
@@ -102,8 +102,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if(iWeatherDetailsList.size() < 1 || isLoading()){
             return VIEW_TYPE_EMPTY;
+        }else {
+            return VIEW_TYPE_TODAY;
         }
-        else {
+        /*else {
             //CHECK TYPE OF DATA (CURRENT/FORECAST) FROM LIST
             if (position == 0 && iWeatherDetailsList.get(position) instanceof CurrentWeatherBusinessModel && mUseTodayLayout) {
                 return VIEW_TYPE_TODAY;
@@ -128,10 +130,11 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 forecastWeather.setWeatherInfoBusinessModel(infoModels);
                 iWeatherDetailsList.set(0, forecastWeather);
                 return VIEW_TYPE_FUTURE_DAY;
-            } else {
+            } *//*else {
                 return VIEW_TYPE_FUTURE_DAY;
-            }
-        }
+            }*//*
+        }*/
+
     }
 
     public void setWeatherList(List<IWeatherDetails> weatherList){
@@ -148,26 +151,35 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return isLoading;
     }
 
+/*
     class ForecastWeatherViewHolder extends RecyclerView.ViewHolder {
-        final TextView tv_forecast_weather_date;
+       */
+/* final TextView tv_forecast_weather_date;
         final TextView tv_forecast_weather_description;
         final TextView tv_forecast_weather_high_temperature;
         final TextView tv_forecast_weather_low_temperature;
-        final ImageView img_forecast_weather_icon;
+        final ImageView img_forecast_weather_icon;*//*
+
+
+       RecyclerView forecastRecyclerView;
 
         ForecastWeatherViewHolder(View view) {
             super(view);
-            img_forecast_weather_icon = view.findViewById(R.id.img_forecast_weather_icon);
+            forecastRecyclerView = view.findViewById(R.id.recyclerview_forecast_update);
+           */
+/* img_forecast_weather_icon = view.findViewById(R.id.img_forecast_weather_icon);
             tv_forecast_weather_date = view.findViewById(R.id.tv_forecast_weather_date);
             tv_forecast_weather_description = view.findViewById(R.id.tv_forecast_weather_description);
             tv_forecast_weather_high_temperature = view.findViewById(R.id.tv_forecast_weather_high_temperature);
             tv_forecast_weather_low_temperature = view.findViewById(R.id.tv_forecast_weather_low_temperature);
+*//*
 
         }
 
         void bind(WeatherListBusinessModel weatherListBusinessModel){
 
-            //SET DESC
+        */
+/*    //SET DESC
             String description = Utils.getStringForWeatherCondition(mContext, weatherListBusinessModel.getWeatherInfoBusinessModel().get(0).getId());
             String descriptionA11y = mContext.getString(R.string.a11y_forecast, description);
             tv_forecast_weather_description.setText(description);
@@ -200,9 +212,11 @@ public class WeatherAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             long dateInMillis = weatherListBusinessModel.getDt();
             String dateString = Utils.getDateString(mContext, dateInMillis);
             tv_forecast_weather_date.setText(dateString);
+*//*
 
         }
     }
+*/
 
     class CurrentWeatherViewHolder extends RecyclerView.ViewHolder{
 

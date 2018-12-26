@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -33,6 +34,8 @@ import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.f
 import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.forecastWeatherRoomDBEntity.ForecastWeather;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 
@@ -60,12 +63,13 @@ public class WeatherListFragment extends Fragment
     WeatherDatabase mDbInstance;
     boolean isOnline = false;
     //VARIABLES FOR SHOWING LIST
-    WeatherAdapter adapter;
+    CurrentWeatherAdapter adapter;
     private LocalBroadcastManager broadcastManager = null;
     private boolean isCurrentWeatherLoaded = false,
             isWeatherForecastLoaded = false;
     private RecyclerView recyclerView;
-    private FrameLayout list_layout;
+    RecyclerView recyclerview_forecast;
+    private CoordinatorLayout list_layout;
 
     //  NetworkConnectivityReceiver connectivityReceiverListener;
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -110,12 +114,9 @@ public class WeatherListFragment extends Fragment
                             super.onPostExecute(weatherListBusinessModels);
 
                             if (weatherListBusinessModels != null) {
-                                //ADD WEATHERLISTBUSINESSMODELS TO LIST FOR ADAPTER
-                                for (WeatherListBusinessModel weatherListBusinessModel : weatherListBusinessModels) {
-                                    iWeatherDetailsList.add(weatherListBusinessModel);
-                                }
+                                populateForecastWeatherIntoList(weatherListBusinessModels);
                             }
-                            adapter.setWeatherList(iWeatherDetailsList);
+                            //      adapter.setWeatherList(iWeatherDetailsList);
                             isWeatherForecastLoaded = true;
                             postLoad();
 
@@ -224,7 +225,7 @@ public class WeatherListFragment extends Fragment
 
         //  connectivityReceiverListener = new NetworkConnectivityReceiver(this);
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        adapter = new WeatherAdapter(getActivity(), iWeatherDetailsList);
+        adapter = new CurrentWeatherAdapter(getActivity(), iWeatherDetailsList);
         setHasOptionsMenu(true);
 
     }
@@ -235,7 +236,8 @@ public class WeatherListFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather_list, container, false);
         list_layout = view.findViewById(R.id.list_layout);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_forecast);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_current);
+        recyclerview_forecast = view.findViewById(R.id.recyclerview_forecast);
 
         mProgressDialog = new ProgressDialog(getActivity());
         mProgressDialog.setIndeterminate(true);
@@ -300,13 +302,11 @@ public class WeatherListFragment extends Fragment
                 @Override
                 protected void onPostExecute(List<WeatherListBusinessModel> weatherListBusinessModels) {
                     super.onPostExecute(weatherListBusinessModels);
-//                    deleteOldData();
+                    deleteOldData();
                     if (weatherListBusinessModels != null) {
-                        for (WeatherListBusinessModel mWeatherListBusinessModel : weatherListBusinessModels) {
-                            iWeatherDetailsList.add(mWeatherListBusinessModel);
-                        }
+                        populateForecastWeatherIntoList(weatherListBusinessModels);
                     }
-                    adapter.setWeatherList(iWeatherDetailsList);
+                    //      adapter.setWeatherList(iWeatherDetailsList);
                     isWeatherForecastLoaded = true;
                     postLoad();
 
@@ -331,10 +331,7 @@ public class WeatherListFragment extends Fragment
                     deleteOldData();
                     if (weatherDetails != null) {
                         weatherDetailsForOffline.add(0, weatherDetails);
-                        List<WeatherListBusinessModel> mWeatherListBusinessModels = loadForecastDataFromDB(weatherDetails.getId());
-                        for (WeatherListBusinessModel weather : mWeatherListBusinessModels) {
-                            weatherDetailsForOffline.add(weather);
-                        }
+//                        populateForecastWeatherIntoList(loadForecastDataFromDB(weatherDetails.getId());
                     }
                     //CHECK DATA AVAILABLE IN DB
                     adapter.setWeatherList(weatherDetailsForOffline);
@@ -393,21 +390,21 @@ public class WeatherListFragment extends Fragment
       /*  new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {*/
-                //check currentWeather table
-                WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
+        //check currentWeather table
+        WeatherDatabase weatherDatabase = WeatherDatabase.getInstance(getActivity());
 
-                List<CurrentWeather> mCurrentWeathers = weatherDatabase
-                        .getCurrentWeatherDao()
-                        .getAllCurrentWeathers();
-                if (mCurrentWeathers.size() > 0) {
-                    for (int i = 0; i < mCurrentWeathers.size(); i++) {
-                        if (!Utils.convertUtcToDate(mCurrentWeathers.get(i).date).equals(Utils.getCurrentDate())) {
-                            //delete old data
-                            weatherDatabase.getForecastWeatherDao().deleteById(mCurrentWeathers.get(i).cityId);
-                            weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
-                        }
-                    }
+        List<CurrentWeather> mCurrentWeathers = weatherDatabase
+                .getCurrentWeatherDao()
+                .getAllCurrentWeathers();
+        if (mCurrentWeathers.size() > 0) {
+            for (int i = 0; i < mCurrentWeathers.size(); i++) {
+                if (!Utils.convertUtcToDate(mCurrentWeathers.get(i).date).equals(Utils.getCurrentDate())) {
+                    //delete old data
+                    weatherDatabase.getForecastWeatherDao().deleteById(mCurrentWeathers.get(i).cityId);
+                    weatherDatabase.getCurrentWeatherDao().delete(mCurrentWeathers.get(i));
                 }
+            }
+        }
            /*     return null;
             }
 
@@ -494,4 +491,25 @@ public class WeatherListFragment extends Fragment
         void onSettingOptiionClicked(Fragment fragment);
     }
 
+    private void populateForecastWeatherIntoList(List<WeatherListBusinessModel> weatherListBusinessModels) {
+        List<WeatherListBusinessModel> mWeatherListBusinessModelList = weatherListBusinessModels;
+        LinkedHashMap<String, List<WeatherListBusinessModel>> mMap = new LinkedHashMap<>();
+        for (WeatherListBusinessModel mWeatherListBusinessModel : mWeatherListBusinessModelList) {
+            long date = mWeatherListBusinessModel.getDt();
+            String day = Utils.getDateString(getContext(), date);
+            if (mMap.containsKey(day)) {
+                List<WeatherListBusinessModel> availableList = mMap.get(day);
+                availableList.add(mWeatherListBusinessModel);
+            } else {
+                List<WeatherListBusinessModel> newList = new ArrayList<>();
+                newList.add(mWeatherListBusinessModel);
+                mMap.put(day, newList);
+            }
+        }
+        ForecastAdapter mForecastAdapter = new ForecastAdapter(mMap, getContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(mForecastAdapter);
+    }
 }

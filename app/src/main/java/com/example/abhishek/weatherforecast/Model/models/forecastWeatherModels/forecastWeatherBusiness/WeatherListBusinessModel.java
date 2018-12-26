@@ -11,7 +11,7 @@ import com.example.abhishek.weatherforecast.Model.models.forecastWeatherModels.f
 
 import java.util.ArrayList;
 
-public class WeatherListBusinessModel implements IWeatherDetails, Parcelable {
+public class WeatherListBusinessModel implements Parcelable {
 
     private long dt;
     private MainBusinessModel mainBusinessModel;
