@@ -45,9 +45,6 @@ public class CurrentWeatherBusinessModel implements IWeatherDetails{
         }
     }
 
-    public CurrentWeatherBusinessModel() {
-
-    }
 
     public List<CurrentWeatherInfoBusinessModel> getCurrentWeatherInfoBusinessModel() {
         return currentWeatherInfoBusinessModel;
