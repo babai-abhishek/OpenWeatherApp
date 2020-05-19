@@ -4,12 +4,9 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Created by abhishek on 19/7/18.
@@ -403,19 +401,9 @@ public class Utils {
     public static List<WeatherListBusinessModel> convertForecastWeatherDBModelsListToForecastWeatherBusinessModelsList(List<ForecastWeather> forecastWeathers) {
         List<WeatherListBusinessModel> mWeatherListBusinessModels = new ArrayList<>();
 
-        //GET TODAY'S DATE
-        Date currentDate = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-        //GET TOMORROW'S DATE
-        Date tomorrow = getNextDate(currentDate);
-
         for(ForecastWeather mForecastWeather: forecastWeathers){
-            if(sdf.format(tomorrow).equals(sdf.format(new Date((long) (mForecastWeather.date*1000L))))){
                 mWeatherListBusinessModels.add(new WeatherListBusinessModel(mForecastWeather));
-                tomorrow = getNextDate(tomorrow);
             }
-        }
         return mWeatherListBusinessModels;
     }
 
@@ -425,6 +413,16 @@ public class Utils {
         String city = Utils.formantCity(cityWithCountry[0].trim());
 
         return formantCity(city);
+    }
+
+    public static String getTime(Context context, long dt) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(TimeZone.getDefault());
+        calendar.setTimeInMillis(dt * 1000L);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("hh a");
+
+        return sdf.format(calendar.getTime());
     }
 
     public static class NotificationUtils {
@@ -482,13 +480,7 @@ public class Utils {
                     PendingIntent.FLAG_UPDATE_CURRENT
             );
         }
-/*
 
-        public static void showUpdatedData(Context context, CurrentWeatherBusinessModel cwBusinessModel) {
-            setNotification(context, "Weather Updated",
-                    "Current weather has changed. Open app for detailed weather information.", R.drawable.art_clear);
-        }
-*/
 
         public static void clearNotifications(Context context) {
             NotificationManager notificationManager = (NotificationManager) context
