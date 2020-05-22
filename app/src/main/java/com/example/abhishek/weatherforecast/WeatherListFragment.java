@@ -45,7 +45,7 @@ import java.util.List;
 public class WeatherListFragment extends Fragment
         implements NetworkConnectivityReceiver.ConnectivityReceiverListener {
 
-    public static final String OWM_API_KEY = "71ecdcdd6d04f99f1c06210c95011f10";
+    public static final String OWM_API_KEY = "";
     public static final String ACTION_WEATHER_FORECAST_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.success";
     public static final String ACTION_WEATHER_FORECAST_API_FAILURE = "com.example.abhishek.weatherforecast.weatherlistfragment.api.weatherforecast.result.fail";
     public static final String ACTION_CURRENT_WEATHER_API_SUCCESS = "com.example.abhishek.weatherforecast.weatherlistfragment.api.currentweather.result.success";
