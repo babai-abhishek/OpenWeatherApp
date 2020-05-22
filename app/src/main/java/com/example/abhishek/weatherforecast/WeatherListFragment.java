@@ -428,6 +428,7 @@ public class WeatherListFragment extends Fragment
         broadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.settings, menu);
